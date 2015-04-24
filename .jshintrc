@@ -1,0 +1,21 @@
+{
+  "browser": true,
+  "curly": true,
+  "devel": true,
+  "eqeqeq": true,
+  "forin" : true,
+  "freeze": true,
+  "funcscope": true,
+  "futurehostile": true,
+  "globals": {
+    "_": false
+  },
+  "latedef": true,
+  "noarg": true,
+  "nocomma": true,
+  "nonbsp": true,
+  "plusplus": true,
+  "strict": true,
+  "undef": true,
+  "unused": "strict"
+}

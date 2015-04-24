@@ -1,0 +1,6 @@
+{
+  "name": "yc3",
+  "dependencies": {
+    "lodash": "~3.7.0"
+  }
+}

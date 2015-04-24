@@ -1,0 +1,75 @@
+* {
+    -webkit-user-select: none;
+    user-select: none;
+}
+
+html,
+body {
+    height: 100%;
+}
+
+body {
+    margin: 0;
+}
+
+.yc-main-ui {
+    display: flex;
+    flex-direction: column;
+
+    height: 100%;
+}
+
+.yc-life-points-container {
+    display: flex;
+
+    height: 15%;
+}
+
+.yc-life-points {
+    flex: 1;
+
+    height: 100%;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    font-size: 13vh;
+
+    cursor: pointer;
+}
+
+.yc-expression {
+    height: 10%;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    font-size: 8vh;
+}
+
+.yc-button-row {
+    display: flex;
+
+    flex: 1;
+}
+
+.yc-button,
+.yc-timer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    font-size: 13vh;
+}
+
+.yc-button {
+    flex: 1;
+
+    cursor: pointer;
+}
+
+.yc-timer {
+    flex: 2;
+}
