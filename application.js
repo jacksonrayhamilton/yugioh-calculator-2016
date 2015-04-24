@@ -1,3 +1,5 @@
+/*jshint browser: true */
+/*globals _: false, FastClick: false */
 (function () {
 
     'use strict';
@@ -383,7 +385,10 @@
         });
     };
 
-    initialize();
-    initializeOnce();
+    document.addEventListener('DOMContentLoaded', function() {
+        initialize();
+        initializeOnce();
+        FastClick.attach(document.body);
+    }, false);
 
 }());

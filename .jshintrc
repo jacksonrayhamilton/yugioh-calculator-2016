@@ -1,5 +1,4 @@
 {
-  "browser": true,
   "curly": true,
   "devel": true,
   "eqeqeq": true,
@@ -7,9 +6,6 @@
   "freeze": true,
   "funcscope": true,
   "futurehostile": true,
-  "globals": {
-    "_": false
-  },
   "latedef": true,
   "noarg": true,
   "nocomma": true,
