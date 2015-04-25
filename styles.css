@@ -173,7 +173,7 @@ body {
     width: 40%;
     height: 15%;
 
-    font-size: 52px;
+    font-size: 42px;
 }
 
 .yc-timer-inner {
@@ -193,8 +193,5 @@ body {
     }
     .yc-button {
         font-size: 48px;
-    }
-    .yc-timer {
-        font-size: 42px;
     }
 }
