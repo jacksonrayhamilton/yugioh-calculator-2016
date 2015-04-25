@@ -1,5 +1,5 @@
 /*jshint browser: true */
-/*globals _: false, FastClick: false */
+/*globals FastClick: false */
 (function () {
 
     'use strict';
@@ -10,14 +10,19 @@
     var advise = (function () {
         var objects = [];
         var runAdvices = function (advices) {
-            _.forEach(advices, function (fn) {
+            advices.forEach(function (fn) {
                 fn();
             });
         };
         var getAdvisingFunction = function (mutateAdviceData) {
             return function (object, methodName, advice) {
-                var entry = _.find(objects, function (entry) {
-                    return entry.object === object;
+                var entry;
+                objects.some(function (innerEntry) {
+                    var equal = innerEntry.object === object;
+                    if (equal) {
+                        entry = innerEntry;
+                    }
+                    return equal;
                 });
                 if (entry === undefined) {
                     entry = {
@@ -107,10 +112,10 @@
             }
         };
 
-        _.forEach([
+        [
             'lose',
             'gain'
-        ], function (methodName) {
+        ].forEach(function (methodName) {
             advise.after(player, methodName, render);
         });
 
@@ -273,7 +278,7 @@
 
         var getDisplayedValue = function () {
             var itemsIndex = expression.getIndex();
-            return _.reduce(expression.getItems(), function (previous, current, index) {
+            return expression.getItems().reduce(function (previous, current, index) {
                 var view;
                 if (current.type === 'operand') {
                     view = makeOperandView({
@@ -298,11 +303,11 @@
             }
         };
 
-        _.forEach([
+        [
             'insertDigit',
             'backspace',
             'clearValue'
-        ], function (methodName) {
+        ].forEach(function (methodName) {
             advise.after(expression, methodName, render);
         });
 
@@ -348,7 +353,7 @@
                 element: document.getElementById('yc-expression')
             });
             expressionView.render();
-            _.forEach(players, function (player, index) {
+            players.forEach(function (player, index) {
                 document.getElementById('yc-button-minus-' + index)
                     .addEventListener('click', function () {
                         lose(player);
@@ -358,7 +363,7 @@
                         gain(player);
                     }, false);
             });
-            _.forEach(_.range(0, 10), function (number) {
+            [0, 1, 2, 3, 4, 5, 6, 7, 8, 9].forEach(function (number) {
                 document.getElementById('yc-button-digit-' + number)
                     .addEventListener('click', function () {
                         expression.insertDigit(String(number));
@@ -383,14 +388,18 @@
      * Performs per-game initialization logic. (Can be used to reset state.)
      */
     var initialize = function () {
-        players = _.times(numberOfPlayers, makePlayer);
-        playerViews = _.map(players, function (player, index) {
+        players = [];
+        var i;
+        for (i = 0; i < numberOfPlayers; i += 1) {
+            players.push(makePlayer());
+        }
+        playerViews = players.map(function (player, index) {
             return makePlayerView({
                 model: player,
                 element: document.getElementById('yc-player-' + index + '-life-points')
             });
         });
-        _.forEach(playerViews, function (playerView) {
+        playerViews.forEach(function (playerView) {
             playerView.render();
         });
     };
