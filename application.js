@@ -108,6 +108,11 @@
             var lifePoints = player.getLifePoints();
             if (previousLifePoints !== lifePoints) {
                 element.textContent = lifePoints;
+                if (String(lifePoints).length > 4) {
+                    element.classList.add('yc-life-points-overflowing');
+                } else {
+                    element.classList.remove('yc-life-points-overflowing');
+                }
                 previousLifePoints = lifePoints;
             }
         };

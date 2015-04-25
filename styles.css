@@ -53,6 +53,10 @@ body {
     font-family: monospace;
 }
 
+.yc-life-points-overflowing {
+    font-size: 48px;
+}
+
 .yc-life-points-0 {
     left: 0;
 }
@@ -187,6 +191,9 @@ body {
 @media screen and (max-height: 460px) {
     .yc-life-points {
         font-size: 52px;
+    }
+    .yc-life-points-overflowing {
+        font-size: 38px;
     }
     .yc-expression {
         font-size: 38px;
