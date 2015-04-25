@@ -97,13 +97,13 @@
         var player = spec.model;
         var element = spec.element;
 
-        var previousLifePoints = player.getLifePoints();
+        var previousLifePoints = NaN;
 
-        var applyDelta = function () {
-            var newLifePoints = player.getLifePoints();
-            if (previousLifePoints !== newLifePoints) {
-                element.textContent = newLifePoints;
-                previousLifePoints = newLifePoints;
+        var render = function () {
+            var lifePoints = player.getLifePoints();
+            if (previousLifePoints !== lifePoints) {
+                element.textContent = lifePoints;
+                previousLifePoints = lifePoints;
             }
         };
 
@@ -111,8 +111,12 @@
             'lose',
             'gain'
         ], function (methodName) {
-            advise.after(player, methodName, applyDelta);
+            advise.after(player, methodName, render);
         });
+
+        return {
+            render: render
+        };
     };
 
     /**
@@ -284,12 +288,12 @@
             }, '');
         };
 
-        var previousDisplayedValue = getDisplayedValue();
+        var previousDisplayedValue = NaN;
 
         var render = function () {
             var displayedValue = getDisplayedValue();
             if (previousDisplayedValue !== displayedValue) {
-                element.innerHTML = getDisplayedValue();
+                element.innerHTML = displayedValue;
                 previousDisplayedValue = displayedValue;
             }
         };
@@ -301,6 +305,10 @@
         ], function (methodName) {
             advise.after(expression, methodName, render);
         });
+
+        return {
+            render: render
+        };
     };
 
 
@@ -334,6 +342,12 @@
         var lose = getExpressionApplicationFunction('lose');
         var gain = getExpressionApplicationFunction('gain');
         return function () {
+            expression = makeExpression();
+            expressionView = makeExpressionView({
+                model: expression,
+                element: document.getElementById('yc-expression')
+            });
+            expressionView.render();
             _.forEach(players, function (player, index) {
                 document.getElementById('yc-button-minus-' + index)
                     .addEventListener('click', function () {
@@ -358,6 +372,10 @@
                 .addEventListener('click', function () {
                     expression.backspace();
                 }, false);
+            document.getElementById('yc-button-reset-game')
+                .addEventListener('click', function () {
+                    initialize();
+                }, false);
         };
     }());
 
@@ -372,10 +390,8 @@
                 element: document.getElementById('yc-player-' + index + '-life-points')
             });
         });
-        expression = makeExpression();
-        expressionView = makeExpressionView({
-            model: expression,
-            element: document.getElementById('yc-expression')
+        _.forEach(playerViews, function (playerView) {
+            playerView.render();
         });
     };
 
