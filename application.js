@@ -317,13 +317,8 @@
 
     var players;
     var playerViews;
-    var currentPlayerIndex;
     var expression;
     var expressionView;
-
-    var getCurrentPlayer = function () {
-        return players[currentPlayerIndex];
-    };
 
 
     /**
@@ -331,18 +326,22 @@
      */
     var initializeOnce = (function () {
         var getExpressionApplicationFunction = function (methodName) {
-            return function () {
-                getCurrentPlayer()[methodName](expression.getValue());
+            return function (player) {
+                player[methodName](expression.getValue());
                 expression.clearValue();
             };
         };
         var lose = getExpressionApplicationFunction('lose');
         var gain = getExpressionApplicationFunction('gain');
         return function () {
-            _.forEach(_.range(numberOfPlayers), function (index) {
-                document.getElementById('yc-player-' + index + '-life-points')
+            _.forEach(players, function (player, index) {
+                document.getElementById('yc-button-minus-' + index)
                     .addEventListener('click', function () {
-                        currentPlayerIndex = index;
+                        lose(player);
+                    }, false);
+                document.getElementById('yc-button-plus-' + index)
+                    .addEventListener('click', function () {
+                        gain(player);
                     }, false);
             });
             _.forEach(_.range(0, 10), function (number) {
@@ -359,10 +358,6 @@
                 .addEventListener('click', function () {
                     expression.backspace();
                 }, false);
-            document.getElementById('yc-button-minus')
-                .addEventListener('click', lose, false);
-            document.getElementById('yc-button-plus')
-                .addEventListener('click', gain, false);
         };
     }());
 
@@ -371,7 +366,6 @@
      */
     var initialize = function () {
         players = _.times(numberOfPlayers, makePlayer);
-        currentPlayerIndex = 0;
         playerViews = _.map(players, function (player, index) {
             return makePlayerView({
                 model: player,
