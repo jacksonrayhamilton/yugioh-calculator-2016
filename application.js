@@ -137,7 +137,7 @@
             return index;
         };
         var insertDigit = function (digit) {
-            if (index === 1) {
+            if (index === 1 && value[0] !== '0') {
                 value = value[0] + digit + value.slice(1);
             } else {
                 value = insertString(value, digit, index);
@@ -145,7 +145,7 @@
             index += digit.length;
         };
         var deleteLastDigit = function () {
-            if (index === 2) {
+            if (index === 2 && value[0] !== '0') {
                 value = value[0] + value.slice(2);
                 index -= 1;
             } else if (index > 0) {
