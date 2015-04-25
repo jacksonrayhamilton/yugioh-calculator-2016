@@ -23,16 +23,17 @@ body {
 .yc-button,
 .yc-timer {
     position: absolute;
-
-    display: table;
 }
 
-.yc-center {
-    width: 100%;
-    height: 100%;
-    display: table-cell;
-    vertical-align: middle;
-    text-align: center;
+.yc-life-points,
+.yc-expression,
+.yc-button,
+.yc-button-inner,
+.yc-timer,
+.yc-timer-inner {
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 /* LCD color scheme. */
@@ -71,8 +72,13 @@ body {
 }
 
 .yc-selected-operand-digit {
-    color: #fff;
-    background-color: #000;
+    color: #ddd;
+    background-color: #111612;
+}
+
+.yc-button,
+.yc-timer {
+    padding: 1%;
 }
 
 .yc-button {
@@ -82,31 +88,44 @@ body {
     font-size: 60px;
 
     cursor: pointer;
-
-    padding: 2px;
 }
 
-.yc-button > div {
+.yc-button-inner,
+.yc-timer-inner {
+    width: 100%;
+    height: 100%;
     border-radius: 5px;
+    background-clip: padding-box;
+}
+
+.yc-button-inner {
+    border: 1px solid rgba(0, 0, 0, .05);
+    color: #ddd;
+    text-shadow: 0px -2px 0px rgba(0, 0, 0, .5);
+    background-color: #333;
+    background-image: linear-gradient(to bottom,
+                                      rgba(255, 255, 255, 0.075) 45%,
+                                      rgba(0, 0, 0, 0) 55%);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.25);
 }
 
 .yc-button-digit > div {
-    color: #fff;
+    color: #ddd;
     background-color: #333;
 }
 
 .yc-button-utility > div {
-    color: #fff;
+    color: #ddd;
     background-color: #626669;
 }
 
 .yc-button-math > div {
-    color: #fff;
+    color: #ddd;
     background-color: #464;
 }
 
 .yc-button-destruction > div {
-    color: #fff;
+    color: #ddd;
     background-color: #c33;
 }
 
@@ -147,6 +166,26 @@ body {
     width: 40%;
     height: 15%;
 
-    font-size: 48px;
+    font-size: 42px;
     font-family: monospace;
+}
+
+.yc-timer-inner {
+    color: #f12938;
+    text-shadow: 0 0 3px #f12938;
+    background-color: #000000;
+    border: 1px solid rgba(241, 41, 56, .05);
+    box-shadow: 0 0 2px 1px rgba(241, 41, 56, 0.33);
+}
+
+@media screen and (max-height: 460px) {
+    .yc-life-points {
+        font-size: 52px;
+    }
+    .yc-expression {
+        font-size: 38px;
+    }
+    .yc-button {
+        font-size: 48px;
+    }
 }
