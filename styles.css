@@ -1,6 +1,8 @@
 * {
     -webkit-user-select: none;
     user-select: none;
+
+    box-sizing: border-box;
 }
 
 html,
@@ -68,6 +70,32 @@ body {
     font-size: 60px;
 
     cursor: pointer;
+
+    padding: 2px;
+}
+
+.yc-button > div {
+    border-radius: 5px;
+}
+
+.yc-button-digit > div {
+    color: #fff;
+    background-color: #333;
+}
+
+.yc-button-utility > div {
+    color: #fff;
+    background-color: #626669;
+}
+
+.yc-button-math > div {
+    color: #fff;
+    background-color: #464;
+}
+
+.yc-button-destruction > div {
+    color: #fff;
+    background-color: #c33;
 }
 
 .yc-button-a0 { top: 25%; left: 0%; }
