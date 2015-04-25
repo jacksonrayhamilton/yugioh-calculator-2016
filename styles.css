@@ -10,66 +10,103 @@ body {
 
 body {
     margin: 0;
+
+    font-family: sans-serif;
 }
 
-.yc-main-ui {
-    display: flex;
-    flex-direction: column;
+.yc-life-points,
+.yc-expression,
+.yc-button,
+.yc-timer {
+    position: absolute;
 
+    display: table;
+}
+
+.yc-center {
+    width: 100%;
     height: 100%;
-}
-
-.yc-life-points-container {
-    display: flex;
-
-    height: 15%;
+    display: table-cell;
+    vertical-align: middle;
+    text-align: center;
 }
 
 .yc-life-points {
-    flex: 1;
+    top: 0;
 
-    height: 100%;
+    width: 50%;
+    height: 15%;
 
-    display: flex;
-    justify-content: center;
-    align-items: center;
-
-    font-size: 13vh;
+    font-size: 64px;
+    font-family: monospace;
 
     cursor: pointer;
+}
+
+.yc-life-points-0 {
+    left: 0;
+}
+
+.yc-life-points-1 {
+    right: 0;
 }
 
 .yc-expression {
+    top: 15%;
+
+    width: 100%;
     height: 10%;
 
-    display: flex;
-    justify-content: center;
-    align-items: center;
-
-    font-size: 8vh;
-}
-
-.yc-button-row {
-    display: flex;
-
-    flex: 1;
-}
-
-.yc-button,
-.yc-timer {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-
-    font-size: 13vh;
+    font-size: 48px;
+    font-family: monospace;
 }
 
 .yc-button {
-    flex: 1;
+    width: 20%;
+    height: 15%;
+
+    font-size: 60px;
 
     cursor: pointer;
 }
 
+.yc-button-a0 { top: 25%; left: 0%; }
+.yc-button-a1 { top: 25%; left: 20%; }
+.yc-button-a2 { top: 25%; left: 40%; }
+.yc-button-a3 { top: 25%; left: 60%; }
+.yc-button-a4 { top: 25%; left: 80%; }
+
+.yc-button-b0 { top: 40%; left: 0%; }
+.yc-button-b1 { top: 40%; left: 20%; }
+.yc-button-b2 { top: 40%; left: 40%; }
+.yc-button-b3 { top: 40%; left: 60%; }
+.yc-button-b4 { top: 40%; left: 80%; }
+
+.yc-button-c0 { top: 55%; left: 0%; }
+.yc-button-c1 { top: 55%; left: 20%; }
+.yc-button-c2 { top: 55%; left: 40%; }
+.yc-button-c3 { top: 55%; left: 60%; }
+.yc-button-c4 { top: 55%; left: 80%; }
+
+.yc-button-d0 { top: 70%; left: 0%; }
+.yc-button-d1 { top: 70%; left: 20%; }
+.yc-button-d2 { top: 70%; left: 40%; }
+.yc-button-d3 { top: 70%; left: 60%; }
+.yc-button-d4 { top: 70%; left: 80%; }
+
+.yc-button-e0 { top: 85%; left: 0%; }
+.yc-button-e1 { top: 85%; left: 20%; }
+.yc-button-e2 { top: 85%; left: 40%; }
+.yc-button-e3 { top: 85%; left: 60%; }
+.yc-button-e4 { top: 85%; left: 80%; }
+
 .yc-timer {
-    flex: 2;
+    top: 85%;
+    left: 0%;
+
+    width: 40%;
+    height: 15%;
+
+    font-size: 48px;
+    font-family: monospace;
 }
