@@ -12,26 +12,59 @@ module.exports = function (grunt) {
                 files: {
                     '.tmp/concat/styles.css': '.tmp/concat/styles.css'
                 }
+            },
+            serve: {
+                options: {
+                    map: true
+                },
+                files: [{
+                    expand: true,
+                    cwd: '.tmp/serve/',
+                    src: '*.css',
+                    dest: '.tmp/serve/'
+                }]
             }
         },
         clean: {
             build: [
-                '.tmp/**',
+                '.tmp/concat/**',
                 'build/**'
             ],
             inline: [
                 'build/**.js',
                 'build/**.css'
             ],
-            temporary: [
-                '.tmp/**'
+            postBuild: [
+                '.tmp/concat/**'
+            ],
+            serve: [
+                '.tmp/serve/**'
             ]
+        },
+        connect: {
+            options: {
+                open: false,
+                port: 1024,
+                livereload: 35729
+            },
+            serve: {
+                options: {
+                    base: [
+                        '.tmp/serve/',
+                        './'
+                    ]
+                }
+            }
         },
         copy: {
             build: {
                 files: {
                     'build/index.html': 'index.html'
                 }
+            },
+            styles: {
+                src: '*.css',
+                dest: '.tmp/serve/'
             }
         },
         htmlmin: {
@@ -72,8 +105,34 @@ module.exports = function (grunt) {
                 dest: 'build/'
             },
             html: 'index.html'
+        },
+        watch: {
+            styles: {
+                files: ['*.css'],
+                tasks: [
+                    'copy:styles',
+                    'autoprefixer:serve'
+                ]
+            },
+            livereload: {
+                options: {
+                    livereload: '<%= connect.options.livereload %>'
+                },
+                files: [
+                    '*.html',
+                    '.tmp/serve/*.css'
+                ]
+            }
         }
     });
+
+    grunt.registerTask('serve', [
+        'clean:serve',
+        'copy:styles',
+        'autoprefixer:serve',
+        'connect:serve',
+        'watch'
+    ]);
 
     grunt.registerTask('build', [
         'clean:build',
@@ -87,7 +146,7 @@ module.exports = function (grunt) {
         'inline',
         'clean:inline',
         'htmlmin:build',
-        'clean:temporary'
+        'clean:postBuild'
     ]);
 
     grunt.registerTask('default', 'build');
