@@ -63,6 +63,11 @@ body {
     font-family: monospace;
 }
 
+.yc-selected-operand-digit {
+    color: #fff;
+    background-color: #000;
+}
+
 .yc-button {
     width: 20%;
     height: 15%;

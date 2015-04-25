@@ -128,7 +128,7 @@
      * Abstract representation of an operand (a number) in an expression.
      */
     var makeOperand = function () {
-        var value = '0000';
+        var value = '000';
         var index = 0;
         var getValue = function () {
             return value;
@@ -137,11 +137,18 @@
             return index;
         };
         var insertDigit = function (digit) {
-            value = insertString(value, digit, index);
+            if (index === 1) {
+                value = value[0] + digit + value.slice(1);
+            } else {
+                value = insertString(value, digit, index);
+            }
             index += digit.length;
         };
         var deleteLastDigit = function () {
-            if (index > 0) {
+            if (index === 2) {
+                value = value[0] + value.slice(2);
+                index -= 1;
+            } else if (index > 0) {
                 var replacement = index <= 4 ? '0' : '';
                 value = insertString(value, replacement, index - 1);
                 index -= 1;
