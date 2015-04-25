@@ -81,6 +81,13 @@ body {
     padding: 1%;
 }
 
+.yc-button:active .yc-button-inner {
+    position: relative;
+    top: 1px;
+    box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.25),
+                inset 0 5px 30px rgba(0, 0, 0, 0.25);
+}
+
 .yc-button {
     width: 20%;
     height: 15%;
@@ -166,8 +173,7 @@ body {
     width: 40%;
     height: 15%;
 
-    font-size: 42px;
-    font-family: monospace;
+    font-size: 52px;
 }
 
 .yc-timer-inner {
@@ -187,5 +193,8 @@ body {
     }
     .yc-button {
         font-size: 48px;
+    }
+    .yc-timer {
+        font-size: 42px;
     }
 }
