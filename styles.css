@@ -1,5 +1,4 @@
 * {
-    -webkit-user-select: none;
     user-select: none;
 
     box-sizing: border-box;
@@ -13,9 +12,10 @@ body {
 body {
     margin: 0;
 
+    /* Default font. */
     font-family: sans-serif;
 
-    overflow: hidden;
+    background-color: #131313;
 }
 
 .yc-life-points,
@@ -33,6 +33,13 @@ body {
     display: table-cell;
     vertical-align: middle;
     text-align: center;
+}
+
+/* LCD color scheme. */
+.yc-life-points,
+.yc-expression {
+    color: #111612;
+    background-color: #C9D4CB;
 }
 
 .yc-life-points {
