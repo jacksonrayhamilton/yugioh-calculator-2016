@@ -353,14 +353,16 @@
                 element: document.getElementById('yc-expression')
             });
             expressionView.render();
-            players.forEach(function (player, index) {
+            // Use indices because only the index should be closured, not the
+            // players.
+            [0, 1].forEach(function (index) {
                 document.getElementById('yc-button-minus-' + index)
                     .addEventListener('click', function () {
-                        lose(player);
+                        lose(players[index]);
                     }, false);
                 document.getElementById('yc-button-plus-' + index)
                     .addEventListener('click', function () {
-                        gain(player);
+                        gain(players[index]);
                     }, false);
             });
             [0, 1, 2, 3, 4, 5, 6, 7, 8, 9].forEach(function (number) {
