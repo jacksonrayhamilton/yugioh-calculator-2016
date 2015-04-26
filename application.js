@@ -5,6 +5,34 @@
     'use strict';
 
     /**
+     * Calls `callback` `numberOfTimes` times, accumulating its return values.
+     */
+    var times = function (numberOfTimes, callback) {
+        var results = new Array(numberOfTimes);
+        var index;
+        for (index = 0; index < numberOfTimes; index += 1) {
+            results[index] = callback(index);
+        }
+        return results;
+    };
+
+    /**
+     * Invokes `predicate` with each element of `array`, and returns the first
+     * element in `array` which `predicate` returns truthy for.
+     */
+    var find = function (array, predicate) {
+        var found;
+        array.some(function (element) {
+            var isSatisfactory = predicate.apply(null, arguments);
+            if (isSatisfactory) {
+                found = element;
+            }
+            return isSatisfactory;
+        });
+        return found;
+    };
+
+    /**
      * Sets up hooks to run before and after objects' methods.
      */
     var advise = (function () {
@@ -16,13 +44,8 @@
         };
         var getAdvisingFunction = function (mutateAdviceData) {
             return function (object, methodName, advice) {
-                var entry;
-                objects.some(function (innerEntry) {
-                    var equal = innerEntry.object === object;
-                    if (equal) {
-                        entry = innerEntry;
-                    }
-                    return equal;
+                var entry = find(objects, function (entry) {
+                    return entry.object === object;
                 });
                 if (entry === undefined) {
                     entry = {
@@ -76,8 +99,9 @@
     /**
      * Abstract representation of a Yugioh player.
      */
-    var makePlayer = function () {
-        var lifePoints = 8000;
+    var makePlayer = function (spec) {
+        var id = spec.id;
+        var lifePoints = spec.lifePoints === undefined ? 8000 : spec.lifePoints;
         var getLifePoints = function () {
             return lifePoints;
         };
@@ -367,7 +391,7 @@
             expressionView.render();
             // Use indices because only the index should be closured, not the
             // players.
-            [0, 1].forEach(function (index) {
+            times(2, function (index) {
                 document.getElementById('yc-button-minus-' + index)
                     .addEventListener('click', function () {
                         lose(players[index]);
@@ -377,7 +401,7 @@
                         gain(players[index]);
                     }, false);
             });
-            [0, 1, 2, 3, 4, 5, 6, 7, 8, 9].forEach(function (number) {
+            times(10, function (number) {
                 document.getElementById('yc-button-digit-' + number)
                     .addEventListener('click', function () {
                         expression.insertDigit(String(number));
@@ -402,11 +426,11 @@
      * Performs per-game initialization logic. (Can be used to reset state.)
      */
     var initialize = function () {
-        players = [];
-        var i;
-        for (i = 0; i < numberOfPlayers; i += 1) {
-            players.push(makePlayer());
-        }
+        players = times(numberOfPlayers, function (n) {
+            return makePlayer({
+                id: n + 1
+            });
+        });
         playerViews = players.map(function (player, index) {
             return makePlayerView({
                 model: player,
