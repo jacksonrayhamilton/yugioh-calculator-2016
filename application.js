@@ -1,36 +1,8 @@
 /*jshint browser: true */
-/*globals FastClick: false */
+/*globals _: false, FastClick: false */
 (function () {
 
     'use strict';
-
-    /**
-     * Calls `callback` `numberOfTimes` times, accumulating its return values.
-     */
-    var times = function (numberOfTimes, callback) {
-        var results = new Array(numberOfTimes);
-        var index;
-        for (index = 0; index < numberOfTimes; index += 1) {
-            results[index] = callback(index);
-        }
-        return results;
-    };
-
-    /**
-     * Invokes `predicate` with each element of `array`, and returns the first
-     * element in `array` which `predicate` returns truthy for.
-     */
-    var find = function (array, predicate) {
-        var found;
-        array.some(function (element) {
-            var isSatisfactory = predicate.apply(null, arguments);
-            if (isSatisfactory) {
-                found = element;
-            }
-            return isSatisfactory;
-        });
-        return found;
-    };
 
     /**
      * Sets up hooks to run before and after objects' methods.
@@ -38,13 +10,13 @@
     var advise = (function () {
         var objects = [];
         var runAdvices = function (advices) {
-            advices.forEach(function (fn) {
+            _.forEach(advices, function (fn) {
                 fn();
             });
         };
         var getAdvisingFunction = function (mutateAdviceData) {
             return function (object, methodName, advice) {
-                var entry = find(objects, function (entry) {
+                var entry = _.find(objects, function (entry) {
                     return entry.object === object;
                 });
                 if (entry === undefined) {
@@ -187,10 +159,10 @@
             }
         };
 
-        [
+        _.forEach([
             'lose',
             'gain'
-        ].forEach(function (methodName) {
+        ], function (methodName) {
             advise.after(player, methodName, render);
         });
 
@@ -360,7 +332,7 @@
 
         var getDisplayedValue = function () {
             var itemsIndex = expression.getIndex();
-            return expression.getItems().reduce(function (previous, current, index) {
+            return _.reduce(expression.getItems(), function (previous, current, index) {
                 var view;
                 if (current.type === 'operand') {
                     view = makeOperandView({
@@ -385,11 +357,11 @@
             }
         };
 
-        [
+        _.forEach([
             'insertDigit',
             'backspace',
             'clearValue'
-        ].forEach(function (methodName) {
+        ], function (methodName) {
             advise.after(expression, methodName, render);
         });
 
@@ -437,7 +409,7 @@
             expressionView.render();
             // Use indices because only the index should be closured, not the
             // players.
-            times(2, function (index) {
+            _.times(2, function (index) {
                 document.getElementById('yc-button-minus-' + index)
                     .addEventListener('click', function () {
                         lose(players[index]);
@@ -447,7 +419,7 @@
                         gain(players[index]);
                     }, false);
             });
-            times(10, function (number) {
+            _.times(10, function (number) {
                 document.getElementById('yc-button-digit-' + number)
                     .addEventListener('click', function () {
                         expression.insertDigit(String(number));
@@ -479,18 +451,18 @@
             makePlayerFunction = makePlayer;
         }
         return function () {
-            players = times(numberOfPlayers, function (n) {
+            players = _.times(numberOfPlayers, function (n) {
                 return makePlayerFunction({
                     id: n
                 });
             });
-            playerViews = players.map(function (player, index) {
+            playerViews = _.map(players, function (player, index) {
                 return makePlayerView({
                     model: player,
                     element: document.getElementById('yc-player-' + index + '-life-points')
                 });
             });
-            playerViews.forEach(function (playerView) {
+            _.forEach(playerViews, function (playerView) {
                 playerView.render();
             });
         };
