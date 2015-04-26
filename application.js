@@ -97,26 +97,72 @@
     };
 
     /**
+     * Writes an object to localStorage after a delay.
+     */
+    var queuePersist = (function () {
+        var delay = 300;
+        var queue = {};
+        var cancel = clearTimeout;
+        return function queuePersist(key, value) {
+            if (queue.hasOwnProperty(key)) {
+                var previouslyQueued = queue[key];
+                cancel(previouslyQueued);
+            }
+            queue[key] = setTimeout(function () {
+                localStorage.setItem(key, JSON.stringify(value));
+            }, delay);
+        };
+    }());
+
+    var unpersist = function (key) {
+        return JSON.parse(localStorage.getItem(key));
+    };
+
+    /**
      * Abstract representation of a Yugioh player.
      */
     var makePlayer = function (spec) {
-        var id = spec.id;
-        var lifePoints = spec.lifePoints === undefined ? 8000 : spec.lifePoints;
+        var self = {};
+        self.id = spec.id;
+        self.lifePoints = spec.lifePoints === undefined ? 8000 : spec.lifePoints;
+        var getId = function () {
+            return self.id;
+        };
         var getLifePoints = function () {
-            return lifePoints;
+            return self.lifePoints;
+        };
+        var persist = function () {
+            queuePersist('yc-player-' + self.id, self);
         };
         var lose = function (amount) {
-            lifePoints -= amount;
+            self.lifePoints -= amount;
+            if (amount !== 0) {
+                persist();
+            }
         };
         var gain = function (amount) {
-            lifePoints += amount;
+            self.lifePoints += amount;
+            if (amount !== 0) {
+                persist();
+            }
         };
+        queuePersist('yc-player-' + self.id, self);
         return {
             type: 'player',
+            getId: getId,
             getLifePoints: getLifePoints,
             lose: lose,
             gain: gain
         };
+    };
+
+    var makePersistedPlayer = function (spec) {
+        var persistedSpec = unpersist('yc-player-' + spec.id);
+        if (persistedSpec) {
+            return makePlayer(persistedSpec);
+        } else {
+            return makePlayer(spec);
+        }
     };
 
     /**
@@ -417,7 +463,7 @@
                 }, false);
             document.getElementById('yc-button-reset-game')
                 .addEventListener('click', function () {
-                    initialize();
+                    restart();
                 }, false);
         };
     }());
@@ -425,22 +471,33 @@
     /**
      * Performs per-game initialization logic. (Can be used to reset state.)
      */
-    var initialize = function () {
-        players = times(numberOfPlayers, function (n) {
-            return makePlayer({
-                id: n + 1
+    var getInitializeFunction = function (when) {
+        var makePlayerFunction;
+        if (when === 'first') {
+            makePlayerFunction = makePersistedPlayer;
+        } else if (when === 'subsequent') {
+            makePlayerFunction = makePlayer;
+        }
+        return function () {
+            players = times(numberOfPlayers, function (n) {
+                return makePlayerFunction({
+                    id: n
+                });
             });
-        });
-        playerViews = players.map(function (player, index) {
-            return makePlayerView({
-                model: player,
-                element: document.getElementById('yc-player-' + index + '-life-points')
+            playerViews = players.map(function (player, index) {
+                return makePlayerView({
+                    model: player,
+                    element: document.getElementById('yc-player-' + index + '-life-points')
+                });
             });
-        });
-        playerViews.forEach(function (playerView) {
-            playerView.render();
-        });
+            playerViews.forEach(function (playerView) {
+                playerView.render();
+            });
+        };
     };
+
+    var initialize = getInitializeFunction('first');
+    var restart = getInitializeFunction('subsequent');
 
     document.addEventListener('DOMContentLoaded', function() {
         initialize();
