@@ -180,8 +180,9 @@ module.exports = function (grunt) {
     grunt.registerTask('build', [
         'clean:build',
         'useminPrepare',
-        'lodash:build',
-        'hijackLodash',
+        // TODO: Ensure we aren't missing any methods.
+        // 'lodash:build',
+        // 'hijackLodash',
         'concat:generated',
         'autoprefixer:build',
         'cssmin:generated',
