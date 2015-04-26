@@ -2,6 +2,10 @@
 
 'use strict';
 
+var _ = require('lodash');
+
+var lodashBuildOutputPath = 'build/lodash.js';
+
 module.exports = function (grunt) {
 
     require('load-grunt-tasks')(grunt);
@@ -94,6 +98,22 @@ module.exports = function (grunt) {
                 }
             }
         },
+        lodash: {
+            build: {
+                options: {
+                    modifier: 'modern',
+                    exports: ['global'],
+                    include: [
+                        'find',
+                        'forEach',
+                        'map',
+                        'reduce',
+                        'times'
+                    ]
+                },
+                dest: lodashBuildOutputPath
+            }
+        },
         usemin: {
             options: {
                 assetsDirs: ['build/']
@@ -140,9 +160,28 @@ module.exports = function (grunt) {
         'watch'
     ]);
 
+    // Update the usemin `concat:generated` task to use the custom lodash build.
+    grunt.registerTask('hijackLodash', function () {
+        var config = grunt.config.get('concat');
+        var scriptsConfig = _.find(config.generated.files, function (config) {
+            return /scripts\.js/.test(config.dest);
+        });
+        var lodashIndex = _.findIndex(scriptsConfig.src, function (path) {
+            return /lodash\.js/.test(path);
+        });
+        scriptsConfig.src = [].concat(
+            _.slice(scriptsConfig.src, 0, lodashIndex),
+            lodashBuildOutputPath,
+            _.slice(scriptsConfig.src, lodashIndex + 1)
+        );
+        grunt.config.set('concat', config);
+    });
+
     grunt.registerTask('build', [
         'clean:build',
         'useminPrepare',
+        'lodash:build',
+        'hijackLodash',
         'concat:generated',
         'autoprefixer:build',
         'cssmin:generated',
