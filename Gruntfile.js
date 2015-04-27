@@ -62,13 +62,23 @@ module.exports = function (grunt) {
         },
         copy: {
             build: {
-                files: {
-                    'build/index.html': 'index.html'
-                }
+                files: [{
+                    expand: true,
+                    cwd: './',
+                    dest: 'build/',
+                    src: [
+                        'index.html',
+                        'fonts/**'
+                    ]
+                }]
             },
             styles: {
-                src: '*.css',
-                dest: '.tmp/serve/'
+                files: [{
+                    expand: true,
+                    cwd: './',
+                    src: '*.css',
+                    dest: '.tmp/serve/'
+                }]
             }
         },
         htmlmin: {

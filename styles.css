@@ -41,6 +41,7 @@ body {
 .yc-expression {
     color: #111612;
     background-color: #C9D4CB;
+    font-family: 'Droid Sans Mono';
 }
 
 .yc-life-points {
@@ -50,7 +51,6 @@ body {
     height: 15%;
 
     font-size: 64px;
-    font-family: monospace;
 }
 
 .yc-life-points-overflowing {
@@ -72,7 +72,6 @@ body {
     height: 10%;
 
     font-size: 48px;
-    font-family: monospace;
 }
 
 .yc-selected-operand-digit {
@@ -83,6 +82,8 @@ body {
 .yc-button,
 .yc-timer {
     padding: 1%;
+
+    font-size: 60px;
 }
 
 .yc-button:active .yc-button-inner {
@@ -96,7 +97,7 @@ body {
     width: 20%;
     height: 15%;
 
-    font-size: 60px;
+    font-family: 'Droid Sans';
 
     cursor: pointer;
 }
@@ -177,7 +178,7 @@ body {
     width: 40%;
     height: 15%;
 
-    font-size: 42px;
+    font-family: 'Liquid Crystal';
 }
 
 .yc-timer-inner {
@@ -198,7 +199,8 @@ body {
     .yc-expression {
         font-size: 38px;
     }
-    .yc-button {
+    .yc-button,
+    .yc-timer {
         font-size: 48px;
     }
 }
