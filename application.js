@@ -171,14 +171,15 @@
         };
     };
 
-
+    /**
+     * Gets an arbitrary number of the string "0".
+     */
     var getZeros = (function () {
         var getZero = _.constant('0');
         return function (times) {
             return _.times(times, getZero);
         };
     }());
-
 
     /**
      * Abstract representation of an operand (a number) in an expression.
@@ -187,19 +188,23 @@
         var values = [];
         var getValue = function () {
             if (values.length === 0) {
-                return ' 00';
+                return '000';
             } else if (values.length === 1) {
                 if (values[0] === 0) {
-                    return '000';
+                    return '00';
                 } else {
-                    return values.concat(' ', getZeros(2)).join('');
+                    return values.concat(getZeros(2)).join('');
                 }
             } else if (values.length >= 2) {
-                return values.concat(getZeros(4 - values.length)).join('');
+                if (values.length === 2 && values[0] === 0 && values[1] === 0) {
+                    return '0';
+                } else {
+                    return values.concat(getZeros(4 - values.length)).join('');
+                }
             }
         };
         var getNumericValue = function () {
-            return parseFloat(getValue().replace(' ', ''));
+            return parseFloat(getValue().replace());
         };
         var getIndex = function () {
             if (values.length === 0) {
@@ -211,7 +216,11 @@
                     return 1;
                 }
             } else if (values.length >= 2) {
-                return values.length;
+                if (values.length === 2 && values[0] === 0 && values[1] === 0) {
+                    return 0;
+                } else {
+                    return values.length;
+                }
             }
         };
         var insertDigit = function (digit) {
