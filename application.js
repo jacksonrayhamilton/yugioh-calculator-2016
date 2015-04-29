@@ -171,39 +171,59 @@
         };
     };
 
+
+    var getZeros = (function () {
+        var getZero = _.constant('0');
+        return function (times) {
+            return _.times(times, getZero);
+        };
+    }());
+
+
     /**
      * Abstract representation of an operand (a number) in an expression.
      */
     var makeOperand = function () {
-        var value = '000';
-        var index = 0;
+        var values = [];
         var getValue = function () {
-            return value;
+            if (values.length === 0) {
+                return ' 00';
+            } else if (values.length === 1) {
+                if (values[0] === 0) {
+                    return '000';
+                } else {
+                    return values.concat(' ', getZeros(2)).join('');
+                }
+            } else if (values.length >= 2) {
+                return values.concat(getZeros(4 - values.length)).join('');
+            }
+        };
+        var getNumericValue = function () {
+            return parseFloat(getValue().replace(' ', ''));
         };
         var getIndex = function () {
-            return index;
+            if (values.length === 0) {
+                return 0;
+            } else if (values.length === 1) {
+                if (values[0] === 0) {
+                    return 0;
+                } else {
+                    return 1;
+                }
+            } else if (values.length >= 2) {
+                return values.length;
+            }
         };
         var insertDigit = function (digit) {
-            if (index === 1 && value[0] !== '0') {
-                value = value[0] + digit + value.slice(1);
-            } else {
-                value = insertString(value, digit, index);
-            }
-            index += digit.length;
+            values.push(digit);
         };
         var deleteLastDigit = function () {
-            if (index === 2 && value[0] !== '0') {
-                value = value[0] + value.slice(2);
-                index -= 1;
-            } else if (index > 0) {
-                var replacement = index <= 4 ? '0' : '';
-                value = insertString(value, replacement, index - 1);
-                index -= 1;
-            }
+            values.pop();
         };
         return {
             type: 'operand',
             getValue: getValue,
+            getNumericValue: getNumericValue,
             getIndex: getIndex,
             insertDigit: insertDigit,
             deleteLastDigit: deleteLastDigit
@@ -223,7 +243,7 @@
             // Determine the "currently selected" character in the value (the
             // one that will be highlighted to show the user his index).
             var wrappedChar = value.charAt(index);
-            if (wrappedChar === '') {
+            if (_.contains(['', ' '], wrappedChar)) {
                 wrappedChar = '&nbsp;';
             }
 
@@ -304,7 +324,7 @@
             }
         };
         var getValue = function () {
-            return parseFloat(getCurrentItem().getValue());
+            return getCurrentItem().getNumericValue();
         };
         var clearValue = function () {
             items = [makeOperand()];
@@ -483,7 +503,7 @@
             _.times(10, function (number) {
                 document.getElementById('yc-button-digit-' + number)
                     .addEventListener('click', function () {
-                        expression.insertDigit(String(number));
+                        expression.insertDigit(number);
                     }, false);
             });
             document.getElementById('yc-button-cancel')
