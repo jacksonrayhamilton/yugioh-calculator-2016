@@ -58,6 +58,44 @@
     }());
 
     /**
+     * Makes an object that can emit named events to listeners.
+     */
+    var makeEventEmitter = function () {
+        var events = {};
+        var on = function (event, handler) {
+            if (!Object.prototype.hasOwnProperty.call(events, event)) {
+                events[event] = [];
+            }
+            events[event].push(handler);
+        };
+        var off = function (event, handler) {
+            if (handler === undefined) {
+                events[event] = [];
+            } else {
+                while (true) {
+                    var index = _.indexOf(events[event], handler);
+                    if (index === -1) {
+                        break;
+                    }
+                    events[event].splice(index, 1);
+                }
+            }
+        };
+        var trigger = function (event, data) {
+            if (Object.prototype.hasOwnProperty.call(events, event)) {
+                _.forEach(events[event], function (handler) {
+                    handler(data);
+                });
+            }
+        };
+        return {
+            on: on,
+            off: off,
+            trigger: trigger
+        };
+    };
+
+    /**
      * Writes an object to localStorage after a delay.
      */
     var queuePersist = (function () {
@@ -86,31 +124,34 @@
      * Abstract representation of a Yugioh player.
      */
     var makePlayer = function (spec) {
-        var self = {};
-        self.id = spec.id;
-        self.lifePoints = spec.lifePoints === undefined ? 8000 : spec.lifePoints;
+        spec = spec === undefined ? {} : spec;
+        var id = spec.id;
+        var lifePoints = spec.lifePoints === undefined ? 8000 : spec.lifePoints;
         var getId = function () {
-            return self.id;
+            return id;
         };
         var getLifePoints = function () {
-            return self.lifePoints;
+            return lifePoints;
         };
         var persist = function () {
-            queuePersist('yc-player-' + self.id, self);
+            queuePersist('yc-player-' + id, {
+                id: id,
+                lifePoints: lifePoints
+            });
         };
         var lose = function (amount) {
-            self.lifePoints -= amount;
+            lifePoints -= amount;
             if (amount !== 0) {
                 persist();
             }
         };
         var gain = function (amount) {
-            self.lifePoints += amount;
+            lifePoints += amount;
             if (amount !== 0) {
                 persist();
             }
         };
-        queuePersist('yc-player-' + self.id, self);
+        persist();
         return {
             type: 'player',
             getId: getId,
@@ -124,6 +165,7 @@
      * Reanimate a persisted player object.
      */
     var makePersistedPlayer = function (spec) {
+        spec = spec === undefined ? {} : spec;
         var persistedSpec = unpersist('yc-player-' + spec.id);
         if (persistedSpec) {
             return makePlayer(persistedSpec);
@@ -136,6 +178,7 @@
      * DOM representation of a player object.
      */
     var makePlayerView = function (spec) {
+        spec = spec === undefined ? {} : spec;
         var player = spec.model;
         var element = spec.element;
 
@@ -238,6 +281,7 @@
      * DOM representation of an operand object.
      */
     var makeOperandView = function (spec) {
+        spec = spec === undefined ? {} : spec;
         var operand = spec.model;
 
         var getDisplayedValue = function (isSelected) {
@@ -351,6 +395,7 @@
      * DOM representation of an expression object.
      */
     var makeExpressionView = function (spec) {
+        spec = spec === undefined ? {} : spec;
         var expression = spec.model;
         var element = spec.element;
 
@@ -394,6 +439,143 @@
         };
     };
 
+    var getTimestamp;
+    var formatMs;
+    (function () {
+
+        /**
+         * Pads a 2-digit number with a leading zero, if needed.
+         */
+        var pad = function (number) {
+            return number < 10 ? '0' + number : '' + number;
+        };
+
+        /**
+         * Gets a timestamp in the format "hh:mm:ss A".
+         */
+        getTimestamp = function (ms) {
+            var date = typeof ms === 'undefined' ? new Date() : new Date(ms);
+            var hours = date.getHours();
+            var minutes = date.getMinutes();
+            var seconds = date.getSeconds();
+            var period;
+            if (hours < 12) {
+                if (hours === 0) {
+                    hours = 12;
+                }
+                period = 'AM';
+            } else {
+                if (hours > 12) {
+                    hours -= 12;
+                }
+                period = 'PM';
+            }
+            return [pad(hours), pad(minutes), pad(seconds)].join(':') + ' ' + period;
+        };
+
+        /**
+         * Formats milliseconds as "00:00" (MINS:SECS).
+         */
+        formatMs = function (ms) {
+            // Round to make for a more-accurate end result.
+            ms = Math.round(ms / 1000) * 1000;
+            var seconds = Math.floor(ms / 1000) % 60;
+            var minutes = Math.floor(ms / 60000);
+            return pad(minutes) + ':' + pad(seconds);
+        };
+
+    }());
+
+    var timerUpdateFrequency = 1000; // 1 second
+    var matchTime = 40 * 60 * 1000;  // 40 minutes
+
+    /**
+     * Abstract representation of a Yugioh match timer.
+     */
+    var makeTimer = function (spec) {
+        spec = spec === undefined ? {} : spec;
+        var self = makeEventEmitter();
+        var startTime = spec.startTime;
+        var timeout;
+        var getTimePassed = function () {
+            return Date.now() - startTime;
+        };
+        var getTimeLeft = function () {
+            return matchTime - getTimePassed();
+        };
+        var isInOvertime = function () {
+            return getTimePassed() > matchTime;
+        };
+        var tick = function () {
+            if (isInOvertime()) {
+                self.trigger('overtime');
+            } else {
+                self.trigger('tick');
+                timeout = setTimeout(tick, timerUpdateFrequency);
+            }
+        };
+        var persist = function () {
+            queuePersist('yc-timer', {
+                startTime: startTime
+            });
+        };
+        var restart = function () {
+            clearTimeout(timeout);
+            startTime = Date.now();
+            persist();
+            tick();
+        };
+        if (startTime === undefined) {
+            restart();
+        } else {
+            tick();
+        }
+        persist();
+        return _.assign(self, {
+            restart: restart,
+            getTimeLeft: getTimeLeft,
+            isInOvertime: isInOvertime
+        });
+    };
+
+    /**
+     * Reanimate a persisted timer object.
+     */
+    var makePersistedTimer = function (spec) {
+        spec = spec === undefined ? {} : spec;
+        var persistedSpec = unpersist('yc-timer');
+        if (persistedSpec) {
+            return makeTimer(persistedSpec);
+        } else {
+            return makeTimer(spec);
+        }
+    };
+
+    /**
+     * DOM representation of a timer object.
+     */
+    var makeTimerView = function (spec) {
+        spec = spec === undefined ? {} : spec;
+        var timer = spec.model;
+        var element = spec.element;
+        var renderOvertime = function () {
+            element.textContent = 'TIME';
+        };
+        var renderTime = function () {
+            element.textContent = formatMs(timer.getTimeLeft());
+        };
+        var render = function () {
+            if (timer.isInOvertime()) {
+                renderOvertime();
+            } else {
+                renderTime();
+            }
+        };
+        render();
+        timer.on('tick', renderTime);
+        timer.on('overtime', renderOvertime);
+    };
+
 
     /*
      * Static values.
@@ -410,6 +592,8 @@
     var playerViews;
     var expression;
     var expressionView;
+    var timer;
+    var timerView;
 
 
     /**
@@ -518,6 +702,10 @@
                 .addEventListener('click', function () {
                     restart();
                 });
+            document.getElementById('yc-button-reset-timer')
+                .addEventListener('click', function () {
+                    timer.restart();
+                });
             updateFontSizes();
             var onResizeFunction = _.debounce(updateFontSizes);
             _.forEach([
@@ -525,6 +713,11 @@
                 'orientationchange'
             ], function (event) {
                 window.addEventListener(event, onResizeFunction);
+            });
+            timer = makePersistedTimer();
+            timerView = makeTimerView({
+                model: timer,
+                element: document.getElementById('yc-timer')
             });
         };
     }());
