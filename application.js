@@ -5,59 +5,6 @@
     'use strict';
 
     /**
-     * Sets up hooks to run before and after objects' methods.
-     */
-    var advise = (function () {
-        var objects = [];
-        var runAdvices = function (advices) {
-            _.forEach(advices, function (fn) {
-                fn();
-            });
-        };
-        var getAdvisingFunction = function (mutateAdviceData) {
-            return function (object, methodName, advice) {
-                var entry = _.find(objects, function (entry) {
-                    return entry.object === object;
-                });
-                if (entry === undefined) {
-                    entry = {
-                        object: object,
-                        methods: {}
-                    };
-                }
-                var data;
-                if (entry.methods.hasOwnProperty(methodName)) {
-                    data = entry.methods[methodName];
-                } else {
-                    data = {
-                        method: object[methodName],
-                        before: [],
-                        after: []
-                    };
-                    entry.methods[methodName] = data;
-                }
-                mutateAdviceData(data, advice);
-                var method = data.method;
-                object[methodName] = function () {
-                    runAdvices(data.before);
-                    method.apply(this, arguments);
-                    runAdvices(data.after);
-                };
-            };
-        };
-        var before = getAdvisingFunction(function (data, advice) {
-            data.before.unshift(advice);
-        });
-        var after = getAdvisingFunction(function (data, advice) {
-            data.after.push(advice);
-        });
-        return {
-            before: before,
-            after: after
-        };
-    }());
-
-    /**
      * Makes an object that can emit named events to listeners.
      */
     var makeEventEmitter = function () {
@@ -81,7 +28,7 @@
                 }
             }
         };
-        var trigger = function (event, data) {
+        var emit = function (event, data) {
             if (Object.prototype.hasOwnProperty.call(events, event)) {
                 _.forEach(events[event], function (handler) {
                     handler(data);
@@ -91,7 +38,7 @@
         return {
             on: on,
             off: off,
-            trigger: trigger
+            emit: emit
         };
     };
 
@@ -125,6 +72,7 @@
      */
     var makePlayer = function (spec) {
         spec = spec === undefined ? {} : spec;
+        var self = makeEventEmitter();
         var id = spec.id;
         var lifePoints = spec.lifePoints === undefined ? 8000 : spec.lifePoints;
         var getId = function () {
@@ -143,22 +91,24 @@
             lifePoints -= amount;
             if (amount !== 0) {
                 persist();
+                self.emit('change');
             }
         };
         var gain = function (amount) {
             lifePoints += amount;
             if (amount !== 0) {
                 persist();
+                self.emit('change');
             }
         };
         persist();
-        return {
+        return _.assign(self, {
             type: 'player',
             getId: getId,
             getLifePoints: getLifePoints,
             lose: lose,
             gain: gain
-        };
+        });
     };
 
     /**
@@ -182,27 +132,17 @@
         var player = spec.model;
         var element = spec.element;
 
-        var previousLifePoints = NaN;
-
         var render = function () {
             var lifePoints = player.getLifePoints();
-            if (previousLifePoints !== lifePoints) {
-                element.textContent = lifePoints;
-                if (String(lifePoints).length > 4) {
-                    element.classList.add('yc-life-points-overflowing');
-                } else {
-                    element.classList.remove('yc-life-points-overflowing');
-                }
-                previousLifePoints = lifePoints;
+            element.textContent = lifePoints;
+            if (String(lifePoints).length > 4) {
+                element.classList.add('yc-life-points-overflowing');
+            } else {
+                element.classList.remove('yc-life-points-overflowing');
             }
         };
 
-        _.forEach([
-            'lose',
-            'gain'
-        ], function (methodName) {
-            advise.after(player, methodName, render);
-        });
+        player.on('change', render);
 
         return {
             render: render
@@ -347,6 +287,7 @@
      * evaluate and then add or subtract from a player's life points.
      */
     var makeExpression = function () {
+        var self = makeEventEmitter();
         var items;
         var index;
         var getItems = function () {
@@ -360,6 +301,7 @@
         };
         var insertDigit = function (digit) {
             getCurrentItem().insertDigit(digit);
+            self.emit('change');
         };
         var backspace = function () {
             var currentItem = getCurrentItem();
@@ -367,8 +309,10 @@
             if (index > 0 && currentItemIndex === 0) {
                 items.splice(items.length - 2, 2);
                 index -= 2;
+                self.emit('change');
             } else if (currentItemIndex > 0) {
                 currentItem.deleteLastDigit();
+                self.emit('change');
             }
         };
         var getValue = function () {
@@ -377,9 +321,10 @@
         var clearValue = function () {
             items = [makeOperand()];
             index = 0;
+            self.emit('change');
         };
         clearValue();
-        return {
+        return _.assign(self, {
             type: 'expression',
             getItems: getItems,
             getIndex: getIndex,
@@ -388,7 +333,7 @@
             backspace: backspace,
             getValue: getValue,
             clearValue: clearValue
-        };
+        });
     };
 
     /**
@@ -416,23 +361,11 @@
             }, '');
         };
 
-        var previousDisplayedValue = NaN;
-
         var render = function () {
-            var displayedValue = getDisplayedValue();
-            if (previousDisplayedValue !== displayedValue) {
-                element.innerHTML = displayedValue;
-                previousDisplayedValue = displayedValue;
-            }
+            element.innerHTML = getDisplayedValue();
         };
 
-        _.forEach([
-            'insertDigit',
-            'backspace',
-            'clearValue'
-        ], function (methodName) {
-            advise.after(expression, methodName, render);
-        });
+        expression.on('change', render);
 
         return {
             render: render
@@ -508,9 +441,9 @@
         };
         var tick = function () {
             if (isInOvertime()) {
-                self.trigger('overtime');
+                self.emit('overtime');
             } else {
-                self.trigger('tick');
+                self.emit('tick');
                 timeout = setTimeout(tick, timerUpdateFrequency);
             }
         };
