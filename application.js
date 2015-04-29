@@ -563,6 +563,7 @@
 
         var lifePointsHeightPercentage = 0.15;
         var lifePointsScaling = 0.85;
+        var lifePointsOverflowingScaling = 0.7;
         var expressionHeightPercentage = 0.1;
         var expressionScaling = 0.9;
         var buttonHeightPercentage = 0.15;
@@ -579,6 +580,11 @@
             insertRule(
                 '.yc-life-points {',
                 '    font-size: ' + (lifePointsHeightPx * lifePointsScaling) + 'px;',
+                '}'
+            );
+            insertRule(
+                '.yc-life-points-overflowing {',
+                '    font-size: ' + (lifePointsHeightPx * lifePointsOverflowingScaling) + 'px;',
                 '}'
             );
             insertRule(
