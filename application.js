@@ -257,20 +257,20 @@
      * Abstract representation of a mathematical operator in an unevaluated
      * mathematical expression.
      */
-    var makeOperator = function (symbol) {
-        var getSymbol = function () {
-            return symbol;
-        };
-        return {
-            type: 'operator',
-            getSymbol: getSymbol
-        };
-    };
+    // var makeOperator = function (symbol) {
+    //     var getSymbol = function () {
+    //         return symbol;
+    //     };
+    //     return {
+    //         type: 'operator',
+    //         getSymbol: getSymbol
+    //     };
+    // };
 
     /**
      * DOM representation of an operator object.
      */
-    var makeOperatorView = function (spec) {
+    var makeOperatorView = function () {
 
     };
 
