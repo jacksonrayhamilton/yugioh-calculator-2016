@@ -114,11 +114,13 @@ module.exports = function (grunt) {
                     modifier: 'modern',
                     exports: ['global'],
                     include: [
+                        'assign',
                         'constant',
                         'contains',
                         'debounce',
                         'find',
                         'forEach',
+                        'indexOf',
                         'map',
                         'reduce',
                         'times'
