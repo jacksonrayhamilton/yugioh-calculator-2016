@@ -494,37 +494,37 @@
                 document.getElementById('yc-button-minus-' + index)
                     .addEventListener('click', function () {
                         lose(players[index]);
-                    }, false);
+                    });
                 document.getElementById('yc-button-plus-' + index)
                     .addEventListener('click', function () {
                         gain(players[index]);
-                    }, false);
+                    });
             });
             _.times(10, function (number) {
                 document.getElementById('yc-button-digit-' + number)
                     .addEventListener('click', function () {
                         expression.insertDigit(number);
-                    }, false);
+                    });
             });
             document.getElementById('yc-button-cancel')
                 .addEventListener('click', function () {
                     expression.clearValue();
-                }, false);
+                });
             document.getElementById('yc-button-delete')
                 .addEventListener('click', function () {
                     expression.backspace();
-                }, false);
+                });
             document.getElementById('yc-button-reset-game')
                 .addEventListener('click', function () {
                     restart();
-                }, false);
+                });
             updateFontSizes();
             var onResizeFunction = _.debounce(updateFontSizes);
             _.forEach([
                 'resize',
                 'orientationchange'
             ], function (event) {
-                window.addEventListener(event, onResizeFunction, false);
+                window.addEventListener(event, onResizeFunction);
             });
         };
     }());
@@ -564,6 +564,6 @@
         initialize();
         initializeOnce();
         FastClick.attach(document.body);
-    }, false);
+    });
 
 }());
