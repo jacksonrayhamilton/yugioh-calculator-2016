@@ -58,17 +58,6 @@
     }());
 
     /**
-     * Inserts a string into a target string, replacing characters in the string
-     * up to the length of the inserted string. (Works like the INSERT key.)
-     * Also, it always replaces at least 1 character.
-     */
-    var insertString = function (target, string, index) {
-        // Length should always be treated as at least 1
-        var length = (string.length > 0) ? string.length : 1;
-        return target.substring(0, index) + string + target.substring(index + length);
-    };
-
-    /**
      * Writes an object to localStorage after a delay.
      */
     var queuePersist = (function () {
@@ -86,6 +75,9 @@
         };
     }());
 
+    /**
+     * Reads an object from localStorage synchronously.
+     */
     var unpersist = function (key) {
         return JSON.parse(localStorage.getItem(key));
     };
@@ -128,6 +120,9 @@
         };
     };
 
+    /**
+     * Reanimate a persisted player object.
+     */
     var makePersistedPlayer = function (spec) {
         var persistedSpec = unpersist('yc-player-' + spec.id);
         if (persistedSpec) {
@@ -430,16 +425,11 @@
         var lose = getExpressionApplicationFunction('lose');
         var gain = getExpressionApplicationFunction('gain');
 
+        // Stylesheet for dynamic rule insertion.
         var sheet = (function() {
-            // Create the <style> tag.
             var style = document.createElement('style');
-
-            // WebKit hack.
-            style.appendChild(document.createTextNode(''));
-
-            // Add the <style> element to the page.
+            style.appendChild(document.createTextNode('')); // WebKit hack
             document.head.appendChild(style);
-
             return style.sheet;
         }());
 
@@ -450,7 +440,8 @@
         };
 
         var insertRule = function () {
-            sheet.insertRule(Array.prototype.slice.call(arguments).join('\n'), sheet.cssRules.length);
+            var rule = Array.prototype.slice.call(arguments).join('\n');
+            sheet.insertRule(rule, sheet.cssRules.length);
         };
 
         var lifePointsHeightPercentage = 0.15;
