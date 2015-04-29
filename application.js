@@ -400,6 +400,67 @@
         };
         var lose = getExpressionApplicationFunction('lose');
         var gain = getExpressionApplicationFunction('gain');
+
+        var sheet = (function() {
+            // Create the <style> tag.
+            var style = document.createElement('style');
+
+            // WebKit hack.
+            style.appendChild(document.createTextNode(''));
+
+            // Add the <style> element to the page.
+            document.head.appendChild(style);
+
+            return style.sheet;
+        }());
+
+        var clearRules = function () {
+            while (sheet.cssRules.length > 0) {
+                sheet.deleteRule(0);
+            }
+        };
+
+        var insertRule = function () {
+            sheet.insertRule(Array.prototype.slice.call(arguments).join('\n'), sheet.cssRules.length);
+        };
+
+        var lifePointsHeightPercentage = 0.15;
+        var lifePointsScaling = 0.85;
+        var expressionHeightPercentage = 0.1;
+        var expressionScaling = 0.9;
+        var buttonHeightPercentage = 0.15;
+        var buttonPaddingPercentage = 0.01;
+        var buttonFontScaling = 0.85;
+        var timerFontScaling = 0.75;
+
+        var updateFontSizes = function () {
+            var bodyHeight = document.body.clientHeight;
+            var lifePointsHeightPx = bodyHeight * lifePointsHeightPercentage;
+            var expressionHeightPx = bodyHeight * expressionHeightPercentage;
+            var buttonHeightPx = bodyHeight * (buttonHeightPercentage - (2 * buttonPaddingPercentage));
+            clearRules();
+            insertRule(
+                '.yc-life-points {',
+                '    font-size: ' + (lifePointsHeightPx * lifePointsScaling) + 'px;',
+                '}'
+            );
+            insertRule(
+                '.yc-expression {',
+                '    font-size: ' + (expressionHeightPx * expressionScaling) + 'px;',
+                '}'
+            );
+            insertRule(
+                '.yc-button {',
+                '    font-size: ' + (buttonHeightPx * buttonFontScaling) + 'px;',
+                '}'
+            );
+            insertRule(
+                '.yc-timer {',
+                '    font-size: ' + (buttonHeightPx * timerFontScaling) + 'px;',
+                '}'
+            );
+        };
+
         return function () {
             expression = makeExpression();
             expressionView = makeExpressionView({
@@ -437,6 +498,14 @@
                 .addEventListener('click', function () {
                     restart();
                 }, false);
+            updateFontSizes();
+            var onResizeFunction = _.debounce(updateFontSizes);
+            _.forEach([
+                'resize',
+                'orientationchange'
+            ], function (event) {
+                window.addEventListener(event, onResizeFunction, false);
+            });
         };
     }());
 

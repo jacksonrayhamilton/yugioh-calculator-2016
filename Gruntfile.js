@@ -114,6 +114,7 @@ module.exports = function (grunt) {
                     modifier: 'modern',
                     exports: ['global'],
                     include: [
+                        'debounce',
                         'find',
                         'forEach',
                         'map',
