@@ -9,4 +9,4 @@ mkdir -p ../yc3-build/
 grunt build
 cp -r build/* ../yc3-build/
 cd ../yc3-build/
-divshot push
+divshot push production
