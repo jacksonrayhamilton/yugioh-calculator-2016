@@ -593,6 +593,11 @@
                 '}'
             );
             insertRule(
+                '.yc-selected-operand-digit {',
+                '    line-height: ' + (expressionHeightPx) + 'px;',
+                '}'
+            );
+            insertRule(
                 '.yc-button {',
                 '    font-size: ' + (buttonHeightPx * buttonFontScaling) + 'px;',
                 '}'
