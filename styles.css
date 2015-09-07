@@ -87,7 +87,7 @@ body {
 
     /* Pulsate. */
     opacity: 1;
-    animation: yc-blinker-blink 2s ease-in-out infinite;
+    animation: yc-blinker-blink 1s steps(1, start) infinite;
 
     /* Clever trick to exclude padding from background. */
     background-clip: content-box;
