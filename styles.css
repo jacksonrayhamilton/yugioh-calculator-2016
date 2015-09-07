@@ -74,6 +74,26 @@ body {
     font-size: 48px;
 }
 
+@keyframes yc-blinker-blink {
+    50% {
+        opacity: 0;
+    }
+}
+
+.yc-blinker {
+    width: 2px;
+    height: 100%;
+    background-color: #111612;
+
+    /* Pulsate. */
+    opacity: 1;
+    animation: yc-blinker-blink 2s ease-in-out infinite;
+
+    /* Clever trick to exclude padding from background. */
+    background-clip: content-box;
+    padding: 1% 0;
+}
+
 .yc-selected-operand-digit {
     color: #ddd;
     background-color: #111612;

@@ -166,7 +166,7 @@
         var values = [];
         var getValue = function () {
             if (values.length === 0) {
-                return '000';
+                return '00';
             } else if (values.length === 1) {
                 if (values[0] === 0) {
                     return '00';
@@ -175,7 +175,7 @@
                 }
             } else if (values.length >= 2) {
                 if (values.length === 2 && values[0] === 0 && values[1] === 0) {
-                    return '0';
+                    return '00';
                 } else {
                     return values.concat(getZeros(4 - values.length)).join('');
                 }
@@ -231,16 +231,23 @@
             // Determine the "currently selected" character in the value (the
             // one that will be highlighted to show the user his index).
             var wrappedChar = value.charAt(index);
-            if (_.contains(['', ' '], wrappedChar)) {
-                wrappedChar = '&nbsp;';
-            }
+
+            var conditionallyWrap = function (shouldWrap, start, text, end) {
+                if (shouldWrap) {
+                    return start + text + end;
+                } else {
+                    return text;
+                }
+            };
 
             var displayedValue;
             if (isSelected) {
                 // Wrap that "currently selected" character.
                 displayedValue =
                     value.substring(0, index) +
-                    '<span class="yc-selected-operand-digit">' + wrappedChar + '</span>' +
+                    conditionallyWrap(index < 2, '<div class="yc-blinker">', '', '</div>') +
+                    conditionallyWrap(index >= 2 && index < 4, '<span class="yc-selected-operand-digit">', wrappedChar, '</span>') +
+                    conditionallyWrap(index >= 4, '<div class="yc-blinker">', '', '</div>') +
                     value.substring(index + 1);
             } else {
                 displayedValue = value;
