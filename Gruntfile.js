@@ -2,213 +2,159 @@
 
 'use strict';
 
-var _ = require('lodash');
-
-var lodashBuildOutputPath = 'build/lodash.js';
-
 module.exports = function (grunt) {
 
-    require('load-grunt-tasks')(grunt);
+  require('load-grunt-tasks')(grunt);
 
-    grunt.initConfig({
-        autoprefixer: {
-            build: {
-                files: {
-                    '.tmp/concat/styles.css': '.tmp/concat/styles.css'
-                }
-            },
-            serve: {
-                options: {
-                    map: true
-                },
-                files: [{
-                    expand: true,
-                    cwd: '.tmp/serve/',
-                    src: '*.css',
-                    dest: '.tmp/serve/'
-                }]
-            }
-        },
-        clean: {
-            build: [
-                '.tmp/concat/**',
-                'build/**'
-            ],
-            inline: [
-                'build/**.js',
-                'build/**.css'
-            ],
-            postBuild: [
-                '.tmp/concat/**'
-            ],
-            serve: [
-                '.tmp/serve/**'
-            ]
-        },
-        connect: {
-            options: {
-                open: false,
-                port: 1024,
-                livereload: 35729
-            },
-            serve: {
-                options: {
-                    base: [
-                        '.tmp/serve/',
-                        './'
-                    ]
-                }
-            }
-        },
-        copy: {
-            build: {
-                files: [{
-                    expand: true,
-                    cwd: './',
-                    dest: 'build/',
-                    src: [
-                        'index.html',
-                        'fonts/**'
-                    ]
-                }]
-            },
-            styles: {
-                files: [{
-                    expand: true,
-                    cwd: './',
-                    src: '*.css',
-                    dest: '.tmp/serve/'
-                }]
-            }
-        },
-        htmlmin: {
-            build: {
-                options: {
-                    removeComments: true,
-                    collapseWhitespace: true,
-                    conservativeCollapse: true,
-                    collapseBooleanAttributes: true,
-                    removeAttributeQuotes: true,
-                    removeRedundantAttributes: true,
-                    removeEmptyAttributes: true,
-                    removeOptionalTags: true
-                },
-                files: {
-                    'build/index.html': 'build/index.html'
-                }
-            }
-        },
-        inline: {
-            build: {
-                options: {
-                    tag: ''
-                },
-                files: {
-                    'build/index.html': 'build/index.html'
-                }
-            }
-        },
-        lodash: {
-            build: {
-                options: {
-                    modifier: 'modern',
-                    exports: ['global'],
-                    include: [
-                        'assign',
-                        'constant',
-                        'contains',
-                        'debounce',
-                        'find',
-                        'forEach',
-                        'indexOf',
-                        'map',
-                        'reduce',
-                        'times'
-                    ]
-                },
-                dest: lodashBuildOutputPath
-            }
-        },
-        usemin: {
-            options: {
-                assetsDirs: ['build/']
-            },
-            html: 'build/index.html'
-        },
-        useminPrepare: {
-            options: {
-                dest: 'build/'
-            },
-            html: 'index.html'
-        },
-        watch: {
-            scripts: {
-                files: ['application.js'],
-                options: {
-                    livereload: true
-                }
-            },
-            styles: {
-                files: ['*.css'],
-                tasks: [
-                    'copy:styles',
-                    'autoprefixer:serve'
-                ]
-            },
-            livereload: {
-                options: {
-                    livereload: '<%= connect.options.livereload %>'
-                },
-                files: [
-                    '*.html',
-                    '.tmp/serve/*.css'
-                ]
-            }
+  grunt.initConfig({
+    autoprefixer: {
+      build: {
+        files: {
+          '.tmp/concat/styles.css': '.tmp/concat/styles.css'
         }
-    });
+      },
+      serve: {
+        options: {
+          map: true
+        },
+        files: [{
+          expand: true,
+          cwd: '.tmp/serve/',
+          src: '*.css',
+          dest: '.tmp/serve/'
+        }]
+      }
+    },
+    clean: {
+      build: [
+        '.tmp/concat/**',
+        'build/**'
+      ],
+      postBuild: [
+        '.tmp/concat/**'
+      ],
+      serve: [
+        '.tmp/serve/**'
+      ]
+    },
+    connect: {
+      options: {
+        open: false,
+        port: 1024,
+        livereload: 35729,
+        middleware: function (connect) {
+          return [
+            connect.static('.tmp/serve'),
+            connect().use(
+              '/bower_components',
+              connect.static('./bower_components')
+            ),
+            connect.static('app')
+          ];
+        }
+      },
+      serve: {}
+    },
+    copy: {
+      build: {
+        files: [{
+          expand: true,
+          cwd: 'app/',
+          src: 'index.html',
+          dest: 'build/'
+        }]
+      },
+      styles: {
+        files: [{
+          expand: true,
+          cwd: 'app/',
+          src: '*.css',
+          dest: '.tmp/serve/'
+        }]
+      }
+    },
+    filerev: {
+      build: {
+        src: 'build/*.{css,js}'
+      }
+    },
+    htmlmin: {
+      build: {
+        options: {
+          removeComments: true,
+          collapseWhitespace: true,
+          conservativeCollapse: true,
+          collapseBooleanAttributes: true,
+          removeAttributeQuotes: true,
+          removeRedundantAttributes: true,
+          removeEmptyAttributes: true,
+          removeOptionalTags: true
+        },
+        files: {
+          'build/index.html': 'build/index.html'
+        }
+      }
+    },
+    usemin: {
+      options: {
+        assetsDirs: ['build/']
+      },
+      html: 'build/index.html'
+    },
+    useminPrepare: {
+      options: {
+        dest: 'build/'
+      },
+      html: 'app/index.html'
+    },
+    watch: {
+      scripts: {
+        files: ['app/*.js'],
+        options: {
+          livereload: true
+        }
+      },
+      styles: {
+        files: ['app/*.css'],
+        tasks: [
+          'copy:styles',
+          'autoprefixer:serve'
+        ]
+      },
+      livereload: {
+        options: {
+          livereload: '<%= connect.options.livereload %>'
+        },
+        files: [
+          'app/index.html',
+          '.tmp/serve/*.css'
+        ]
+      }
+    }
+  });
 
-    grunt.registerTask('serve', [
-        'clean:serve',
-        'copy:styles',
-        'autoprefixer:serve',
-        'connect:serve',
-        'watch'
-    ]);
+  grunt.registerTask('serve', [
+    'clean:serve',
+    'copy:styles',
+    'autoprefixer:serve',
+    'connect:serve',
+    'watch'
+  ]);
 
-    // Update the usemin `concat:generated` task to use the custom lodash build.
-    grunt.registerTask('hijackLodash', function () {
-        var config = grunt.config.get('concat');
-        var scriptsConfig = _.find(config.generated.files, function (config) {
-            return /scripts\.js/.test(config.dest);
-        });
-        var lodashIndex = _.findIndex(scriptsConfig.src, function (path) {
-            return /lodash\.js/.test(path);
-        });
-        scriptsConfig.src = [].concat(
-            _.slice(scriptsConfig.src, 0, lodashIndex),
-            lodashBuildOutputPath,
-            _.slice(scriptsConfig.src, lodashIndex + 1)
-        );
-        grunt.config.set('concat', config);
-    });
+  grunt.registerTask('build', [
+    'clean:build',
+    'useminPrepare',
+    'concat:generated',
+    'autoprefixer:build',
+    'cssmin:generated',
+    'uglify:generated',
+    'copy:build',
+    'filerev:build',
+    'usemin',
+    'htmlmin:build',
+    'clean:postBuild'
+  ]);
 
-    grunt.registerTask('build', [
-        'clean:build',
-        'useminPrepare',
-        'lodash:build',
-        'hijackLodash',
-        'concat:generated',
-        'autoprefixer:build',
-        'cssmin:generated',
-        'uglify:generated',
-        'copy:build',
-        'usemin',
-        'inline',
-        'clean:inline',
-        'htmlmin:build',
-        'clean:postBuild'
-    ]);
-
-    grunt.registerTask('default', 'build');
+  grunt.registerTask('default', 'build');
 
 };
