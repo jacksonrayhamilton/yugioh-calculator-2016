@@ -1,0 +1,32 @@
+.yc-operand {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  height: 15%;
+  font-size: 13vh;
+  padding: 1%;
+}
+
+@keyframes yc-blinker-blink {
+  50% {
+    opacity: 0;
+  }
+}
+
+.yc-operand-blinker {
+  width: 2px;
+  height: 100%;
+  background-color: black;
+
+  /* Pulsate. */
+  opacity: 1;
+  animation: yc-blinker-blink 1s step-start infinite;
+}
+
+.yc-operand-selected-digit {
+  display: flex;
+  align-items: center;
+  height: 100%;
+  color: white;
+  background-color: black;
+}

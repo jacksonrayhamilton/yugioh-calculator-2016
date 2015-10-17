@@ -5,8 +5,8 @@
 }
 
 .yc-lp-val,
-.yc-lp-add,
-.yc-lp-sub {
+.yc-lp-gain,
+.yc-lp-lose {
   height: 100%;
   padding: 1%;
   display: flex;
@@ -18,7 +18,7 @@
   flex: 1;
 }
 
-.yc-lp-add,
-.yc-lp-sub {
+.yc-lp-gain,
+.yc-lp-lose {
   width: 15%;
 }

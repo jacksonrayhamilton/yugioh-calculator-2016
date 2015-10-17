@@ -1,7 +1,8 @@
 {
   "name": "yc3",
   "dependencies": {
-    "fastclick": "~1.0.6"
+    "fastclick": "~1.0.6",
+    "mithril": "~0.2.0"
   },
   "devDependencies": {
     "jasmine-core": "~2.3.4"

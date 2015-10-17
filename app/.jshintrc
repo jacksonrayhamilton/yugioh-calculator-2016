@@ -4,14 +4,18 @@
     "describe": false,
     "expect": false,
     "FastClick": false,
+    "m": false,
     "it": false,
     "ycHasOwnProperty": true,
+    "ycMakeApp": true,
     "ycMakeEventEmitter": true,
+    "ycMakeLayout": true,
+    "ycMakeLp": true,
     "ycMakeOperand": true,
     "ycMakePlayer": true,
     "ycQueuePersist": true,
-    "ycUnpersist": true,
-    "ycTimes": true
+    "ycTimes": true,
+    "ycUnpersist": true
   },
   "globalstrict": true
 }
