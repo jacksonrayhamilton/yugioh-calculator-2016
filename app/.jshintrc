@@ -1,6 +1,17 @@
 {
   "browser": true,
   "globals": {
-    "FastClick": false
-  }
+    "describe": false,
+    "expect": false,
+    "FastClick": false,
+    "it": false,
+    "ycHasOwnProperty": true,
+    "ycMakeEventEmitter": true,
+    "ycMakeOperand": true,
+    "ycMakePlayer": true,
+    "ycQueuePersist": true,
+    "ycUnpersist": true,
+    "ycTimes": true
+  },
+  "globalstrict": true
 }

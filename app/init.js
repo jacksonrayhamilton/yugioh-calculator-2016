@@ -1,7 +1,9 @@
-(function () {
+'use strict';
 
-  'use strict';
+var players = ycTimes(2, function () {
+  return ycMakePlayer();
+});
 
-  FastClick.attach(document.body);
+var operand = ycMakeOperand();
 
-}());
+FastClick.attach(document.body);
