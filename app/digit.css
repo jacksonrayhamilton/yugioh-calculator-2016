@@ -1,0 +1,9 @@
+.yc-digit {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 20%;
+  height: 20%;
+  padding: 1%;
+  font-size: 18vh;
+}

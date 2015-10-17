@@ -12,9 +12,16 @@ var ycMakeApp = function () {
       operand: operand
     });
   });
+  var digits = ycTimes(10, function (n) {
+    return ycMakeDigit({
+      value: n,
+      operand: operand
+    });
+  });
   var layout = ycMakeLayout({
     operand: operand,
-    lps: lps
+    lps: lps,
+    digits: digits
   });
   var onKeydown = function (event) {
     var keyCode = event.keyCode;
