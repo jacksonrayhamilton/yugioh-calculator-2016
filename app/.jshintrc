@@ -16,6 +16,7 @@
     "ycMakeDigit": true,
     "ycMakeLayout": true,
     "ycMakeLp": true,
+    "ycMakeMore": true,
     "ycMakeOperand": true,
     "ycMakePlayer": true,
     "ycMakePersistedPlayer": true,

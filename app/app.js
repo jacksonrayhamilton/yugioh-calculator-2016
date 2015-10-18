@@ -8,14 +8,9 @@ var ycMakeApp = function () {
   var digits;
   var timer;
   var calc;
-  var initFirst = function () {
-    players = ycTimes(2, function (n) {
-      return ycMakePersistedPlayer({
-        id: n
-      });
-    });
-    timer = ycMakePersistedTimer();
-  };
+  var more;
+  var mode;
+  var modes;
   var initNth = function () {
     operand = ycMakeOperand();
     lps = players.map(function (player) {
@@ -39,8 +34,19 @@ var ycMakeApp = function () {
     });
   };
   var init = function () {
-    initFirst();
+    players = ycTimes(2, function (n) {
+      return ycMakePersistedPlayer({
+        id: n
+      });
+    });
+    timer = ycMakePersistedTimer();
     initNth();
+    more = ycMakeMore();
+    mode = 0;
+    modes = [
+      calc,
+      more
+    ];
   };
   var reset = function () {
     players.forEach(function (player) {
@@ -65,12 +71,19 @@ var ycMakeApp = function () {
   var cancel = function () {
     operand.reset();
   };
+  var toggleMode = function () {
+    if (mode + 1 >= modes.length) {
+      mode = 0;
+    } else {
+      mode += 1;
+    }
+  };
   app.view = function () {
     return m('.yc-layout', [
-      calc.view(),
+      modes[mode].view(),
       m('.yc-layout-row.yc-layout-underline', [
         timer.view(),
-        m('.yc-layout-more', m.trust('&hellip;'))
+        m('.yc-layout-toggle', { onclick: toggleMode }, m.trust('&hellip;'))
       ])
     ]);
   };

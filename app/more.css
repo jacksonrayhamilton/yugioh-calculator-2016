@@ -1,0 +1,12 @@
+.yc-more-row {
+  height: 18%;
+  font-size: 6vh;
+  display: flex;
+}
+
+.yc-more-col {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
