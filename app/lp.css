@@ -5,7 +5,6 @@
 .yc-lp-val,
 .yc-lp-gain,
 .yc-lp-lose {
-  height: 100%;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -17,5 +16,5 @@
 
 .yc-lp-gain,
 .yc-lp-lose {
-  width: 15%;
+  width: 20%;
 }

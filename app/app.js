@@ -66,7 +66,17 @@ var ycMakeApp = function () {
       m('.yc-layout-row.yc-layout-modeline', [
         m('.yc-modeline-button.yc-cancel', { onclick: cancel }, 'C'),
         m('.yc-modeline-button.yc-reset', { onclick: reset }, 'R'),
-        operand.view()
+        m('.yc-layout-operand-table', [
+          m('.yc-layout-operand-spacer'),
+          m('.yc-layout-operand-cell', [
+            m('.yc-layout-operand-anchor', [
+              // Center some text to position the operand relative to the "right
+              // edge" of the below digit.
+              m.trust('&nbsp;'),
+              operand.view()
+            ])
+          ])
+        ])
       ]),
       ycTimes(2, function (n) {
         var someDigits = digits.slice(n * 5, (n * 5) + 5);
@@ -76,7 +86,8 @@ var ycMakeApp = function () {
         return m('.yc-layout-row.yc-layout-digits', views);
       }),
       m('.yc-layout-row.yc-layout-underline', [
-        timer.view()
+        timer.view(),
+        m('.yc-layout-more', m.trust('&hellip;'))
       ])
     ]);
   };
