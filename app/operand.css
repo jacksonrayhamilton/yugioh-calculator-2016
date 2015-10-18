@@ -20,6 +20,12 @@
   animation: yc-blinker-blink 1s step-start infinite;
 }
 
+@media (max-height: 250px) {
+  .yc-operand-blinker {
+    width: 1px;
+  }
+}
+
 .yc-operand-selected {
   display: flex;
   align-items: center;

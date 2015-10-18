@@ -6,14 +6,10 @@
   display: flex;
 }
 
-.yc-layout .yc-lp {
-  height: 15%;
-  font-size: 13vh;
-}
-
+.yc-layout .yc-lp,
 .yc-layout-modeline {
-  height: 15%;
-  font-size: 13vh;
+  height: 10%;
+  font-size: 9vh;
 }
 
 .yc-layout-modeline .yc-cancel,
@@ -27,11 +23,12 @@
 
 .yc-layout-modeline .yc-operand {
   flex: 1;
+  margin-right: 1%;
 }
 
 .yc-layout-digits {
-  height: 20%;
-  font-size: 18vh;
+  height: 15%;
+  font-size: 13vh;
 }
 
 .yc-layout-digits .yc-digit {
