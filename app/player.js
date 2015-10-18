@@ -4,11 +4,12 @@
  * Abstract representation of a Yugioh player.
  */
 var ycMakePlayer = function (spec) {
+  var defaultLifePoints = 8000;
   spec = spec === undefined ? {} : spec;
   var player = {};
   var id = spec.id;
   var lifePoints = spec.lifePoints === undefined ?
-    8000 :
+    defaultLifePoints :
     spec.lifePoints;
   player.type = 'player';
   player.getId = function () {
@@ -34,6 +35,10 @@ var ycMakePlayer = function (spec) {
     if (amount !== 0) {
       persist();
     }
+  };
+  player.reset = function () {
+    lifePoints = defaultLifePoints;
+    persist();
   };
   persist();
   return player;

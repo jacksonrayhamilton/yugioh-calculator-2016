@@ -8,6 +8,7 @@
     "jasmine": false,
     "m": false,
     "it": false,
+    "ycFormatMs": true,
     "ycHasOwnProperty": true,
     "ycMakeApp": true,
     "ycMakeCancel": true,
@@ -17,6 +18,8 @@
     "ycMakeOperand": true,
     "ycMakePlayer": true,
     "ycMakePersistedPlayer": true,
+    "ycMakeTimer": true,
+    "ycMakePersistedTimer": true,
     "ycQueuePersist": true,
     "ycTimes": true,
     "ycUnpersist": true

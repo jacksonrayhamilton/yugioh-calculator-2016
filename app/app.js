@@ -6,12 +6,14 @@ var ycMakeApp = function () {
   var operand;
   var lps;
   var digits;
+  var timer;
   var initFirst = function () {
     players = ycTimes(2, function (n) {
       return ycMakePersistedPlayer({
         id: n
       });
     });
+    timer = ycMakePersistedTimer();
   };
   var initNth = function () {
     operand = ycMakeOperand();
@@ -34,11 +36,10 @@ var ycMakeApp = function () {
   };
   init();
   var reset = function () {
-    players = ycTimes(2, function (n) {
-      return ycMakePlayer({
-        id: n
-      });
+    players.forEach(function (player) {
+      player.reset();
     });
+    timer.reset();
     initNth();
   };
   var onKeydown = function (event) {
@@ -74,7 +75,10 @@ var ycMakeApp = function () {
           return digit.view();
         });
         return m('.yc-layout-row.yc-layout-digits', views);
-      })
+      }),
+      m('.yc-layout-row.yc-layout-underline', [
+        timer.view()
+      ])
     ]);
   };
   document.addEventListener('keydown', onKeydown);
