@@ -12,12 +12,12 @@
   font-size: 9vh;
 }
 
-.yc-layout-modeline .yc-cancel,
+.yc-layout-modeline .yc-modeline-button,
 .yc-layout-modeline .yc-operand {
   height: 100%;
 }
 
-.yc-layout-modeline .yc-cancel {
+.yc-layout-modeline .yc-modeline-button {
   width: 20%;
 }
 
