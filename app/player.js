@@ -42,7 +42,7 @@ var ycMakePlayer = function (spec) {
 /**
  * Reanimate a persisted player object.
  */
-var makePersistedPlayer = function (spec) {
+var ycMakePersistedPlayer = function (spec) {
   spec = spec === undefined ? {} : spec;
   var persistedSpec = ycUnpersist('yc-player-' + spec.id);
   if (persistedSpec) {

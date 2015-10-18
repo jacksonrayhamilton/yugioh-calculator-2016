@@ -13,6 +13,7 @@
     "ycMakeLp": true,
     "ycMakeOperand": true,
     "ycMakePlayer": true,
+    "ycMakePersistedPlayer": true,
     "ycQueuePersist": true,
     "ycTimes": true,
     "ycUnpersist": true

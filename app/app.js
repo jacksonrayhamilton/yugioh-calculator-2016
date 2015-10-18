@@ -2,8 +2,10 @@
 
 var ycMakeApp = function () {
   var app = {};
-  var players = ycTimes(2, function () {
-    return ycMakePlayer();
+  var players = ycTimes(2, function (n) {
+    return ycMakePersistedPlayer({
+      id: n
+    });
   });
   var operand = ycMakeOperand();
   var lps = players.map(function (player) {
