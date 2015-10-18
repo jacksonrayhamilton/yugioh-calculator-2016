@@ -2,9 +2,6 @@
   display: flex;
   justify-content: flex-end;
   align-items: center;
-  height: 15%;
-  font-size: 13vh;
-  padding: 1%;
 }
 
 @keyframes yc-blinker-blink {

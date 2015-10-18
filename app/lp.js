@@ -8,11 +8,11 @@ var ycMakeLp = function (spec) {
   lp.type = 'lp';
   var gain = function () {
     player.gain(operand.getNumericValue());
-    operand.clear();
+    operand.reset();
   };
   var lose = function () {
     player.lose(operand.getNumericValue());
-    operand.clear();
+    operand.reset();
   };
   lp.view = function () {
     return m('.yc-lp', [

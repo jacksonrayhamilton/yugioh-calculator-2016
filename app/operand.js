@@ -16,7 +16,7 @@ var ycMakeOperand = function () {
   var operand = {};
   var values = [];
   operand.type = 'operand';
-  operand.clear = function () {
+  operand.reset = function () {
     values = [];
   };
   operand.getValue = function () {

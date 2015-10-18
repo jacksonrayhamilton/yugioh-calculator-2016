@@ -8,6 +8,7 @@
     "it": false,
     "ycHasOwnProperty": true,
     "ycMakeApp": true,
+    "ycMakeCancel": true,
     "ycMakeDigit": true,
     "ycMakeLayout": true,
     "ycMakeLp": true,

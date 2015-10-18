@@ -20,10 +20,14 @@ var ycMakeApp = function () {
       operand: operand
     });
   });
+  var cancel = ycMakeCancel({
+    operand: operand
+  });
   var layout = ycMakeLayout({
     operand: operand,
     lps: lps,
-    digits: digits
+    digits: digits,
+    cancel: cancel
   });
   var onKeydown = function (event) {
     var keyCode = event.keyCode;

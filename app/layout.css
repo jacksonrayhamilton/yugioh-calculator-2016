@@ -1,3 +1,43 @@
-.yc-layout-digits {
+.yc-layout {
+  height: 100%;
+}
+
+.yc-layout-row {
   display: flex;
+}
+
+.yc-layout .yc-lp {
+  height: 15%;
+  font-size: 13vh;
+}
+
+.yc-layout-modeline {
+  height: 15%;
+  font-size: 13vh;
+  justify-content: flex-end;
+}
+
+.yc-layout-modeline .yc-cancel,
+.yc-layout-modeline .yc-operand {
+  height: 100%;
+  padding: 1%;
+}
+
+.yc-layout-modeline .yc-cancel {
+  width: 20%;
+}
+
+.yc-layout-modeline .yc-operand {
+  flex: 1;
+}
+
+.yc-layout-digits {
+  height: 20%;
+  font-size: 18vh;
+}
+
+.yc-layout-digits .yc-digit {
+  width: 100%;
+  height: 100%;
+  padding: 1%;
 }
