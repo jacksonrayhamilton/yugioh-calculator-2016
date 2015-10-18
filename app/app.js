@@ -7,6 +7,7 @@ var ycMakeApp = function () {
   var lps;
   var digits;
   var timer;
+  var calc;
   var initFirst = function () {
     players = ycTimes(2, function (n) {
       return ycMakePersistedPlayer({
@@ -29,12 +30,18 @@ var ycMakeApp = function () {
         operand: operand
       });
     });
+    calc = ycMakeCalc({
+      lps: lps,
+      cancel: cancel,
+      reset: reset,
+      operand: operand,
+      digits: digits
+    });
   };
   var init = function () {
     initFirst();
     initNth();
   };
-  init();
   var reset = function () {
     players.forEach(function (player) {
       player.reset();
@@ -60,37 +67,14 @@ var ycMakeApp = function () {
   };
   app.view = function () {
     return m('.yc-layout', [
-      lps.map(function (lp) {
-        return lp.view();
-      }),
-      m('.yc-layout-row.yc-layout-modeline', [
-        m('.yc-modeline-button.yc-cancel', { onclick: cancel }, 'C'),
-        m('.yc-modeline-button.yc-reset', { onclick: reset }, 'R'),
-        m('.yc-layout-operand-table', [
-          m('.yc-layout-operand-spacer'),
-          m('.yc-layout-operand-cell', [
-            m('.yc-layout-operand-anchor', [
-              // Center some text to position the operand relative to the "right
-              // edge" of the below digit.
-              m.trust('&nbsp;'),
-              operand.view()
-            ])
-          ])
-        ])
-      ]),
-      ycTimes(2, function (n) {
-        var someDigits = digits.slice(n * 5, (n * 5) + 5);
-        var views = someDigits.map(function (digit) {
-          return digit.view();
-        });
-        return m('.yc-layout-row.yc-layout-digits', views);
-      }),
+      calc.view(),
       m('.yc-layout-row.yc-layout-underline', [
         timer.view(),
         m('.yc-layout-more', m.trust('&hellip;'))
       ])
     ]);
   };
+  init();
   document.addEventListener('keydown', onKeydown);
   m.mount(document.body, { view: app.view });
   app.destroy = function () {

@@ -11,6 +11,7 @@
     "ycFormatMs": true,
     "ycHasOwnProperty": true,
     "ycMakeApp": true,
+    "ycMakeCalc": true,
     "ycMakeCancel": true,
     "ycMakeDigit": true,
     "ycMakeLayout": true,
