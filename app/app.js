@@ -39,7 +39,6 @@ var ycMakeApp = function () {
     players.forEach(function (player) {
       player.reset();
     });
-    timer.reset();
     initNth();
   };
   var onKeydown = function (event) {

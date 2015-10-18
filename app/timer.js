@@ -39,7 +39,7 @@ var makeTimer = function (spec) {
     tick();
   };
   timer.view = function () {
-    return m('.yc-timer', { onclick: timer.restart },
+    return m('.yc-timer', { onclick: timer.reset },
              timer.isInOvertime() ?
              'TIME' :
              ycFormatMs(timer.getTimeLeft()));
