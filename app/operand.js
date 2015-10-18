@@ -75,19 +75,29 @@ var ycMakeOperand = function () {
 
     var leading = value.substring(0, index)
       .replace(/^0+/, '');
+    var trailing = value.substring(index + 1);
 
     // Determine the "currently selected" character in the value (the one that
     // will be highlighted to show the user his index).
     var selected = value.charAt(index);
 
+    // Split up so we can test positions more easily.
+    var splitDigits = function (digits) {
+      return digits.split('').map(function (digit) {
+        return m('span', digit);
+      });
+    };
+
+    var vals = values.length;
+
     return m('.yc-operand', [].concat(
-      leading,
-      index < 2 ? m('.yc-operand-blinker') : [],
-      index >= 2 && index < 4 ?
-        m('.yc-operand-selected-digit', selected) :
-        selected,
+      splitDigits(leading),
+      index < 2 && vals < 2 ? m('.yc-operand-blinker') : [],
+      (index >= 2 || vals >= 2) && index < 4 ?
+        m('.yc-operand-selected', selected) :
+        splitDigits(selected),
       index >= 4 ? m('.yc-operand-blinker') : [],
-      value.substring(index + 1)
+      splitDigits(trailing)
     ));
   };
   return operand;

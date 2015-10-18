@@ -1,9 +1,11 @@
 {
   "browser": true,
   "globals": {
+    "beforeEach": false,
     "describe": false,
     "expect": false,
     "FastClick": false,
+    "jasmine": false,
     "m": false,
     "it": false,
     "ycHasOwnProperty": true,

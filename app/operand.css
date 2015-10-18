@@ -20,7 +20,7 @@
   animation: yc-blinker-blink 1s step-start infinite;
 }
 
-.yc-operand-selected-digit {
+.yc-operand-selected {
   display: flex;
   align-items: center;
   height: 100%;
