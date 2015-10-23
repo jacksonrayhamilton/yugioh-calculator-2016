@@ -3,7 +3,7 @@
 /**
  * Abstract representation of a Yugioh match timer.
  */
-var makeTimer = function (spec) {
+var ycMakeTimer = function (spec) {
   var timerUpdateFrequency = 1000; // 1 second
   var matchTime = 40 * 60 * 1000;  // 40 minutes
   spec = spec === undefined ? {} : spec;
@@ -60,8 +60,8 @@ var ycMakePersistedTimer = function (spec) {
   spec = spec === undefined ? {} : spec;
   var persistedSpec = ycUnpersist('yc-timer');
   if (persistedSpec) {
-    return makeTimer(persistedSpec);
+    return ycMakeTimer(persistedSpec);
   } else {
-    return makeTimer(spec);
+    return ycMakeTimer(spec);
   }
 };
