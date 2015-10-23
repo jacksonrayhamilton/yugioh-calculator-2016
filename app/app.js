@@ -9,6 +9,7 @@ var ycMakeApp = function () {
   var timer;
   var calc;
   var more;
+  var history;
   var mode;
   var modes;
   var initNth = function () {
@@ -41,12 +42,20 @@ var ycMakeApp = function () {
     });
     timer = ycMakePersistedTimer();
     initNth();
-    more = ycMakeMore();
-    mode = 0;
-    modes = [
-      calc,
-      more
-    ];
+    more = ycMakeMore({
+      setMode: function (name) {
+        mode = name;
+      }
+    });
+    history = ycMakePersistedHistory({
+      players: players
+    });
+    mode = 'calc';
+    modes = {
+      calc: calc,
+      more: more,
+      history: history
+    };
   };
   var reset = function () {
     players.forEach(function (player) {
@@ -72,18 +81,20 @@ var ycMakeApp = function () {
     operand.reset();
   };
   var toggleMode = function () {
-    if (mode + 1 >= modes.length) {
-      mode = 0;
+    if ((mode !== 'calc' && mode !== 'more') || mode === 'calc') {
+      // Toggle or return to the "more" mode.
+      mode = 'more';
     } else {
-      mode += 1;
+      mode = 'calc';
     }
   };
   app.view = function () {
+    var toggleText = mode !== 'calc' ? 'Back' : m.trust('&hellip;');
     return m('.yc-layout', [
       modes[mode].view(),
       m('.yc-layout-row.yc-layout-underline', [
         timer.view(),
-        m('.yc-layout-toggle', { onclick: toggleMode }, m.trust('&hellip;'))
+        m('.yc-layout-toggle', { onclick: toggleMode }, toggleText)
       ])
     ]);
   };

@@ -1,0 +1,19 @@
+.yc-history {
+  overflow-y: scroll;
+  -webkit-overflow-scrolling: touch;
+}
+
+.yc-history-row {
+  display: flex;
+}
+
+.yc-history-name-col,
+.yc-history-desc-col,
+.yc-history-time-col {
+  padding: 5px;
+}
+
+.yc-history-desc-col {
+  flex: 1;
+  text-align: center;
+}

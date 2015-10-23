@@ -1,12 +1,22 @@
 'use strict';
 
 var ycMakeMore = function (spec) {
-  spec = spec === undefined ? {} : spec;
+  spec = spec || {};
   var more = {};
+  var setMode = spec.setMode;
+  var modes = {};
+  var modeNames = [
+    'history'
+  ];
+  modeNames.forEach(function (name) {
+    modes[name] = function () {
+      setMode(name);
+    };
+  });
   more.view = function () {
     return [
       m('.yc-more-row', [
-        m('.yc-more-col', 'History'),
+        m('.yc-more-col', { onclick: modes.history }, 'History'),
         m('.yc-more-col', 'Notes')
       ]),
       m('.yc-more-row', [

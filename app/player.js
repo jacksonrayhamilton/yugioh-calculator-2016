@@ -5,8 +5,8 @@
  */
 var ycMakePlayer = function (spec) {
   var defaultLifePoints = 8000;
-  spec = spec === undefined ? {} : spec;
-  var player = {};
+  spec = spec || {};
+  var player = ycMakeEventEmitter(spec);
   var id = spec.id;
   var lifePoints = spec.lifePoints === undefined ?
     defaultLifePoints :
@@ -24,17 +24,23 @@ var ycMakePlayer = function (spec) {
       lifePoints: lifePoints
     });
   };
-  player.lose = function (amount) {
-    lifePoints -= amount;
+  var gain = function (amount) {
+    var oldLifePoints = lifePoints;
+    lifePoints += amount;
     if (amount !== 0) {
+      player.emit('lifePointsChange', {
+        id: id,
+        old: oldLifePoints,
+        amount: amount
+      });
       persist();
     }
   };
+  player.lose = function (amount) {
+    gain(-1 * amount);
+  };
   player.gain = function (amount) {
-    lifePoints += amount;
-    if (amount !== 0) {
-      persist();
-    }
+    gain(amount);
   };
   player.reset = function () {
     lifePoints = defaultLifePoints;

@@ -11,3 +11,10 @@ var ycTimes = function (max, fn) {
   }
   return results;
 };
+
+var ycAssign = function (dest, source) {
+  Object.keys(source).forEach(function (key) {
+    dest[key] = source[key];
+  });
+  return dest;
+};
