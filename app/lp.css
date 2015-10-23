@@ -17,4 +17,5 @@
 .yc-lp-gain,
 .yc-lp-lose {
   width: 20%;
+  cursor: pointer;
 }

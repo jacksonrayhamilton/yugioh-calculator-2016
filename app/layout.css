@@ -78,4 +78,6 @@
   align-items: center;
 
   flex: 1;
+
+  cursor: pointer;
 }
