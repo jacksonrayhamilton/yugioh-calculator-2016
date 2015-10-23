@@ -6,8 +6,8 @@
 var ycMakeTimer = function (spec) {
   var timerUpdateFrequency = 1000; // 1 second
   var matchTime = 40 * 60 * 1000;  // 40 minutes
-  spec = spec === undefined ? {} : spec;
-  var timer = {};
+  spec = spec || {};
+  var timer = ycMakeEventEmitter(spec);
   var startTime = spec.startTime;
   var timeout;
   var getTimePassed = function () {
@@ -35,6 +35,7 @@ var ycMakeTimer = function (spec) {
   timer.reset = function () {
     clearTimeout(timeout);
     startTime = Date.now();
+    timer.emit('timerReset');
     persist();
     tick();
   };

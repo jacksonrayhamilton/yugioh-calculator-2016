@@ -5,13 +5,16 @@ var ycMakeHistory = function (spec) {
   spec = spec || {};
   var history = {};
   var events = spec.events || [];
+  var app = spec.app;
   var players = spec.players;
+  var timer = spec.timer;
   var persist = function () {
     ycQueuePersist('yc-history', {
       events: events
     });
   };
   var log = function (name, event) {
+    event = event || {};
     event.name = name;
     event.time = Date.now();
     events.push(event);
@@ -20,6 +23,12 @@ var ycMakeHistory = function (spec) {
     }
     persist();
   };
+  app.on('lifePointsReset', function () {
+    log('lifePointsReset');
+  });
+  timer.on('timerReset', function () {
+    log('timerReset');
+  });
   players.forEach(function (player) {
     player.on('lifePointsChange', function (event) {
       log('lifePointsChange', event);
@@ -32,9 +41,16 @@ var ycMakeHistory = function (spec) {
       var lifePoints = event.old + event.amount;
       description = event.old + (lifePoints > event.old ? ' + ' : ' - ') +
         Math.abs(event.amount) + ' = ' + lifePoints;
+    } else if (event.name === 'lifePointsReset') {
+      description = 'Life points reset';
+    } else if (event.name === 'timerReset') {
+      description = 'Timer reset';
     }
+    var name =
+      playerId !== undefined ? 'P' + (playerId + 1) :
+      m.trust('&nbsp;&nbsp;');
     return [
-      m('.yc-history-name-col', playerId !== undefined ? 'P' + (playerId + 1) : ''),
+      m('.yc-history-name-col', name),
       m('.yc-history-desc-col', description),
       m('.yc-history-time-col', ycGetTimestamp(event.time))
     ];

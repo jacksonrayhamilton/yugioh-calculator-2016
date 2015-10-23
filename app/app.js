@@ -1,7 +1,7 @@
 'use strict';
 
 var ycMakeApp = function () {
-  var app = {};
+  var app = ycMakeEventEmitter();
   var players;
   var operand;
   var lps;
@@ -48,7 +48,9 @@ var ycMakeApp = function () {
       }
     });
     history = ycMakePersistedHistory({
-      players: players
+      app: app,
+      players: players,
+      timer: timer
     });
     mode = 'calc';
     modes = {
@@ -61,6 +63,7 @@ var ycMakeApp = function () {
     players.forEach(function (player) {
       player.reset();
     });
+    app.emit('lifePointsReset');
     initNth();
   };
   var onKeydown = function (event) {
