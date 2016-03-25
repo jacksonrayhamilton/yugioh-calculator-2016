@@ -8,27 +8,6 @@
     "jasmine": false,
     "m": false,
     "it": false,
-    "ycAssign": true,
-    "ycFormatMs": true,
-    "ycGetTimestamp": true,
-    "ycHasOwnProperty": true,
-    "ycMakeApp": true,
-    "ycMakeCalc": true,
-    "ycMakeCancel": true,
-    "ycMakeDigit": true,
-    "ycMakeEventEmitter": true,
-    "ycMakeLayout": true,
-    "ycMakeLp": true,
-    "ycMakeMore": true,
-    "ycMakeOperand": true,
-    "ycMakePlayer": true,
-    "ycMakePersistedPlayer": true,
-    "ycMakePersistedHistory": true,
-    "ycMakePersistedTimer": true,
-    "ycMakeTimer": true,
-    "ycQueuePersist": true,
-    "ycTimes": true,
-    "ycUnpersist": true
-  },
-  "globalstrict": true
+    "YC": false
+  }
 }

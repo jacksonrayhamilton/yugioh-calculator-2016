@@ -1,4 +1,8 @@
-'use strict';
+(function () {
 
-ycMakeApp();
-FastClick.attach(document.body);
+  'use strict';
+
+  new YC.App();
+  FastClick.attach(document.body);
+
+}());

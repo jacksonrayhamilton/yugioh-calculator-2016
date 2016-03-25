@@ -1,68 +1,72 @@
-'use strict';
+(function () {
 
-/**
- * Abstract representation of a Yugioh match timer.
- */
-var ycMakeTimer = function (spec) {
-  var timerUpdateFrequency = 1000; // 1 second
-  var matchTime = 40 * 60 * 1000;  // 40 minutes
-  spec = spec || {};
-  var timer = ycMakeEventEmitter(spec);
-  var startTime = spec.startTime;
-  var timeout;
-  var getTimePassed = function () {
-    return Date.now() - startTime;
+  'use strict';
+
+  /**
+   * Abstract representation of a Yugioh match timer.
+   */
+  YC.Timer = function (spec) {
+    var timerUpdateFrequency = 1000; // 1 second
+    var matchTime = 40 * 60 * 1000;  // 40 minutes
+    spec = spec || {};
+    var timer = new YC.Events(spec);
+    var startTime = spec.startTime;
+    var timeout;
+    var getTimePassed = function () {
+      return Date.now() - startTime;
+    };
+    timer.getTimeLeft = function () {
+      return matchTime - getTimePassed();
+    };
+    timer.isInOvertime = function () {
+      return getTimePassed() > matchTime;
+    };
+    var tick = function () {
+      if (!timer.isInOvertime()) {
+        timeout = setTimeout(function () {
+          m.redraw();
+          tick();
+        }, timerUpdateFrequency);
+      }
+    };
+    var persist = function () {
+      YC.queuePersist('yc-timer', {
+        startTime: startTime
+      });
+    };
+    timer.reset = function () {
+      clearTimeout(timeout);
+      startTime = Date.now();
+      timer.emit('timerReset');
+      persist();
+      tick();
+    };
+    timer.view = function () {
+      return m('.yc-timer', { onclick: timer.reset },
+               timer.isInOvertime() ?
+               'TIME' :
+               YC.formatMs(timer.getTimeLeft()));
+    };
+    if (startTime === undefined) {
+      timer.reset();
+    } else {
+      persist();
+      tick();
+    }
+    return timer;
   };
-  timer.getTimeLeft = function () {
-    return matchTime - getTimePassed();
-  };
-  timer.isInOvertime = function () {
-    return getTimePassed() > matchTime;
-  };
-  var tick = function () {
-    if (!timer.isInOvertime()) {
-      timeout = setTimeout(function () {
-        m.redraw();
-        tick();
-      }, timerUpdateFrequency);
+
+  /**
+   * Reanimate a persisted timer object.
+   */
+  YC.PersistedTimer = function (spec) {
+    spec = spec === undefined ? {} : spec;
+    var persistedSpec = YC.unpersist('yc-timer');
+    if (persistedSpec) {
+      return new YC.Timer(persistedSpec);
+    } else {
+      return new YC.Timer(spec);
     }
   };
-  var persist = function () {
-    ycQueuePersist('yc-timer', {
-      startTime: startTime
-    });
-  };
-  timer.reset = function () {
-    clearTimeout(timeout);
-    startTime = Date.now();
-    timer.emit('timerReset');
-    persist();
-    tick();
-  };
-  timer.view = function () {
-    return m('.yc-timer', { onclick: timer.reset },
-             timer.isInOvertime() ?
-             'TIME' :
-             ycFormatMs(timer.getTimeLeft()));
-  };
-  if (startTime === undefined) {
-    timer.reset();
-  } else {
-    persist();
-    tick();
-  }
-  return timer;
-};
 
-/**
- * Reanimate a persisted timer object.
- */
-var ycMakePersistedTimer = function (spec) {
-  spec = spec === undefined ? {} : spec;
-  var persistedSpec = ycUnpersist('yc-timer');
-  if (persistedSpec) {
-    return ycMakeTimer(persistedSpec);
-  } else {
-    return ycMakeTimer(spec);
-  }
-};
+}());

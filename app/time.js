@@ -1,8 +1,6 @@
-'use strict';
-
-var ycGetTimestamp;
-var ycFormatMs;
 (function () {
+
+  'use strict';
 
   /**
    * Pads a 2-digit number with a leading zero, if needed.
@@ -14,7 +12,7 @@ var ycFormatMs;
   /**
    * Gets a timestamp in the format "hh:mm:ss A".
    */
-  ycGetTimestamp = function (ms) {
+  YC.getTimestamp = function (ms) {
     var date = ms === undefined ? new Date() : new Date(ms);
     var hours = date.getHours();
     var minutes = date.getMinutes();
@@ -37,7 +35,7 @@ var ycFormatMs;
   /**
    * Formats milliseconds as "00:00" (MINS:SECS).
    */
-  ycFormatMs = function (ms) {
+  YC.formatMs = function (ms) {
     // Round to make for a more-accurate end result.
     ms = Math.round(ms / 1000) * 1000;
     var seconds = Math.floor(ms / 1000) % 60;

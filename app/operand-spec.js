@@ -33,7 +33,7 @@ describe('operand', function () {
     jasmine.addMatchers(matchers);
   });
   it('should build up values', function () {
-    var operand = ycMakeOperand();
+    var operand = new YC.Operand();
     expect(operand.getValue()).toBe('00');
     operand.insertDigit(1);
     expect(operand.getValue()).toBe('100');
@@ -43,7 +43,7 @@ describe('operand', function () {
     expect(operand.getValue()).toBe('1230');
   });
   it('should transition from blinker to selected to blinker', function () {
-    var operand = ycMakeOperand();
+    var operand = new YC.Operand();
     expect(operand).toHaveThingAt('yc-operand-blinker', 0);
     expect(operand).toHaveThingAt('yc-operand-selected', -1);
     operand.insertDigit(1);
@@ -60,7 +60,7 @@ describe('operand', function () {
     expect(operand).toHaveThingAt('yc-operand-selected', -1);
   });
   it('should handle leading zeros correctly', function () {
-    var operand = ycMakeOperand();
+    var operand = new YC.Operand();
     operand.insertDigit(0);
     expect(operand).toHaveThingAt('yc-operand-blinker', 0);
     expect(operand).toHaveThingAt('yc-operand-selected', -1);
