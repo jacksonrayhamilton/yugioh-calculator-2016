@@ -33,6 +33,11 @@ var ycMakeApp = function () {
       operand: operand,
       digits: digits
     });
+    modes = {
+      calc: calc,
+      more: more,
+      history: history
+    };
   };
   var init = function () {
     players = ycTimes(2, function (n) {
@@ -41,7 +46,6 @@ var ycMakeApp = function () {
       });
     });
     timer = ycMakePersistedTimer();
-    initNth();
     more = ycMakeMore({
       setMode: function (name) {
         mode = name;
@@ -53,11 +57,7 @@ var ycMakeApp = function () {
       timer: timer
     });
     mode = 'calc';
-    modes = {
-      calc: calc,
-      more: more,
-      history: history
-    };
+    initNth();
   };
   var reset = function () {
     players.forEach(function (player) {
