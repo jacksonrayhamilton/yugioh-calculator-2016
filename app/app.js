@@ -10,7 +10,6 @@
     var digits;
     var timer;
     var calc;
-    var more;
     var history;
     var mode;
     var modes;
@@ -37,7 +36,6 @@
       });
       modes = {
         calc: calc,
-        more: more,
         history: history
       };
     };
@@ -48,11 +46,6 @@
         });
       });
       timer = new YC.PersistedTimer();
-      more = new YC.More({
-        setMode: function (name) {
-          mode = name;
-        }
-      });
       history = new YC.PersistedHistory({
         app: app,
         players: players,
@@ -85,21 +78,27 @@
     var cancel = function () {
       operand.reset();
     };
-    var toggleMode = function () {
-      if ((mode !== 'calc' && mode !== 'more') || mode === 'calc') {
-        // Toggle or return to the "more" mode.
-        mode = 'more';
-      } else {
-        mode = 'calc';
-      }
+    var revertMode = function () {
+      mode = 'calc';
+    };
+    var historyMode = function () {
+      mode = 'history';
+    };
+    var undo = function () {
+      // TODO: Implement
     };
     app.view = function () {
-      var toggleText = mode !== 'calc' ? 'Back' : m.trust('&hellip;');
+      var underlineRight = mode !== 'calc' ?
+          m('.yc-layout-revert', { onclick: revertMode }, 'Back') :
+          [
+            m('.yc-button', { onclick: historyMode }, 'H'),
+            m('.yc-button', { onclick: undo }, 'U')
+          ];
       return m('.yc-layout', [
         modes[mode].view(),
         m('.yc-layout-row.yc-layout-underline', [
           timer.view(),
-          m('.yc-layout-toggle', { onclick: toggleMode }, toggleText)
+          underlineRight
         ])
       ]);
     };

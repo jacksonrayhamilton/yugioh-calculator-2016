@@ -19,12 +19,12 @@
   font-size: 8vh;
 }
 
-.yc-layout-modeline .yc-modeline-button,
+.yc-layout-modeline .yc-button,
 .yc-layout-operand-table {
   height: 100%;
 }
 
-.yc-layout-modeline .yc-modeline-button {
+.yc-layout-modeline .yc-button {
   width: 20%;
 }
 
@@ -72,6 +72,10 @@
   width: 60%;
 }
 
+.yc-layout-underline .yc-button {
+  width: 20%;
+}
+
 .yc-layout .yc-history {
   flex: 1;
 }
@@ -80,7 +84,7 @@
   font-size: 2.5vh;
 }
 
-.yc-layout-toggle {
+.yc-layout-revert {
   display: flex;
   justify-content: center;
   align-items: center;
