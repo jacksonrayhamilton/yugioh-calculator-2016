@@ -10,6 +10,7 @@
     var app = spec.app;
     var players = spec.players;
     var timer = spec.timer;
+    var undos = spec.undos;
     var persist = function () {
       YC.queuePersist('yc-history', {
         events: events
@@ -28,13 +29,22 @@
     app.on('lifePointsReset', function () {
       log('lifePointsReset');
     });
+    undos.on('lifePointsResetRevert', function () {
+      log('lifePointsResetRevert');
+    });
     timer.on('timerReset', function () {
       log('timerReset');
+    });
+    undos.on('timerResetRevert', function () {
+      log('timerResetRevert');
     });
     players.forEach(function (player) {
       player.on('lifePointsChange', function (event) {
         log('lifePointsChange', event);
       });
+    });
+    undos.on('lifePointsChangeRevert', function (event) {
+      log('lifePointsChangeRevert', event);
     });
     var eventView = function (event) {
       var playerId = event.id;
@@ -43,10 +53,16 @@
         var lifePoints = event.old + event.amount;
         description = event.old + (lifePoints > event.old ? ' + ' : ' - ') +
           Math.abs(event.amount) + ' = ' + lifePoints;
+      } else if (event.name === 'lifePointsChangeRevert') {
+        description = 'Life points reverted to ' + event.lifePoints;
       } else if (event.name === 'lifePointsReset') {
         description = 'Life points reset';
+      } else if (event.name === 'lifePointsResetRevert') {
+        description = 'Life points reset reverted';
       } else if (event.name === 'timerReset') {
         description = 'Timer reset';
+      } else if (event.name === 'timerResetRevert') {
+        description = 'Timer reset reverted';
       }
       var name =
           playerId !== undefined ? 'P' + (playerId + 1) :

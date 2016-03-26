@@ -34,12 +34,24 @@
         startTime: startTime
       });
     };
-    timer.reset = function () {
+    var restore = function (time) {
       clearTimeout(timeout);
-      startTime = Date.now();
-      timer.emit('timerReset');
+      startTime = time;
       persist();
       tick();
+    };
+    timer.restore = function (time) {
+      restore(time);
+      timer.emit('timerRestore');
+    };
+    timer.reset = function () {
+      var event = {
+        previous: {
+          startTime: startTime
+        }
+      };
+      restore(Date.now());
+      timer.emit('timerReset', event);
     };
     timer.view = function () {
       return m('.yc-timer', { onclick: timer.reset },

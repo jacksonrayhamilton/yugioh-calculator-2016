@@ -13,6 +13,7 @@
     var timer;
     var calc;
     var history;
+    var undos;
     var mode;
     var modes;
     var initNth = function () {
@@ -48,19 +49,33 @@
         });
       });
       timer = new YC.PersistedTimer();
-      history = new YC.PersistedHistory({
+      undos = new YC.PersistedUndos({
         app: app,
         players: players,
         timer: timer
+      });
+      history = new YC.PersistedHistory({
+        app: app,
+        players: players,
+        timer: timer,
+        undos: undos
       });
       mode = 'calc';
       initNth();
     };
     var reset = function () {
+      var previous = players.map(function (player) {
+        return {
+          id: player.getId(),
+          lifePoints: player.getLifePoints()
+        };
+      });
       players.forEach(function (player) {
         player.reset();
       });
-      app.emit('lifePointsReset');
+      app.emit('lifePointsReset', {
+        previous: previous
+      });
       initNth();
     };
     var onKeydown = function (event) {
@@ -87,7 +102,7 @@
       mode = 'history';
     };
     var undo = function () {
-      // TODO: Implement
+      undos.undo();
     };
     app.view = function () {
       var underlineRight = mode !== 'calc' ?

@@ -14,6 +14,18 @@
     return results;
   };
 
+  YC.find = function (collection, predicate) {
+    var target;
+    Array.prototype.some.call(collection, function (element) {
+      var result = predicate(element);
+      if (result) {
+        target = element;
+      }
+      return result;
+    });
+    return target;
+  };
+
   YC.assign = function (dest, source) {
     Object.keys(source).forEach(function (key) {
       dest[key] = source[key];

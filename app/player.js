@@ -20,6 +20,12 @@
     player.getLifePoints = function () {
       return lifePoints;
     };
+    player.setLifePoints = function (_lifePoints) {
+      if (lifePoints !== _lifePoints) {
+        persist();
+      }
+      lifePoints = _lifePoints;
+    };
     var persist = function () {
       YC.queuePersist('yc-player-' + id, {
         id: id,
