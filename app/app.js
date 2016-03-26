@@ -64,6 +64,13 @@
       initNth();
     };
     var reset = function () {
+      var areAllPlayersDefault = players.every(function (player) {
+        return player.areLifePointsDefault();
+      });
+      if (areAllPlayersDefault) {
+        // Don't uselessly reset (it clutters the history).
+        return;
+      }
       var previous = players.map(function (player) {
         return {
           id: player.getId(),

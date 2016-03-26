@@ -26,6 +26,9 @@
       }
       lifePoints = _lifePoints;
     };
+    player.areLifePointsDefault = function () {
+      return lifePoints === defaultLifePoints;
+    };
     var persist = function () {
       YC.queuePersist('yc-player-' + id, {
         id: id,
