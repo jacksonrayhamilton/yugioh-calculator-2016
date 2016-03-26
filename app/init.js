@@ -2,7 +2,9 @@
 
   'use strict';
 
-  new YC.App();
+  new YC.App({
+    element: document.body
+  });
   FastClick.attach(document.body);
 
 }());

@@ -2,8 +2,10 @@
 
   'use strict';
 
-  YC.App = function () {
+  YC.App = function (spec) {
+    spec = spec || {};
     var app = new YC.Events();
+    var element = spec.element;
     var players;
     var operand;
     var lps;
@@ -104,10 +106,10 @@
     };
     init();
     document.addEventListener('keydown', onKeydown);
-    m.mount(document.body, { view: app.view });
+    m.mount(element, app);
     app.destroy = function () {
       document.removeEventListener('keydown', onKeydown);
-      m.mount(document.body, null);
+      m.mount(element, null);
     };
     return app;
   };
