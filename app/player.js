@@ -7,7 +7,7 @@
    */
   YC.Player = function (spec) {
     var defaultLifePoints = 8000;
-    spec = spec || {};
+    spec = spec === undefined ? {} : spec;
     var player = new YC.Events(spec);
     var id = spec.id;
     var lifePoints = spec.lifePoints === undefined ?

@@ -4,7 +4,7 @@
 
   YC.History = function (spec) {
     var maxEvents = 150;
-    spec = spec || {};
+    spec = spec === undefined ? {} : spec;
     var history = {};
     var events = spec.events || [];
     var app = spec.app;
@@ -68,7 +68,7 @@
   };
 
   YC.PersistedHistory = function (spec) {
-    spec = spec || {};
+    spec = spec === undefined ? {} : spec;
     var persistedSpec = YC.unpersist('yc-history');
     return new YC.History(YC.assign(persistedSpec || {}, spec));
   };

@@ -3,7 +3,7 @@
   'use strict';
 
   YC.App = function (spec) {
-    spec = spec || {};
+    spec = spec === undefined ? {} : spec;
     var app = new YC.Events();
     var element = spec.element;
     var players;

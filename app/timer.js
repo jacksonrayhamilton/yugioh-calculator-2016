@@ -8,7 +8,7 @@
   YC.Timer = function (spec) {
     var timerUpdateFrequency = 1000; // 1 second
     var matchTime = 40 * 60 * 1000;  // 40 minutes
-    spec = spec || {};
+    spec = spec === undefined ? {} : spec;
     var timer = new YC.Events(spec);
     var startTime = spec.startTime;
     var timeout;
