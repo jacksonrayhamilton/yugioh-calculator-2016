@@ -60,7 +60,7 @@ module.exports = function (grunt) {
         files: [{
           expand: true,
           cwd: 'app/',
-          src: 'index.html',
+          src: ['index.html', 'robots.txt'],
           dest: 'build/'
         }]
       },
