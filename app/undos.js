@@ -79,7 +79,7 @@
         var lifePoints = last.change.old;
         player.setLifePoints(lifePoints);
         undos.emit('lifePointsChangeRevert', {
-          id: player.id,
+          id: player.getId(),
           lifePoints: lifePoints
         });
       }
