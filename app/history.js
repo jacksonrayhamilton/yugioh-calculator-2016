@@ -75,9 +75,9 @@
     };
     history.view = function () {
       return m('.yc-history', [
-        events.map(function (event) {
-          return m('.yc-history-row', eventView(event));
-        })
+        events.reduceRight(function (previous, event) {
+          return previous.concat(m('.yc-history-row', eventView(event)));
+        }, [])
       ]);
     };
     return history;
