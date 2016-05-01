@@ -1,5 +1,4 @@
 *.log
 .tmp/
-bower_components/
 build/
 node_modules/
