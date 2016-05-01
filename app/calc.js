@@ -16,8 +16,8 @@
           return lp.view();
         }),
         m('.yc-layout-row.yc-layout-modeline', [
-          m('.yc-button.yc-cancel', { onclick: cancel }, 'C'),
-          m('.yc-button.yc-reset', { onclick: reset }, 'R'),
+          m('.yc-button.yc-cancel', {onclick: cancel}, 'C'),
+          m('.yc-button.yc-reset', {onclick: reset}, 'R'),
           m('.yc-layout-operand-table', [
             m('.yc-layout-operand-spacer'),
             m('.yc-layout-operand-cell', [

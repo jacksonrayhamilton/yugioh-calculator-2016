@@ -32,15 +32,13 @@
           zeros = getZeros(2);
           return values.concat(zeros).join('');
         }
-      } else if (values.length >= 2) {
-        if (values.length === 2 &&
-            values[0] === 0 &&
-            values[1] === 0) {
-          return '00';
-        } else {
-          zeros = getZeros(4 - values.length);
-          return values.concat(zeros).join('');
-        }
+      } else if (values.length === 2 &&
+                 values[0] === 0 &&
+                 values[1] === 0) {
+        return '00';
+      } else {
+        zeros = getZeros(4 - values.length);
+        return values.concat(zeros).join('');
       }
     };
     operand.getNumericValue = function () {
@@ -55,14 +53,12 @@
         } else {
           return 1;
         }
-      } else if (values.length >= 2) {
-        if (values.length === 2 &&
-            values[0] === 0 &&
-            values[1] === 0) {
-          return 0;
-        } else {
-          return values.length;
-        }
+      } else if (values.length === 2 &&
+                 values[0] === 0 &&
+                 values[1] === 0) {
+        return 0;
+      } else {
+        return values.length;
       }
     };
     operand.insertDigit = function (digit) {
@@ -75,8 +71,7 @@
       var value = operand.getValue();
       var index = operand.getIndex();
 
-      var leading = value.substring(0, index)
-        .replace(/^0+/, '');
+      var leading = value.substring(0, index).replace(/^0+/, '');
       var trailing = value.substring(index + 1);
 
       // Determine the "currently selected" character in the value (the one that

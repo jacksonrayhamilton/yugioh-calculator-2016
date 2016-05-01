@@ -18,7 +18,7 @@
       if (handler === undefined) {
         map[event] = [];
       } else {
-        while (true) {
+        for (;;) {
           var index = map[event].indexOf(handler);
           if (index === -1) {
             break;

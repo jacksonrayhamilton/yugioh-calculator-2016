@@ -54,7 +54,7 @@
       timer.emit('timerReset', event);
     };
     timer.view = function () {
-      return m('.yc-timer', { onclick: timer.reset },
+      return m('.yc-timer', {onclick: timer.reset},
                timer.isInOvertime() ?
                'TIME' :
                YC.formatMs(timer.getTimeLeft()));

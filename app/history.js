@@ -69,8 +69,8 @@
           m.trust('&nbsp;&nbsp;');
       return [
         m('.yc-history-name-col', name),
-          m('.yc-history-desc-col', description),
-          m('.yc-history-time-col', YC.getTimestamp(event.time))
+        m('.yc-history-desc-col', description),
+        m('.yc-history-time-col', YC.getTimestamp(event.time))
       ];
     };
     history.view = function () {

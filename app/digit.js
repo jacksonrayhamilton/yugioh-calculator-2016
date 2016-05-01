@@ -11,7 +11,7 @@
       operand.insertDigit(value);
     };
     digit.view = function () {
-      return m('.yc-digit', { onclick: insert }, value);
+      return m('.yc-digit', {onclick: insert}, value);
     };
     return digit;
   };

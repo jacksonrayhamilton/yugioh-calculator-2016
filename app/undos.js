@@ -11,12 +11,14 @@
     var players = spec.players;
     var timer = spec.timer;
     app.on('lifePointsReset', function (event) {
+      // eslint-disable-next-line no-use-before-define
       push({
         type: 'lifePointsReset',
         players: event.previous
       });
     });
     timer.on('timerReset', function (event) {
+      // eslint-disable-next-line no-use-before-define
       push({
         type: 'timerReset',
         timer: event.previous
@@ -24,6 +26,7 @@
     });
     players.forEach(function (player) {
       player.on('lifePointsChange', function (event) {
+        // eslint-disable-next-line no-use-before-define
         push({
           type: 'lifePointsChange',
           change: event
@@ -73,8 +76,8 @@
           startTime: startTime
         });
       } else if (last.type === 'lifePointsChange') {
-        var player = YC.find(players, function (player) {
-          return last.change.id === player.getId();
+        var player = YC.find(players, function (currentPlayer) {
+          return last.change.id === currentPlayer.getId();
         });
         var lifePoints = last.change.old;
         player.setLifePoints(lifePoints);

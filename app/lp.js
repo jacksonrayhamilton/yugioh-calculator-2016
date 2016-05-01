@@ -19,8 +19,8 @@
     lp.view = function () {
       return m('.yc-lp', [
         m('.yc-lp-val', player.getLifePoints()),
-        m('.yc-lp-gain', { onclick: gain }, '+'),
-        m('.yc-lp-lose', { onclick: lose }, '-')
+        m('.yc-lp-gain', {onclick: gain}, '+'),
+        m('.yc-lp-lose', {onclick: lose}, '-')
       ]);
     };
     return lp;

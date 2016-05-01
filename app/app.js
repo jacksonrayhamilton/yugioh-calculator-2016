@@ -32,8 +32,8 @@
       });
       calc = new YC.Calc({
         lps: lps,
-        cancel: cancel,
-        reset: reset,
+        cancel: cancel, // eslint-disable-line no-use-before-define
+        reset: reset, // eslint-disable-line no-use-before-define
         operand: operand,
         digits: digits
       });
@@ -113,11 +113,11 @@
     };
     app.view = function () {
       var underlineRight = mode !== 'calc' ?
-          m('.yc-layout-revert', { onclick: revertMode }, 'Back') :
-          [
-            m('.yc-button', { onclick: historyMode }, 'H'),
-            m('.yc-button', { onclick: undo }, 'U')
-          ];
+          m('.yc-layout-revert', {onclick: revertMode}, 'Back') :
+      [
+        m('.yc-button', {onclick: historyMode}, 'H'),
+        m('.yc-button', {onclick: undo}, 'U')
+      ];
       return m('.yc-layout', [
         modes[mode].view(),
         m('.yc-layout-row.yc-layout-underline', [

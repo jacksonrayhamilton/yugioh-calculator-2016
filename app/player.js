@@ -22,7 +22,7 @@
     };
     player.setLifePoints = function (_lifePoints) {
       if (lifePoints !== _lifePoints) {
-        persist();
+        persist(); // eslint-disable-line no-use-before-define
       }
       lifePoints = _lifePoints;
     };
