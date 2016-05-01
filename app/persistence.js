@@ -1,6 +1,6 @@
-(function () {
+'use strict';
 
-  'use strict';
+define(['YC'], function (YC) {
 
   /**
    * Writes an object to localStorage after a delay.
@@ -27,4 +27,4 @@
     return JSON.parse(localStorage.getItem(key));
   };
 
-}());
+});

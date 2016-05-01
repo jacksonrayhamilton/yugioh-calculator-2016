@@ -59,7 +59,9 @@ rules:
   wrap-iife: 2
 
   # Strict Mode
-  strict: 2
+  strict:
+    - 2
+    - global
 
   # Variables
   no-catch-shadow: 2

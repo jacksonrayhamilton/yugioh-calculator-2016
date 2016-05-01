@@ -1,12 +1,10 @@
 env:
+  amd: true
   browser: true
 
 globals:
   beforeEach: false
   describe: false
   expect: false
-  FastClick: false
   jasmine: false
-  m: false
   it: false
-  YC: false

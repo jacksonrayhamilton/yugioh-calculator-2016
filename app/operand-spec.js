@@ -1,6 +1,9 @@
-(function () {
+'use strict';
 
-  'use strict';
+require([
+  'YC',
+  'YC Operand'
+], function (YC) {
 
   describe('operand', function () {
     var matchers = {};
@@ -80,4 +83,4 @@
     });
   });
 
-}());
+});

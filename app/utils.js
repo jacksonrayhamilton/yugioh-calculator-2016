@@ -1,6 +1,6 @@
-(function () {
+'use strict';
 
-  'use strict';
+define(['YC'], function (YC) {
 
   YC.hasOwn = Function.prototype.call.bind(
     Object.prototype.hasOwnProperty
@@ -33,4 +33,4 @@
     return dest;
   };
 
-}());
+});

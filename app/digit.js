@@ -1,6 +1,10 @@
-(function () {
+'use strict';
 
-  'use strict';
+define([
+  'm',
+  'YC',
+  'css!YC Digit Styles'
+], function (m, YC) {
 
   YC.Digit = function (spec) {
     spec = spec === undefined ? {} : spec;
@@ -16,4 +20,4 @@
     return digit;
   };
 
-}());
+});

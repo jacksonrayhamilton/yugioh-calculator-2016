@@ -1,6 +1,10 @@
-(function () {
+'use strict';
 
-  'use strict';
+define([
+  'YC',
+  'YC Events',
+  'YC Persistence'
+], function (YC) {
 
   /**
    * Abstract representation of a Yugioh player.
@@ -74,4 +78,4 @@
     }
   };
 
-}());
+});

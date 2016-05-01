@@ -1,7 +1,9 @@
-(function () {
+'use strict';
 
-  'use strict';
+define(function () {
 
-  window.YC = {};
+  var YC = {};
 
-}());
+  return YC;
+
+});

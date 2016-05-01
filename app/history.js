@@ -1,6 +1,11 @@
-(function () {
+'use strict';
 
-  'use strict';
+define([
+  'm',
+  'YC',
+  'css!YC History Styles',
+  'YC Persistence'
+], function (m, YC) {
 
   YC.History = function (spec) {
     var maxEvents = 150;
@@ -89,4 +94,4 @@
     return new YC.History(YC.assign(persistedSpec || {}, spec));
   };
 
-}());
+});

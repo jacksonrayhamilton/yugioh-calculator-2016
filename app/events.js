@@ -1,6 +1,9 @@
-(function () {
+'use strict';
 
-  'use strict';
+define([
+  'YC',
+  'YC Utils'
+], function (YC) {
 
   /**
    * Makes an object that can emit named events to listeners.
@@ -37,4 +40,4 @@
     return events;
   };
 
-}());
+});

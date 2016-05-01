@@ -1,6 +1,19 @@
-(function () {
+'use strict';
 
-  'use strict';
+define([
+  'm',
+  'YC',
+  'YC Events',
+  'YC Operand',
+  'YC Lp',
+  'YC Digit',
+  'YC Calc',
+  'YC Player',
+  'YC Timer',
+  'YC Undos',
+  'YC History',
+  'YC Utils'
+], function (m, YC) {
 
   YC.App = function (spec) {
     spec = spec === undefined ? {} : spec;
@@ -136,4 +149,4 @@
     return app;
   };
 
-}());
+});

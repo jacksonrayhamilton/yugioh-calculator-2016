@@ -1,7 +1,9 @@
 {
   "dependencies": {
     "fastclick": "^1.0.6",
-    "mithril": "^0.2.4"
+    "mithril": "^0.2.4",
+    "require-css": "^0.1.8",
+    "requirejs": "^2.2.0"
   },
   "devDependencies": {
     "grunt": "^0.4.5",

@@ -1,6 +1,12 @@
-(function () {
+'use strict';
 
-  'use strict';
+define([
+  'YC',
+  'YC Events',
+  'YC Persistence',
+  'YC Time',
+  'YC Utils'
+], function (YC) {
 
   YC.Undos = function (spec) {
     var maxItems = 150;
@@ -96,4 +102,4 @@
     return new YC.Undos(YC.assign(persistedSpec || {}, spec));
   };
 
-}());
+});

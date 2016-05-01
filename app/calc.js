@@ -1,6 +1,9 @@
-(function () {
+'use strict';
 
-  'use strict';
+define([
+  'm',
+  'YC'
+], function (m, YC) {
 
   YC.Calc = function (spec) {
     spec = spec === undefined ? {} : spec;
@@ -42,4 +45,4 @@
     return calc;
   };
 
-}());
+});

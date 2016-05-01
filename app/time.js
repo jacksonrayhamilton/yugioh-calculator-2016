@@ -1,6 +1,6 @@
-(function () {
+'use strict';
 
-  'use strict';
+define(['YC'], function (YC) {
 
   /**
    * Pads a 2-digit number with a leading zero, if needed.
@@ -43,4 +43,4 @@
     return pad(minutes) + ':' + pad(seconds);
   };
 
-}());
+});

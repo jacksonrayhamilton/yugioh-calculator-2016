@@ -1,6 +1,10 @@
-(function () {
+'use strict';
 
-  'use strict';
+define([
+  'm',
+  'YC',
+  'css!YC Lp Styles'
+], function (m, YC) {
 
   YC.Lp = function (spec) {
     spec = spec === undefined ? {} : spec;
@@ -26,4 +30,4 @@
     return lp;
   };
 
-}());
+});

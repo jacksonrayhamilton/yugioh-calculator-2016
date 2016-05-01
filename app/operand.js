@@ -1,6 +1,11 @@
-(function () {
+'use strict';
 
-  'use strict';
+define([
+  'm',
+  'YC',
+  'css!YC Operand Styles',
+  'YC Utils'
+], function (m, YC) {
 
   var getZeros = (function () {
     var getZero = function () {
@@ -100,4 +105,4 @@
     return operand;
   };
 
-}());
+});

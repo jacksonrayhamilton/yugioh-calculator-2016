@@ -1,6 +1,13 @@
-(function () {
+'use strict';
 
-  'use strict';
+define([
+  'm',
+  'YC',
+  'YC Events',
+  'YC Persistence',
+  'YC Time',
+  'css!YC Timer Styles'
+], function (m, YC) {
 
   /**
    * Abstract representation of a Yugioh match timer.
@@ -81,4 +88,4 @@
     }
   };
 
-}());
+});
