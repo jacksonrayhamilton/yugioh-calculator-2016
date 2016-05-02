@@ -1,12 +1,8 @@
 'use strict';
 
 require.config({
-  map: {
-    '*': {
-      'css': 'node_modules/require-css/css'
-    }
-  },
   paths: {
+    'css': 'node_modules/require-css/css',
     'm': 'node_modules/mithril/mithril',
     'FastClick': 'node_modules/fastclick/lib/fastclick',
     'YC': 'module',
