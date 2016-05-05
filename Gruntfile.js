@@ -86,7 +86,7 @@ module.exports = function (grunt) {
       options: {
         processors: [
           autoprefixer({
-            browsers: '> 1%'
+            browsers: '> 0%'
           })
         ]
       },
