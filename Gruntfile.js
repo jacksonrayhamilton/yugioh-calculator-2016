@@ -109,7 +109,7 @@ module.exports = function (grunt) {
             'index.html',
             'robots.txt',
             '*.{css,js}',
-            '!*-spec.js'
+            '!*-test.js'
           ],
           dest: 'build/'
         }, {
