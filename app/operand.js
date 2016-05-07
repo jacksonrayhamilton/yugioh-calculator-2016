@@ -67,6 +67,9 @@ define([
       }
     };
     operand.insertDigit = function (digit) {
+      if (values.length >= 5) {
+        return;
+      }
       values.push(digit);
     };
     operand.deleteLastDigit = function () {
@@ -86,8 +89,12 @@ define([
       // Split up so we can test positions more easily.
       var splitDigits = function (digits) {
         return digits.split('').map(function (digit) {
-          return m('span', digit);
+          return m('span.yc-operand-digit', digit);
         });
+      };
+
+      var selectDigit = function (digit) {
+        return m('.yc-operand-selected.yc-operand-digit', digit);
       };
 
       var vals = values.length;
@@ -96,9 +103,9 @@ define([
         splitDigits(leading),
         index < 2 && vals < 2 ? m('.yc-operand-blinker') : [],
         (index >= 2 || vals >= 2) && index < 4 ?
-          m('.yc-operand-selected', selected) :
+          selectDigit(selected) :
           splitDigits(selected),
-        index >= 4 ? m('.yc-operand-blinker') : [],
+        index === 4 ? m('.yc-operand-blinker') : [],
         splitDigits(trailing)
       ));
     };
