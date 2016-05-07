@@ -40,8 +40,17 @@ var replaceRequirePaths = function (source, map) {
       configObjectExpression = node.arguments[0];
     }
   };
+  var variableDeclaratorHandler = function (node) {
+    if (node.id.type === 'Identifier' &&
+        node.id.name === 'require' &&
+        node.init && node.init.type === 'ObjectExpression') {
+      // Matched `var require = {}`.
+      configObjectExpression = node.init;
+    }
+  };
   walk.simple(ast, {
-    CallExpression: callExpressionHandler
+    CallExpression: callExpressionHandler,
+    VariableDeclarator: variableDeclaratorHandler
   });
   if (!configObjectExpression) {
     throw new Error('No `require.config({})` object found');
