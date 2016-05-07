@@ -45,8 +45,9 @@ define([
       });
       calc = new YC.Calc({
         lps: lps,
-        cancel: cancel, // eslint-disable-line no-use-before-define
         reset: reset, // eslint-disable-line no-use-before-define
+        cancel: cancel, // eslint-disable-line no-use-before-define
+        back: back, // eslint-disable-line no-use-before-define
         operand: operand,
         digits: digits
       });
@@ -114,6 +115,9 @@ define([
     };
     var cancel = function () {
       operand.reset();
+    };
+    var back = function () {
+      operand.deleteLastDigit();
     };
     var revertMode = function () {
       mode = 'calc';
