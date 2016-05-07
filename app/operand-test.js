@@ -4,7 +4,7 @@
 
 define(['YC', 'YC Operand'], function (YC) {
 
-  describe('operand', function () {
+  describe('Operand', function () {
 
     beforeEach(function () {
 
