@@ -181,7 +181,7 @@ module.exports = function (grunt) {
     },
     watch: {
       scripts: {
-        files: ['app/*.js'],
+        files: ['app/*.js', '!app/*-test.js'],
         options: {
           livereload: ports.livereload
         }
