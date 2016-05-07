@@ -27,44 +27,16 @@ define([
       values = [];
     };
     operand.getValue = function () {
-      var zeros;
-      if (values.length === 0) {
-        return '00';
-      } else if (values.length === 1) {
-        if (values[0] === 0) {
-          return '00';
-        } else {
-          zeros = getZeros(2);
-          return values.concat(zeros).join('');
-        }
-      } else if (values.length === 2 &&
-                 values[0] === 0 &&
-                 values[1] === 0) {
-        return '00';
-      } else {
-        zeros = getZeros(4 - values.length);
-        return values.concat(zeros).join('');
-      }
+      var zeros = values.length < 2 ?
+          getZeros(2) :
+          getZeros(4 - values.length);
+      return values.concat(zeros).join('');
     };
     operand.getNumericValue = function () {
       return parseFloat(operand.getValue());
     };
     operand.getIndex = function () {
-      if (values.length === 0) {
-        return 0;
-      } else if (values.length === 1) {
-        if (values[0] === 0) {
-          return 0;
-        } else {
-          return 1;
-        }
-      } else if (values.length === 2 &&
-                 values[0] === 0 &&
-                 values[1] === 0) {
-        return 0;
-      } else {
-        return values.length;
-      }
+      return values.length;
     };
     operand.insertDigit = function (digit) {
       if (values.length >= 5) {
@@ -79,7 +51,7 @@ define([
       var value = operand.getValue();
       var index = operand.getIndex();
 
-      var leading = value.substring(0, index).replace(/^0+/, '');
+      var leading = value.substring(0, index);
       var trailing = value.substring(index + 1);
 
       // Determine the "currently selected" character in the value (the one that
@@ -87,9 +59,22 @@ define([
       var selected = value.charAt(index);
 
       // Split up so we can test positions more easily.
-      var splitDigits = function (digits) {
+      var digitsToElements = function (digits, selectors) {
+        selectors = selectors === undefined ? function () {
+          return '';
+        } : selectors;
         return digits.split('').map(function (digit) {
-          return m('span.yc-operand-digit', digit);
+          return m('span.yc-operand-digit' + selectors(digit), digit);
+        });
+      };
+
+      var splitDigits = function (digits) {
+        return digitsToElements(digits);
+      };
+
+      var splitLeadingDigits = function (digits) {
+        return digitsToElements(digits, function (digit) {
+          return digit === '0' ? '.yc-operand-extra-digit' : '';
         });
       };
 
@@ -100,7 +85,7 @@ define([
       var vals = values.length;
 
       return m('.yc-operand', [].concat(
-        splitDigits(leading),
+        splitLeadingDigits(leading),
         index < 2 && vals < 2 ? m('.yc-operand-blinker') : [],
         (index >= 2 || vals >= 2) && index < 4 ?
           selectDigit(selected) :

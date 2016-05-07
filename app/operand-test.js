@@ -92,23 +92,6 @@ define(['YC', 'YC Operand'], function (YC) {
       expect(operand).to.have.operandDigits(5);
     });
 
-    it('should handle leading zeros correctly', function () {
-      var operand = new YC.Operand();
-      operand.insertDigit(0);
-      expect(operand).to.have.operandThingAt('yc-operand-blinker', 0);
-      expect(operand).to.have.operandThingAt('yc-operand-selected', -1);
-      operand.insertDigit(0);
-      expect(operand).to.have.operandThingAt('yc-operand-blinker', -1);
-      expect(operand).to.have.operandThingAt('yc-operand-selected', 0);
-      operand.insertDigit(1);
-      expect(operand).to.have.operandThingAt('yc-operand-blinker', -1);
-      expect(operand).to.have.operandThingAt('yc-operand-selected', 1);
-      operand.deleteLastDigit();
-      operand.insertDigit(0);
-      expect(operand).to.have.operandThingAt('yc-operand-blinker', -1);
-      expect(operand).to.have.operandThingAt('yc-operand-selected', 0);
-    });
-
   });
 
 });

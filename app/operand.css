@@ -4,6 +4,10 @@
   align-items: center;
 }
 
+.yc-operand-extra-digit {
+  opacity: 0.25;
+}
+
 @keyframes yc-blinker-blink {
   50% {
     opacity: 0;
