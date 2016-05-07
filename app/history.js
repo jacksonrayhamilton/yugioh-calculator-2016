@@ -16,6 +16,7 @@ define([
     var players = spec.players;
     var timer = spec.timer;
     var undos = spec.undos;
+    var revertMode = spec.revertMode;
     var persist = function () {
       YC.queuePersist('yc-history', {
         events: events
@@ -79,11 +80,17 @@ define([
       ];
     };
     history.view = function () {
-      return m('.yc-history', [
-        events.reduceRight(function (previous, event) {
-          return previous.concat(m('.yc-history-row', eventView(event)));
-        }, [])
-      ]);
+      return [
+        m('.yc-layout-row.yc-layout-status', [
+          timer.view(),
+          m('.yc-layout-revert', {onclick: revertMode}, 'Back')
+        ]),
+        m('.yc-history', [
+          events.reduceRight(function (previous, event) {
+            return previous.concat(m('.yc-history-row', eventView(event)));
+          }, [])
+        ])
+      ];
     };
     return history;
   };

@@ -49,7 +49,10 @@ define([
         cancel: cancel, // eslint-disable-line no-use-before-define
         back: back, // eslint-disable-line no-use-before-define
         operand: operand,
-        digits: digits
+        digits: digits,
+        timer: timer,
+        historyMode: historyMode, // eslint-disable-line no-use-before-define
+        undo: undo // eslint-disable-line no-use-before-define
       });
       modes = {
         calc: calc,
@@ -72,7 +75,8 @@ define([
         app: app,
         players: players,
         timer: timer,
-        undos: undos
+        undos: undos,
+        revertMode: revertMode // eslint-disable-line no-use-before-define
       });
       mode = 'calc';
       initNth();
@@ -129,18 +133,8 @@ define([
       undos.undo();
     };
     app.view = function () {
-      var underlineRight = mode !== 'calc' ?
-          m('.yc-layout-revert', {onclick: revertMode}, 'Back') :
-      [
-        m('.yc-button', {onclick: historyMode}, 'H'),
-        m('.yc-button', {onclick: undo}, 'U')
-      ];
       return m('.yc-layout', [
-        modes[mode].view(),
-        m('.yc-layout-row.yc-layout-underline', [
-          timer.view(),
-          underlineRight
-        ])
+        modes[mode].view()
       ]);
     };
     init();

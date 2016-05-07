@@ -2,6 +2,9 @@
   display: flex;
   flex-direction: column;
   height: 100%;
+
+  /* Sometimes there is an extra pixel on the bottom.  Rounding? */
+  overflow-y: hidden;
 }
 
 .yc-layout-row {
@@ -9,27 +12,26 @@
 }
 
 .yc-layout .yc-lp {
-  flex: 25;
+  flex: 22.5;
   font-size: 13vh;
 }
 
-.yc-layout-modeline,
-.yc-layout-underline {
+.yc-layout-status {
   flex: 10;
   font-size: 8vh;
 }
 
-.yc-layout-modeline .yc-button,
+.yc-layout-functions .yc-button,
 .yc-layout-operand-table {
   height: 100%;
 }
 
-.yc-layout-modeline .yc-button {
+.yc-layout-functions .yc-button {
   width: 20%;
 }
 
 .yc-layout-operand-table {
-  flex: 1;
+  flex: 2;
   display: flex;
   align-items: flex-end;
 }
@@ -58,6 +60,7 @@
   right: 0;
 }
 
+.yc-layout-functions,
 .yc-layout-digits {
   flex: 15;
   font-size: 13vh;
@@ -68,11 +71,12 @@
   height: 100%;
 }
 
-.yc-layout-underline .yc-timer {
-  width: 60%;
+.yc-layout-status .yc-timer,
+.yc-layout-functions .yc-timer {
+  flex: 3;
 }
 
-.yc-layout-underline .yc-button {
+.yc-layout-functions .yc-button {
   width: 20%;
 }
 
@@ -89,7 +93,7 @@
   justify-content: center;
   align-items: center;
 
-  flex: 1;
+  flex: 2;
 
   cursor: pointer;
 }

@@ -9,9 +9,12 @@ define([
     spec = spec === undefined ? {} : spec;
     var calc = {};
     var lps = spec.lps;
+    var timer = spec.timer;
     var reset = spec.reset;
     var cancel = spec.cancel;
     var back = spec.back;
+    var historyMode = spec.historyMode;
+    var undo = spec.undo;
     var operand = spec.operand;
     var digits = spec.digits;
     calc.view = function () {
@@ -19,10 +22,8 @@ define([
         lps.map(function (lp) {
           return lp.view();
         }),
-        m('.yc-layout-row.yc-layout-modeline', [
-          m('.yc-button.yc-reset', {onclick: reset}, 'R'),
-          m('.yc-button.yc-cancel', {onclick: cancel}, 'C'),
-          m('.yc-button.yc-back', {onclick: back}, 'B'),
+        m('.yc-layout-row.yc-layout-status', [
+          timer.view(),
           m('.yc-layout-operand-table', [
             m('.yc-layout-operand-spacer'),
             m('.yc-layout-operand-cell', [
@@ -34,6 +35,14 @@ define([
               ])
             ])
           ])
+
+        ]),
+        m('.yc-layout-row.yc-layout-functions', [
+          m('.yc-button', {onclick: reset}, 'R'),
+          m('.yc-button', {onclick: cancel}, 'C'),
+          m('.yc-button', {onclick: back}, 'B'),
+          m('.yc-button', {onclick: historyMode}, 'H'),
+          m('.yc-button', {onclick: undo}, 'U')
         ]),
         YC.times(2, function (n) {
           var someDigits = digits.slice(n * 5, (n * 5) + 5);
