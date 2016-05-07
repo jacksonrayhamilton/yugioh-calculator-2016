@@ -8,6 +8,7 @@
   "devDependencies": {
     "acorn": "^3.1.0",
     "autoprefixer": "^6.3.6",
+    "chai": "^3.5.0",
     "cheerio": "^0.20.0",
     "escodegen": "^1.8.0",
     "grunt": "^1.0.1",
@@ -18,11 +19,17 @@
     "grunt-contrib-uglify": "^1.0.1",
     "grunt-contrib-watch": "^1.0.0",
     "grunt-filerev": "^2.3.1",
+    "grunt-karma": "^1.0.0",
     "grunt-postcss": "^0.8.0",
     "grunt-sync": "^0.5.2",
-    "jasmine-core": "^2.4.1",
+    "karma": "^0.13.22",
+    "karma-chrome-launcher": "^1.0.1",
+    "karma-firefox-launcher": "^1.0.0",
+    "karma-mocha": "^1.0.1",
+    "karma-requirejs": "^1.0.0",
     "load-grunt-tasks": "^3.5.0",
     "lodash": "^4.11.1",
+    "mocha": "^2.4.5",
     "serve-static": "^1.10.2"
   }
 }

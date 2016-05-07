@@ -18,7 +18,8 @@ module.exports = function (grunt) {
 
   var ports = {
     serve: 1024,
-    livereload: 1025
+    livereload: 1025,
+    karma: 1026
   };
 
   grunt.initConfig({
@@ -79,6 +80,34 @@ module.exports = function (grunt) {
         },
         files: {
           'build/index.html': 'build/index.html'
+        }
+      }
+    },
+    karma: {
+      options: {
+        files: [
+          {pattern: 'node_modules/require-css/css.js', included: false},
+          {pattern: 'node_modules/mithril/mithril.js', included: false},
+          {pattern: 'node_modules/fastclick/lib/fastclick.js', included: false},
+          {pattern: 'node_modules/chai/chai.js', included: false},
+          {pattern: 'app/**/*.+(css|js)', included: false},
+          'app/require-config.js',
+          'app/test-main.js',
+          'node_modules/requirejs/require.js',
+          'node_modules/karma-requirejs/lib/adapter.js'
+        ],
+        frameworks: ['mocha'],
+        browsers: ['Chrome', 'Firefox'],
+        port: ports.karma
+      },
+      single: {
+        options: {
+          singleRun: true
+        }
+      },
+      auto: {
+        options: {
+          singleRun: false
         }
       }
     },
@@ -200,6 +229,14 @@ module.exports = function (grunt) {
     grunt.file.write('build/index.html', replaced);
     grunt.log.ok('Replaced index scripts with revisions');
   });
+
+  grunt.registerTask('test', [
+    'karma:single'
+  ]);
+
+  grunt.registerTask('test:auto', [
+    'karma:auto'
+  ]);
 
   grunt.registerTask('serve', [
     'clean:serve',
