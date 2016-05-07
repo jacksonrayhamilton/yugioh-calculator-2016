@@ -23,7 +23,7 @@
 
   // Get a list of all test files to include.
   require.deps = Object.keys(__karma__.files).reduce(function (testFiles, file) {
-    if (/-test\.js$/.test(file)) {
+    if (/^\/base\/app\/.*-test\.js$/.test(file)) {
       // Normalize paths to RequireJS module names.
       var normalized = file.replace(/^\/base\/app\/|\.js$/g, '');
       return testFiles.concat(normalized);
