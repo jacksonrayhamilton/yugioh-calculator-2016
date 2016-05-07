@@ -6,11 +6,17 @@ define([
   'YC Persistence'
 ], function (YC) {
 
+  var defaultLifePoints = 8000;
+
+  // These bounds are good for this application because there is only so much
+  // room in the UI to fit the numbers.
+  var maxLifePoints = 99999;
+  var minLifePoints = -9999;
+
   /**
    * Abstract representation of a Yugioh player.
    */
   YC.Player = function (spec) {
-    var defaultLifePoints = 8000;
     spec = spec === undefined ? {} : spec;
     var player = new YC.Events(spec);
     var id = spec.id;
@@ -42,6 +48,8 @@ define([
     var gain = function (amount) {
       var oldLifePoints = lifePoints;
       lifePoints += amount;
+      lifePoints = Math.min(lifePoints, maxLifePoints);
+      lifePoints = Math.max(lifePoints, minLifePoints);
       if (amount !== 0) {
         player.emit('lifePointsChange', {
           id: id,
