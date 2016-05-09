@@ -4,8 +4,12 @@
 'use strict';
 
 var require = {
+  map: {
+    '*': {
+      'css': 'node_modules/require-css/css'
+    }
+  },
   paths: {
-    'css': 'node_modules/require-css/css',
     'm': 'node_modules/mithril/mithril',
     'FastClick': 'node_modules/fastclick/lib/fastclick'
   }

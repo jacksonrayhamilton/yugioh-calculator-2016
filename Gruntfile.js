@@ -3,15 +3,15 @@
 'use strict';
 
 var autoprefixer = require('autoprefixer');
+var endsWith = require('lodash/endsWith');
+var fs = require('fs');
 var loadGruntTasks = require('load-grunt-tasks');
-var mapKeys = require('lodash/mapKeys');
-var mapValues = require('lodash/mapValues');
 var path = require('path');
-var pick = require('lodash/pick');
+var requirejs = require('requirejs');
 var serveStatic = require('serve-static');
 
-var replaceRequirePaths = require('./etc/replace-require-paths');
-var replaceScripts = require('./etc/replace-scripts');
+var injectFiles = require('./etc/inject-files');
+var asyncScripts = require('./etc/async-scripts');
 
 module.exports = function (grunt) {
 
@@ -26,6 +26,11 @@ module.exports = function (grunt) {
   grunt.initConfig({
     clean: {
       build: ['build/**'],
+      requirejsOptimize: [
+        'build/node_modules/require-css/css-builder.js',
+        'build/node_modules/require-css/normalize.js',
+        'build/_ignore.js'
+      ],
       serve: ['.tmp/serve/**']
     },
     connect: {
@@ -50,14 +55,6 @@ module.exports = function (grunt) {
           src: ['*.css'],
           dest: 'build'
         }]
-      }
-    },
-    filerev: {
-      build1: {
-        src: ['build/**/*.{css,js}', '!build/require-config.js']
-      },
-      build2: {
-        src: ['build/require-config.js']
       }
     },
     htmlmin: {
@@ -149,6 +146,8 @@ module.exports = function (grunt) {
           src: [
             'node_modules/requirejs/require.js',
             'node_modules/require-css/css.js',
+            'node_modules/require-css/css-builder.js',
+            'node_modules/require-css/normalize.js',
             'node_modules/mithril/mithril.js',
             'node_modules/fastclick/lib/fastclick.js'
           ],
@@ -168,17 +167,13 @@ module.exports = function (grunt) {
       options: {
         screwIE8: true
       },
-      build1: {
+      build: {
         files: [{
           expand: true,
           cwd: 'build',
-          src: ['**/*.js', '!require-config.js'],
+          src: ['**/*.js'],
           dest: 'build'
         }]
-      },
-      build2: {
-        src: 'build/require-config.js',
-        dest: 'build/require-config.js'
       }
     },
     watch: {
@@ -207,33 +202,52 @@ module.exports = function (grunt) {
     }
   });
 
-  /**
-   * Make `summary` keys and values relative to the path `relativeTo`.
-   */
-  var relativeSummary = function (relativeTo, summary) {
-    return mapKeys(mapValues(summary, function (value) {
-      return path.relative(relativeTo, value);
-    }), function (value, key) {
-      return path.relative(relativeTo, key);
+  grunt.registerTask('requirejsOptimize', function () {
+    var done = this.async(); // eslint-disable-line no-invalid-this
+    var baseUrl = 'build';
+    var normalizeFilePath = function (filePath) {
+      if (/^node_modules\/require-css\/css!/.test(filePath)) {
+        return filePath.split('!')[1] + '.css';
+      }
+      return path.relative(path.resolve(baseUrl), filePath);
+    };
+    var files = [];
+    requirejs.optimize({
+      baseUrl: baseUrl,
+      mainConfigFile: 'build/require-config.js',
+      name: 'main',
+      optimize: 'none',
+      out: 'build/_ignore.js',
+      onBuildWrite: function (moduleName, filePath, contents) {
+        var out = normalizeFilePath(filePath);
+        if (out !== 'node_modules/require-css/normalize.js') {
+          files.push(out);
+        }
+        if (endsWith(out, '.js')) {
+          fs.writeFileSync(path.resolve(baseUrl, out), contents);
+        }
+        return contents;
+      },
+      logLevel: 4 // logger.SILENT
+    }, function () {
+      grunt.requirejsOptimize = {
+        files: files
+      };
+      done();
     });
-  };
-
-  grunt.registerTask('replaceRequirePaths', function () {
-    var summary = relativeSummary('build', grunt.filerev.summary);
-    var replaced = replaceRequirePaths(grunt.file.read('build/require-config.js'), summary);
-    grunt.file.write('build/require-config.js', replaced);
-    grunt.log.ok('Replaced require paths with revisions');
   });
 
-  grunt.registerTask('replaceScripts', function () {
-    var summary = relativeSummary('build', grunt.filerev.summary);
-    var replaced = replaceScripts(grunt.file.read('build/index.html'), pick(summary, [
-      'require-config.js',
-      'node_modules/requirejs/require.js',
-      'main.js'
-    ]));
-    grunt.file.write('build/index.html', replaced);
-    grunt.log.ok('Replaced index scripts with revisions');
+  grunt.registerTask('requirejsInject', function () {
+    var html = grunt.file.read('build/index.html');
+    html = injectFiles(html, grunt.requirejsOptimize.files);
+    html = asyncScripts(html, {
+      ignore: [
+        'require-config.js',
+        'node_modules/requirejs/require.js'
+      ]
+    });
+    grunt.file.write('build/index.html', html);
+    grunt.log.ok('Injected  files');
   });
 
   grunt.registerTask('test', [
@@ -257,12 +271,10 @@ module.exports = function (grunt) {
     'sync:build',
     'postcss:build',
     'cssmin:build',
-    'uglify:build1',
-    'filerev:build1',
-    'replaceRequirePaths',
-    'uglify:build2',
-    'filerev:build2',
-    'replaceScripts',
+    'requirejsOptimize',
+    'clean:requirejsOptimize',
+    'uglify:build',
+    'requirejsInject',
     'htmlmin:build'
   ]);
 
