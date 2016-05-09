@@ -13,6 +13,14 @@
 
 .yc-layout .yc-lp {
   flex: 22.5;
+}
+
+.yc-layout .yc-lp-val {
+  font-size: 12vh;
+}
+
+.yc-layout .yc-lp-gain,
+.yc-layout .yc-lp-lose {
   font-size: 13vh;
 }
 
