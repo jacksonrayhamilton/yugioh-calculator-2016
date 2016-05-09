@@ -9,6 +9,7 @@ var loadGruntTasks = require('load-grunt-tasks');
 var path = require('path');
 var requirejs = require('requirejs');
 var serveStatic = require('serve-static');
+var without = require('lodash/without');
 
 var injectFiles = require('./etc/inject-files');
 var asyncScripts = require('./etc/async-scripts');
@@ -239,13 +240,12 @@ module.exports = function (grunt) {
 
   grunt.registerTask('requirejsInject', function () {
     var html = grunt.file.read('build/index.html');
-    html = injectFiles(html, grunt.requirejsOptimize.files);
-    html = asyncScripts(html, {
-      ignore: [
-        'require-config.js',
-        'node_modules/requirejs/require.js'
-      ]
-    });
+    var files = grunt.requirejsOptimize.files;
+    html = injectFiles(html, files);
+    html = asyncScripts(html, without(files, [
+      'require-config.js',
+      'node_modules/requirejs/require.js'
+    ]));
     grunt.file.write('build/index.html', html);
     grunt.log.ok('Injected  files');
   });

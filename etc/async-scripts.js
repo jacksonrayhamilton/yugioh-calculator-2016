@@ -4,18 +4,14 @@
 
 var cheerio = require('cheerio');
 var includes = require('lodash/includes');
-var defaults = require('lodash/defaults');
 
 /**
  * Given `html`, give all its scripts the `async=""` attribute.
  */
-var asyncScripts = function (html, options) {
-  options = defaults(options, {
-    ignore: []
-  });
+var asyncScripts = function (html, files) {
   var $ = cheerio.load(html);
   $('script').each(function (index, script) {
-    if (!includes(options.ignore, $(script).attr('src'))) {
+    if (includes(files, $(script).attr('src'))) {
       $(script).attr('async', '');
     }
   });
