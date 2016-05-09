@@ -1,0 +1,56 @@
+.yc-lp-val {
+  background-color: #eee;
+  margin: 5px 5px 0 5px;
+}
+
+.yc-lp-gain,
+.yc-lp-lose {
+  color: #fff;
+  margin: 5px 5px 0 0;
+}
+
+.yc-lp-gain {
+  background-color: #62ce21;
+}
+
+.yc-lp-lose {
+  background-color: #663dcf;
+}
+
+.yc-layout-status > * {
+  background-color: #eee;
+  margin: 5px 0 5px 5px;
+}
+
+.yc-layout-status > *:last-child {
+  margin: 5px;
+}
+
+.yc-reset-button,
+.yc-cancel-button,
+.yc-back-button {
+  color: #fff;
+  background-color: #ce312d;
+}
+
+.yc-history-button,
+.yc-undo-button {
+  background-color: #2c999a;
+}
+
+.yc-digit {
+  color: #fff;
+  background-color: #333;
+}
+
+.yc-layout > *:nth-child(4) > *:not(:last-child),
+.yc-layout > *:nth-child(5) > *:not(:last-child),
+.yc-layout > *:nth-child(6) > *:not(:last-child) {
+  margin: 0 0 5px 5px;
+}
+
+.yc-layout > *:nth-child(4) > *:last-child,
+.yc-layout > *:nth-child(5) > *:last-child,
+.yc-layout > *:nth-child(6) > *:last-child {
+  margin: 0 5px 5px 5px;
+}

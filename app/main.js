@@ -5,7 +5,8 @@ require([
   './app',
   'css!./global.css',
   'css!./button.css',
-  'css!./layout.css'
+  'css!./layout.css',
+  'css!./theme.css'
 ], function (YC) {
 
   // eslint-disable-next-line no-new
