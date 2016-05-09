@@ -63,8 +63,8 @@ define([
         selectors = selectors === undefined ? function () {
           return '';
         } : selectors;
-        return digits.split('').map(function (digit) {
-          return m('span.yc-operand-digit' + selectors(digit), digit);
+        return digits.split('').map(function (digit, digitIndex, digitStrings) {
+          return m('span.yc-operand-digit' + selectors(digitIndex, digitStrings), digit);
         });
       };
 
@@ -73,8 +73,10 @@ define([
       };
 
       var splitLeadingDigits = function (digits) {
-        return digitsToElements(digits, function (digit) {
-          return digit === '0' ? '.yc-operand-extra-digit' : '';
+        return digitsToElements(digits, function (digitIndex, digitStrings) {
+          return digitStrings.slice(0, digitIndex + 1).every(function (digit) {
+            return digit === '0';
+          }) ? '.yc-operand-extra-digit' : '';
         });
       };
 
