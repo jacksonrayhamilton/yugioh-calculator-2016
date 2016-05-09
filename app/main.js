@@ -1,11 +1,11 @@
 'use strict';
 
 require([
-  'YC',
-  'YC App',
-  'css!YC Global Styles',
-  'css!YC Button Styles',
-  'css!YC Layout Styles'
+  './yc',
+  './app',
+  'css!./global.css',
+  'css!./button.css',
+  'css!./layout.css'
 ], function (YC) {
 
   // eslint-disable-next-line no-new

@@ -2,17 +2,17 @@
 
 define([
   'm',
-  'YC',
-  'YC Events',
-  'YC Operand',
-  'YC Lp',
-  'YC Digit',
-  'YC Calc',
-  'YC Player',
-  'YC Timer',
-  'YC Undos',
-  'YC History',
-  'YC Utils'
+  './yc',
+  './events',
+  './operand',
+  './lp',
+  './digit',
+  './calc',
+  './player',
+  './timer',
+  './undos',
+  './history',
+  './utils'
 ], function (m, YC) {
 
   YC.App = function (spec) {

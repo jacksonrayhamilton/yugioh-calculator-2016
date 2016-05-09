@@ -2,9 +2,9 @@
 
 define([
   'm',
-  'YC',
-  'css!YC Operand Styles',
-  'YC Utils'
+  './yc',
+  'css!./operand.css',
+  './utils'
 ], function (m, YC) {
 
   var getZeros = (function () {

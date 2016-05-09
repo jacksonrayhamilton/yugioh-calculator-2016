@@ -2,7 +2,7 @@
 
 'use strict';
 
-define(['YC', 'YC Player'], function (YC) {
+define(['./yc', './player'], function (YC) {
 
   describe('Player', function () {
 

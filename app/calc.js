@@ -2,7 +2,7 @@
 
 define([
   'm',
-  'YC'
+  './yc'
 ], function (m, YC) {
 
   YC.Calc = function (spec) {

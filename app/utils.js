@@ -1,6 +1,6 @@
 'use strict';
 
-define(['YC'], function (YC) {
+define(['./yc'], function (YC) {
 
   YC.hasOwn = Function.prototype.call.bind(
     Object.prototype.hasOwnProperty

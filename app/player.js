@@ -1,9 +1,9 @@
 'use strict';
 
 define([
-  'YC',
-  'YC Events',
-  'YC Persistence'
+  './yc',
+  './events',
+  './persistence'
 ], function (YC) {
 
   var defaultLifePoints = 8000;

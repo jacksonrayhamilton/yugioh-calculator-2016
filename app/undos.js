@@ -1,11 +1,11 @@
 'use strict';
 
 define([
-  'YC',
-  'YC Events',
-  'YC Persistence',
-  'YC Time',
-  'YC Utils'
+  './yc',
+  './events',
+  './persistence',
+  './time',
+  './utils'
 ], function (YC) {
 
   YC.Undos = function (spec) {

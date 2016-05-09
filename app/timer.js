@@ -2,11 +2,11 @@
 
 define([
   'm',
-  'YC',
-  'YC Events',
-  'YC Persistence',
-  'YC Time',
-  'css!YC Timer Styles'
+  './yc',
+  './events',
+  './persistence',
+  './time',
+  'css!./timer.css'
 ], function (m, YC) {
 
   /**

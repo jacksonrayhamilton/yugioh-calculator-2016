@@ -2,8 +2,8 @@
 
 define([
   'm',
-  'YC',
-  'css!YC Lp Styles'
+  './yc',
+  'css!./lp.css'
 ], function (m, YC) {
 
   YC.Lp = function (spec) {

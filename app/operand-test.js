@@ -2,7 +2,7 @@
 
 'use strict';
 
-define(['YC', 'YC Operand'], function (YC) {
+define(['./yc', './operand'], function (YC) {
 
   describe('Operand', function () {
 

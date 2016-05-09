@@ -1,8 +1,8 @@
 'use strict';
 
 define([
-  'YC',
-  'YC Utils'
+  './yc',
+  './utils'
 ], function (YC) {
 
   /**

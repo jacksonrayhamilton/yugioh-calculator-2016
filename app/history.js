@@ -2,9 +2,9 @@
 
 define([
   'm',
-  'YC',
-  'css!YC History Styles',
-  'YC Persistence'
+  './yc',
+  'css!./history.css',
+  './persistence'
 ], function (m, YC) {
 
   YC.History = function (spec) {

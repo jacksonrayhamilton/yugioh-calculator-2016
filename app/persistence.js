@@ -1,6 +1,6 @@
 'use strict';
 
-define(['YC'], function (YC) {
+define(['./yc'], function (YC) {
 
   /**
    * Writes an object to localStorage after a delay.

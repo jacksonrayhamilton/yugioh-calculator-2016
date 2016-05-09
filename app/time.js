@@ -1,6 +1,6 @@
 'use strict';
 
-define(['YC'], function (YC) {
+define(['./yc'], function (YC) {
 
   /**
    * Pads a 2-digit number with a leading zero, if needed.

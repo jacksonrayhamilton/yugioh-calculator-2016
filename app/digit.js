@@ -2,8 +2,8 @@
 
 define([
   'm',
-  'YC',
-  'css!YC Digit Styles'
+  './yc',
+  'css!./digit.css'
 ], function (m, YC) {
 
   YC.Digit = function (spec) {
