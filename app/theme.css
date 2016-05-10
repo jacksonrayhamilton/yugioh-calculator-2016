@@ -1,3 +1,14 @@
+.yc-lp-val,
+.yc-lp-gain,
+.yc-lp-lose,
+.yc-timer,
+.yc-layout-operand-table,
+.yc-button,
+.yc-digit,
+.yc-layout-revert {
+  border-radius: 3px;
+}
+
 .yc-lp-val {
   background-color: #eee;
   margin: 5px 5px 0 5px;
