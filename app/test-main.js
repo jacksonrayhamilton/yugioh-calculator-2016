@@ -9,14 +9,11 @@ require.config({
 
   map: {
     '*': {
-      'css': '../node_modules/require-css/css'
+      'css': 'node_modules/require-css/css',
+      'm': 'node_modules/mithril/mithril',
+      'FastClick': 'node_modules/fastclick/lib/fastclick',
+      'chai': 'node_modules/chai/chai'
     }
-  },
-
-  paths: {
-    'm': '../node_modules/mithril/mithril',
-    'FastClick': '../node_modules/fastclick/lib/fastclick',
-    'chai': '../node_modules/chai/chai'
   },
 
   // Get a list of all test files to include.
