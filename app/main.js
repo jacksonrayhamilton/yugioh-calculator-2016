@@ -1,5 +1,17 @@
 'use strict';
 
+require.config({
+  map: {
+    '*': {
+      'css': 'node_modules/require-css/css'
+    }
+  },
+  paths: {
+    'm': 'node_modules/mithril/mithril',
+    'FastClick': 'node_modules/fastclick/lib/fastclick'
+  }
+});
+
 require([
   './yc',
   './app',

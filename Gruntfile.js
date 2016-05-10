@@ -105,12 +105,9 @@ module.exports = function (grunt) {
           {pattern: 'node_modules/fastclick/lib/fastclick.js', included: false},
           {pattern: 'node_modules/chai/chai.js', included: false},
           {pattern: 'app/**/*.+(css|js)', included: false},
-          'app/require-config.js',
-          'app/test-main.js',
-          'node_modules/requirejs/require.js',
-          'node_modules/karma-requirejs/lib/adapter.js'
+          'app/test-main.js'
         ],
-        frameworks: ['mocha'],
+        frameworks: ['mocha', 'requirejs'],
         browsers: ['Chrome', 'Firefox'],
         port: ports.karma
       },
@@ -230,7 +227,7 @@ module.exports = function (grunt) {
     var files = [];
     requirejs.optimize({
       baseUrl: baseUrl,
-      mainConfigFile: 'build/require-config.js',
+      mainConfigFile: 'build/main.js',
       name: 'main',
       optimize: 'none',
       out: 'build/_ignore.js',
@@ -258,7 +255,6 @@ module.exports = function (grunt) {
     var files = grunt.requirejsOptimize.files;
     html = injectFiles(html, files);
     html = asyncScripts(html, without(files, [
-      'require-config.js',
       'node_modules/requirejs/require.js'
     ]));
     grunt.file.write('build/index.html', html);

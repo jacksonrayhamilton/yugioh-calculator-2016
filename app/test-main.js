@@ -1,37 +1,35 @@
-/* global __karma__, require */
+/* global __karma__ */
 
 'use strict';
 
-(function () {
-
-  // Add additional testing libraries to the configuration.
-  require.paths['chai'] = 'node_modules/chai/chai';
-
-  Object.keys(require.paths).forEach(function (module) {
-    if (/^node_modules/.test(require.paths[module])) {
-      // Unlike in the development and deployment environments, Karma serves
-      // `node_modules` one level up.
-      require.paths[module] = '../' + require.paths[module];
-    }
-  });
+require.config({
 
   // Karma serves files under `/base`, i.e. the `basePath` from the config file.
-  require.baseUrl = '/base/app';
+  baseUrl: '/base/app',
 
-  // These will be required immediately after RequireJS loads.
-  var testDeps = ['chai'];
+  map: {
+    '*': {
+      'css': '../node_modules/require-css/css'
+    }
+  },
+
+  paths: {
+    'm': '../node_modules/mithril/mithril',
+    'FastClick': '../node_modules/fastclick/lib/fastclick',
+    'chai': '../node_modules/chai/chai'
+  },
 
   // Get a list of all test files to include.
-  require.deps = Object.keys(__karma__.files).reduce(function (testFiles, file) {
+  deps: Object.keys(__karma__.files).reduce(function (testFiles, file) {
     if (/^\/base\/app\/.*-test\.js$/.test(file)) {
       // Normalize paths to RequireJS module names.
       var normalized = file.replace(/^\/base\/app\/|\.js$/g, '');
       return testFiles.concat(normalized);
     }
     return testFiles;
-  }, testDeps);
+  }, ['chai']), // Arguments to the initial callback.
 
-  require.callback = function (chai) {
+  callback: function (chai) {
     // The following utilities are so ubiquitous that it is worth making them
     // globally available.
     window.Assertion = chai.Assertion;
@@ -39,6 +37,6 @@
 
     // We have to kickoff the test runner, as it is asynchronous.
     __karma__.start();
-  };
+  }
 
-}());
+});
