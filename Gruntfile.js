@@ -1,9 +1,12 @@
 /* eslint-env node */
+/* eslint-disable no-console */
 
 'use strict';
 
+var assign = require('lodash/assign');
 var autoprefixer = require('autoprefixer');
 var async = require('async');
+var crypto = require('crypto');
 var endsWith = require('lodash/endsWith');
 var forEach = require('lodash/forEach');
 var forOwn = require('lodash/forOwn');
@@ -12,12 +15,17 @@ var fs = require('fs');
 var includes = require('lodash/includes');
 var keys = require('lodash/keys');
 var loadGruntTasks = require('load-grunt-tasks');
+var map = require('lodash/map');
+var mapKeys = require('lodash/mapKeys');
 var mapValues = require('lodash/mapValues');
 var mkdirp = require('mkdirp');
 var path = require('path');
 var requirejs = require('requirejs');
 var startsWith = require('lodash/startsWith');
 var template = require('lodash/template');
+
+var replaceRequirePaths = require('./etc/replace-require-paths');
+var replaceHtmlFiles = require('./etc/replace-html-files');
 
 var indexTemplate = template(fs.readFileSync(path.join(__dirname, 'app/index.html'), 'utf8'));
 
@@ -69,6 +77,15 @@ module.exports = function (grunt) {
           src: ['**/*.css'],
           dest: 'build'
         }]
+      }
+    },
+    filerev: {
+      build: {
+        src: [
+          'build/http1/*.js',
+          'build/http2/main.js',
+          'build/**/*.css'
+        ]
       }
     },
     htmlmin: {
@@ -154,8 +171,7 @@ module.exports = function (grunt) {
           expand: true,
           cwd: 'app',
           src: [
-            'robots.txt',
-            '**/*.css'
+            'robots.txt'
           ],
           dest: 'build/http2'
         }]
@@ -218,9 +234,13 @@ module.exports = function (grunt) {
     }));
   });
 
+  var md5sum = function (string) {
+    return crypto.createHash('md5').update(string).digest('hex');
+  };
+
   grunt.registerTask('requirejsOptimize', function () {
     var done = this.async(); // eslint-disable-line no-invalid-this
-    var optimize = function (logger, pragma) {
+    var optimize = function (build, logger, pragma) {
       mkdirp.sync('.tmp/build');
       mkdirp.sync('build/http1');
       mkdirp.sync('build/http2');
@@ -230,6 +250,26 @@ module.exports = function (grunt) {
           return fileName.split('!')[1] + '.css';
         }
         return path.relative(path.resolve(baseUrl), fileName);
+      };
+      var summary = {};
+      var toTransport = build.toTransport;
+      build.toTransport = function (namespace, moduleName, fileName, contents) {
+        var normalized = path.parse(normalizeFileName(fileName));
+        if (normalized.ext === '.js') {
+          // NOTE: Not hashing compiled contents... that might leave out some edge
+          // case optimizations, OR maybe it is even harmful...
+          var sum = md5sum(contents).slice(0, 8);
+          var newModuleName = moduleName + '.' + sum;
+          var oldFileName = path.join(normalized.dir, normalized.base);
+          var newFileName = path.join(normalized.dir, normalized.name + '.' + sum + normalized.ext);
+          // "main.js" needs to be transformed using the hashes of other files, so
+          // save it for later.
+          if (oldFileName !== 'main.js') {
+            summary[oldFileName] = newFileName;
+          }
+          arguments[1] = newModuleName;
+        }
+        return toTransport.apply(build, arguments);
       };
       var styles = [];
       var scripts = [];
@@ -249,27 +289,38 @@ module.exports = function (grunt) {
           excludeRequireCss: true
         },
         onBuildWrite: function (moduleName, fileName, contents) {
-          var out = normalizeFileName(fileName);
-          if (out !== 'node_modules/require-css/normalize.js') {
-            if (endsWith(out, '.css')) {
-              styles.push(out);
-            } else if (endsWith(out, '.js')) {
-              scripts.push(out);
+          var file = normalizeFileName(fileName);
+          var http1Stream;
+          if (file !== 'node_modules/require-css/normalize.js') {
+            var http2Dest = path.resolve('build/http2', summary[file] ? summary[file] : file);
+            if (endsWith(file, '.css')) {
+              styles.push(file);
+              var fileStream = fs.createReadStream(path.join(baseUrl, file));
+              var http2Stream = fs.createWriteStream(http2Dest);
+              streams['http2/' + file] = http2Stream;
+              fileStream.pipe(http2Stream);
+              http1Stream =
+                  startsWith(file, 'node_modules') ?
+                  streams['http1/external.css'] || (streams['http1/external.css'] = fs.createWriteStream('build/http1/external.css')) :
+                  streams['http1/internal.css'] || (streams['http1/internal.css'] = fs.createWriteStream('build/http1/internal.css'));
+              fileStream.pipe(http1Stream);
+            } else if (endsWith(file, '.js')) {
+              scripts.push(file);
+              // Process in case we've enabled some pragmas.
               var processed = pragma.process(fileName, contents, config, 'OnSave');
-              if (out === 'node_modules/require-css/css.js') {
+              if (file === 'node_modules/require-css/css.js') {
                 // Fix bug that prevents almond from working.
                 processed = processed.replace(
                   'var cssAPI = {};',
                   'var cssAPI = {load: function (n, r, load) { load(); }};'
                 );
               }
-              var dest = path.resolve('build/http2', out);
-              mkdirp.sync(path.dirname(dest));
-              fs.writeFileSync(dest, processed);
-              var http1Stream =
-                  startsWith(out, 'node_modules') ?
-                  streams['external.js'] || (streams['external.js'] = fs.createWriteStream('build/http1/external.js')) :
-                  streams['internal.js'] || (streams['internal.js'] = fs.createWriteStream('build/http1/internal.js'));
+              mkdirp.sync(path.dirname(http2Dest));
+              fs.writeFileSync(http2Dest, processed);
+              http1Stream =
+                  startsWith(file, 'node_modules') ?
+                  streams['http1/external.js'] || (streams['http1/external.js'] = fs.createWriteStream('build/http1/external.js')) :
+                  streams['http1/internal.js'] || (streams['http1/internal.js'] = fs.createWriteStream('build/http1/internal.js'));
               http1Stream.write(processed);
             }
           }
@@ -277,40 +328,75 @@ module.exports = function (grunt) {
         },
         logLevel: logger.SILENT
       };
-      requirejs.optimize(config, function () {
-        forOwn(streams, function (stream) {
-          stream.end();
-        });
-        forEach(styles, function (file) {
-          var out =
-              startsWith(file, 'node_modules') ?
-              streams['external.css'] || (streams['external.css'] = fs.createWriteStream('build/http1/external.css')) :
-              streams['internal.css'] || (streams['internal.css'] = fs.createWriteStream('build/http1/internal.css'));
-          fs.createReadStream(path.resolve(baseUrl, file)).pipe(out);
+      build(config).then(function () {
+        forOwn(streams, function (stream, file) {
+          if (endsWith(file, '.js')) {
+            stream.end();
+          }
         });
         var tasks = mapValues(streams, function (stream) {
           return function (callback) {
             stream.on('finish', callback);
           };
         });
-        async.parallel(tasks, done);
+        async.parallel(tasks, function () {
+          grunt.requirejsOptimize = {
+            summary: summary
+          };
+          done();
+        });
         var filterByStreams = function (files) {
-          return filter(files, function (file) {
+          return map(filter(files, function (file) {
             return includes(keys(streams), file);
+          }), function (file) {
+            return file.replace(/^http1\//, '');
           });
         };
         fs.writeFileSync('build/http1/index.html', indexTemplate({
-          styles: filterByStreams(['external.css', 'internal.css']),
-          scripts: filterByStreams(['external.js', 'internal.js'])
+          styles: filterByStreams(['http1/external.css', 'http1/internal.css']),
+          scripts: filterByStreams(['http1/external.js', 'http1/internal.js'])
         }));
         fs.writeFileSync('build/http2/index.html', indexTemplate({
           styles: styles,
           scripts: scripts
         }));
+      }, function (error) {
+        console.error(error);
+        done(false);
       });
     };
     requirejs.tools.useLib(function (req) {
-      req(['logger', 'pragma'], optimize);
+      req(['build', 'logger', 'pragma'], optimize);
+    });
+  });
+
+  /**
+   * Make `summary` keys and values relative to the path `relativeTo`.
+   */
+  var relativeSummary = function (relativeTo, summary) {
+    return mapKeys(mapValues(summary, function (value) {
+      return path.relative(relativeTo, value);
+    }), function (value, key) {
+      return path.relative(relativeTo, key);
+    });
+  };
+
+  grunt.registerTask('replaceReferences', function () {
+    var fSummary = grunt.filerev.summary;
+    var rSummary = grunt.requirejsOptimize.summary;
+    forEach(['build/http1/internal.js', 'build/http2/main.js'], function (name) {
+      var dir = path.dirname(name);
+      name = fSummary[name];
+      var summary = assign({}, relativeSummary(dir, fSummary), rSummary);
+      fs.writeFileSync(name, replaceRequirePaths(fs.readFileSync(name, 'utf8'), summary));
+    });
+    forEach(['build/http1', 'build/http2'], function (dir) {
+      var name = path.join(dir, 'index.html');
+      var summary = assign({}, relativeSummary(dir, fSummary));
+      if (name === 'build/http2/index.html') {
+        assign(summary, rSummary);
+      }
+      fs.writeFileSync(name, replaceHtmlFiles(fs.readFileSync(name, 'utf8'), summary));
     });
   });
 
@@ -334,8 +420,10 @@ module.exports = function (grunt) {
   grunt.registerTask('build', [
     'clean:build',
     'sync:build',
-    'postcss:build',
     'requirejsOptimize',
+    'filerev:build',
+    'replaceReferences',
+    'postcss:build',
     'cssmin:build',
     'uglify:build',
     'htmlmin:build'
