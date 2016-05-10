@@ -3,16 +3,23 @@
 'use strict';
 
 var autoprefixer = require('autoprefixer');
+var async = require('async');
 var endsWith = require('lodash/endsWith');
+var forEach = require('lodash/forEach');
+var forOwn = require('lodash/forOwn');
+var filter = require('lodash/filter');
 var fs = require('fs');
+var includes = require('lodash/includes');
+var keys = require('lodash/keys');
 var loadGruntTasks = require('load-grunt-tasks');
+var mapValues = require('lodash/mapValues');
+var mkdirp = require('mkdirp');
 var path = require('path');
 var requirejs = require('requirejs');
-var serveStatic = require('serve-static');
-var without = require('lodash/without');
+var startsWith = require('lodash/startsWith');
+var template = require('lodash/template');
 
-var injectFiles = require('./etc/inject-files');
-var asyncScripts = require('./etc/async-scripts');
+var indexTemplate = template(fs.readFileSync(path.join(__dirname, 'app/index.html'), 'utf8'));
 
 module.exports = function (grunt) {
 
@@ -42,11 +49,6 @@ module.exports = function (grunt) {
     },
     clean: {
       build: ['build/**'],
-      requirejsOptimize: [
-        'build/node_modules/require-css/css-builder.js',
-        'build/node_modules/require-css/normalize.js',
-        'build/_ignore.js'
-      ],
       serve: ['.tmp/serve/**']
     },
     connect: {
@@ -55,11 +57,7 @@ module.exports = function (grunt) {
           port: ports.serve,
           livereload: ports.livereload,
           hostname: '*',
-          base: ['.tmp/serve', 'app'],
-          middleware: function (connect, options, middlewares) {
-            middlewares.push(connect().use('/node_modules', serveStatic('./node_modules')));
-            return middlewares;
-          }
+          base: ['.tmp/serve', 'app']
         }
       }
     },
@@ -68,7 +66,7 @@ module.exports = function (grunt) {
         files: [{
           expand: true,
           cwd: 'build',
-          src: ['*.css'],
+          src: ['**/*.css'],
           dest: 'build'
         }]
       }
@@ -92,9 +90,12 @@ module.exports = function (grunt) {
           sortAttributes: true,
           sortClassName: true
         },
-        files: {
-          'build/index.html': 'build/index.html'
-        }
+        files: [{
+          expand: true,
+          cwd: 'build',
+          src: ['**/*.html'],
+          dest: 'build'
+        }]
       }
     },
     karma: {
@@ -131,7 +132,7 @@ module.exports = function (grunt) {
         ]
       },
       build: {
-        src: 'build/*.css'
+        src: 'build/**/*.css'
       },
       serve: {
         options: {
@@ -146,25 +147,17 @@ module.exports = function (grunt) {
           expand: true,
           cwd: 'app',
           src: [
-            'index.html',
-            'robots.txt',
-            '*.{css,js}',
-            '!test-main.js',
-            '!*-test.js'
+            'robots.txt'
           ],
-          dest: 'build/'
+          dest: 'build/http1'
         }, {
           expand: true,
-          cwd: '.',
+          cwd: 'app',
           src: [
-            'node_modules/requirejs/require.js',
-            'node_modules/require-css/css.js',
-            'node_modules/require-css/css-builder.js',
-            'node_modules/require-css/normalize.js',
-            'node_modules/mithril/mithril.js',
-            'node_modules/fastclick/lib/fastclick.js'
+            'robots.txt',
+            '**/*.css'
           ],
-          dest: 'build/'
+          dest: 'build/http2'
         }]
       },
       styles: {
@@ -203,62 +196,122 @@ module.exports = function (grunt) {
           'postcss:serve'
         ]
       },
+      html: {
+        files: ['app/index.html'],
+        tasks: ['indexTemplate:serve']
+      },
       livereload: {
         options: {
           livereload: ports.livereload
         },
-        files: [
-          'app/index.html',
-          '.tmp/serve/*.css'
-        ]
+        files: ['.tmp/serve/*.{html,css}']
       }
     }
   });
 
-  grunt.registerTask('requirejsOptimize', function () {
-    var done = this.async(); // eslint-disable-line no-invalid-this
-    var baseUrl = 'build';
-    var normalizeFilePath = function (filePath) {
-      if (/^node_modules\/require-css\/css!/.test(filePath)) {
-        return filePath.split('!')[1] + '.css';
-      }
-      return path.relative(path.resolve(baseUrl), filePath);
-    };
-    var files = [];
-    requirejs.optimize({
-      baseUrl: baseUrl,
-      mainConfigFile: 'build/main.js',
-      name: 'main',
-      optimize: 'none',
-      out: 'build/_ignore.js',
-      onBuildWrite: function (moduleName, filePath, contents) {
-        var out = normalizeFilePath(filePath);
-        if (out !== 'node_modules/require-css/normalize.js') {
-          files.push(out);
-        }
-        if (endsWith(out, '.js')) {
-          fs.writeFileSync(path.resolve(baseUrl, out), contents);
-        }
-        return contents;
-      },
-      logLevel: 4 // logger.SILENT
-    }, function () {
-      grunt.requirejsOptimize = {
-        files: files
-      };
-      done();
-    });
+  grunt.registerTask('indexTemplate:serve', function () {
+    grunt.file.write('.tmp/serve/index.html', indexTemplate({
+      scripts: [
+        'node_modules/requirejs/require.js',
+        'main.js'
+      ]
+    }));
   });
 
-  grunt.registerTask('requirejsInject', function () {
-    var html = grunt.file.read('build/index.html');
-    var files = grunt.requirejsOptimize.files;
-    html = injectFiles(html, files);
-    html = asyncScripts(html, without(files, [
-      'node_modules/requirejs/require.js'
-    ]));
-    grunt.file.write('build/index.html', html);
-    grunt.log.ok('Injected  files');
+  grunt.registerTask('requirejsOptimize', function () {
+    var done = this.async(); // eslint-disable-line no-invalid-this
+    var optimize = function (logger, pragma) {
+      mkdirp.sync('.tmp/build');
+      mkdirp.sync('build/http1');
+      mkdirp.sync('build/http2');
+      var baseUrl = 'app';
+      var normalizeFileName = function (fileName) {
+        if (/^node_modules\/require-css\/css!/.test(fileName)) {
+          return fileName.split('!')[1] + '.css';
+        }
+        return path.relative(path.resolve(baseUrl), fileName);
+      };
+      var styles = [];
+      var scripts = [];
+      var streams = {};
+      var config = {
+        baseUrl: baseUrl,
+        mainConfigFile: 'app/main.js',
+        //  Use if not dynamically loading JS.
+        name: 'node_modules/almond/almond',
+        include: 'main',
+        // Use if dynamically loading JS.
+        // name: 'main',
+        optimize: 'none',
+        out: '.tmp/build/ignore',
+        pragmasOnSave: {
+          // Enable if not dynamically loading CSS.
+          excludeRequireCss: true
+        },
+        onBuildWrite: function (moduleName, fileName, contents) {
+          var out = normalizeFileName(fileName);
+          if (out !== 'node_modules/require-css/normalize.js') {
+            if (endsWith(out, '.css')) {
+              styles.push(out);
+            } else if (endsWith(out, '.js')) {
+              scripts.push(out);
+              var processed = pragma.process(fileName, contents, config, 'OnSave');
+              if (out === 'node_modules/require-css/css.js') {
+                // Fix bug that prevents almond from working.
+                processed = processed.replace(
+                  'var cssAPI = {};',
+                  'var cssAPI = {load: function (n, r, load) { load(); }};'
+                );
+              }
+              var dest = path.resolve('build/http2', out);
+              mkdirp.sync(path.dirname(dest));
+              fs.writeFileSync(dest, processed);
+              var http1Stream =
+                  startsWith(out, 'node_modules') ?
+                  streams['external.js'] || (streams['external.js'] = fs.createWriteStream('build/http1/external.js')) :
+                  streams['internal.js'] || (streams['internal.js'] = fs.createWriteStream('build/http1/internal.js'));
+              http1Stream.write(processed);
+            }
+          }
+          return contents;
+        },
+        logLevel: logger.SILENT
+      };
+      requirejs.optimize(config, function () {
+        forOwn(streams, function (stream) {
+          stream.end();
+        });
+        forEach(styles, function (file) {
+          var out =
+              startsWith(file, 'node_modules') ?
+              streams['external.css'] || (streams['external.css'] = fs.createWriteStream('build/http1/external.css')) :
+              streams['internal.css'] || (streams['internal.css'] = fs.createWriteStream('build/http1/internal.css'));
+          fs.createReadStream(path.resolve(baseUrl, file)).pipe(out);
+        });
+        var tasks = mapValues(streams, function (stream) {
+          return function (callback) {
+            stream.on('finish', callback);
+          };
+        });
+        async.parallel(tasks, done);
+        var filterByStreams = function (files) {
+          return filter(files, function (file) {
+            return includes(keys(streams), file);
+          });
+        };
+        fs.writeFileSync('build/http1/index.html', indexTemplate({
+          styles: filterByStreams(['external.css', 'internal.css']),
+          scripts: filterByStreams(['external.js', 'internal.js'])
+        }));
+        fs.writeFileSync('build/http2/index.html', indexTemplate({
+          styles: styles,
+          scripts: scripts
+        }));
+      });
+    };
+    requirejs.tools.useLib(function (req) {
+      req(['logger', 'pragma'], optimize);
+    });
   });
 
   grunt.registerTask('test', [
@@ -271,6 +324,7 @@ module.exports = function (grunt) {
 
   grunt.registerTask('serve', [
     'clean:serve',
+    'indexTemplate:serve',
     'sync:styles',
     'postcss:serve',
     'connect:serve',
@@ -281,11 +335,9 @@ module.exports = function (grunt) {
     'clean:build',
     'sync:build',
     'postcss:build',
-    'cssmin:build',
     'requirejsOptimize',
-    'clean:requirejsOptimize',
+    'cssmin:build',
     'uglify:build',
-    'requirejsInject',
     'htmlmin:build'
   ]);
 

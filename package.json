@@ -1,11 +1,13 @@
 {
   "dependencies": {
+    "almond": "^0.3.2",
     "fastclick": "^1.0.6",
     "mithril": "^0.2.4",
     "require-css": "^0.1.8",
     "requirejs": "^2.2.0"
   },
   "devDependencies": {
+    "async": "^2.0.0-rc.4",
     "autoprefixer": "^6.3.6",
     "chai": "^3.5.0",
     "cheerio": "^0.20.0",
@@ -27,7 +29,7 @@
     "karma-requirejs": "^1.0.0",
     "load-grunt-tasks": "^3.5.0",
     "lodash": "^4.11.1",
-    "mocha": "^2.4.5",
-    "serve-static": "^1.10.2"
+    "mkdirp": "^0.5.1",
+    "mocha": "^2.4.5"
   }
 }

@@ -7,9 +7,16 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
     <meta name="apple-mobile-web-app-title" content="Yugioh Calc"/>
     <meta name="format-detection" content="telephone=no"/>
+    <% typeof styles !== 'undefined' && styles.forEach(function (href) { %>
+      <link rel="stylesheet" href="<%= href %>"/>
+    <% }); %>
   </head>
   <body>
-    <script src="node_modules/requirejs/require.js"></script>
-    <script src="main.js"></script>
+    <% typeof scripts !== 'undefined' && scripts.forEach(function (src) { %>
+      <script src="<%= src %>"></script>
+    <% }); %>
+    <% typeof asyncScripts !== 'undefined' && asyncScripts.forEach(function (src) { %>
+      <script src="<%= src %>" async=""></script>
+    <% }); %>
   </body>
 </html>
