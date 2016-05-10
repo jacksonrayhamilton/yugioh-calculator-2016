@@ -9,6 +9,24 @@
   border-radius: 3px;
 }
 
+.yc-lp-gain,
+.yc-lp-lose,
+.yc-timer,
+.yc-button,
+.yc-digit,
+.yc-layout-revert {
+  position: relative;
+}
+
+.yc-lp-gain:active,
+.yc-lp-lose:active,
+.yc-timer:active,
+.yc-button:active,
+.yc-digit:active,
+.yc-layout-revert:active {
+  top: 1px;
+}
+
 .yc-lp-val {
   background-color: #eee;
   margin: 5px 5px 0 5px;
