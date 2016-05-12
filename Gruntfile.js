@@ -168,12 +168,10 @@ module.exports = function (grunt) {
   });
 
   grunt.registerTask('index:serve', function () {
-    grunt.file.write('.tmp/serve/index.html', injectIntoHtml(indexTemplate, {
-      scripts: [
-        'node_modules/requirejs/require.js',
-        'main.js'
-      ]
-    }));
+    grunt.file.write('.tmp/serve/index.html', injectIntoHtml(indexTemplate, [
+      'node_modules/requirejs/require.js',
+      'main.js'
+    ]));
   });
 
   grunt.registerTask('optimize', function () {
