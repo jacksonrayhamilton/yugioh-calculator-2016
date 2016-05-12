@@ -3,21 +3,15 @@
 
 'use strict';
 
-var assign = require('lodash/assign');
 var autoprefixer = require('autoprefixer');
-var forEach = require('lodash/forEach');
 var fs = require('fs');
 var loadGruntTasks = require('load-grunt-tasks');
-var mapKeys = require('lodash/mapKeys');
-var mapValues = require('lodash/mapValues');
 var path = require('path');
-var template = require('lodash/template');
 
-var multiprotocol = require('./etc/multiprotocol');
-var replaceRequirePaths = require('./etc/replace-require-paths');
-var replaceHtmlFiles = require('./etc/replace-html-files');
+var optimize = require('./etc/optimize');
+var injectIntoHtml = require('./etc/inject-into-html');
 
-var indexTemplate = template(fs.readFileSync(path.join(__dirname, 'app/index.html'), 'utf8'));
+var indexTemplate = fs.readFileSync(path.join(__dirname, 'app/index.html'), 'utf8');
 
 module.exports = function (grunt) {
 
@@ -57,25 +51,6 @@ module.exports = function (grunt) {
           hostname: '*',
           base: ['.tmp/serve', 'app']
         }
-      }
-    },
-    cssmin: {
-      build: {
-        files: [{
-          expand: true,
-          cwd: 'build',
-          src: ['**/*.css'],
-          dest: 'build'
-        }]
-      }
-    },
-    filerev: {
-      build: {
-        src: [
-          'build/http1/*.js',
-          'build/http2/main.js',
-          'build/**/*.css'
-        ]
       }
     },
     htmlmin: {
@@ -138,9 +113,6 @@ module.exports = function (grunt) {
           })
         ]
       },
-      build: {
-        src: 'build/**/*.css'
-      },
       serve: {
         options: {
           map: true
@@ -156,14 +128,7 @@ module.exports = function (grunt) {
           src: [
             'robots.txt'
           ],
-          dest: 'build/http1'
-        }, {
-          expand: true,
-          cwd: 'app',
-          src: [
-            'robots.txt'
-          ],
-          dest: 'build/http2'
+          dest: 'build'
         }]
       },
       styles: {
@@ -172,19 +137,6 @@ module.exports = function (grunt) {
           cwd: 'app/',
           src: '*.css',
           dest: '.tmp/serve/'
-        }]
-      }
-    },
-    uglify: {
-      options: {
-        screwIE8: true
-      },
-      build: {
-        files: [{
-          expand: true,
-          cwd: 'build',
-          src: ['**/*.js'],
-          dest: 'build'
         }]
       }
     },
@@ -204,7 +156,7 @@ module.exports = function (grunt) {
       },
       html: {
         files: ['app/index.html'],
-        tasks: ['indexTemplate:serve']
+        tasks: ['index:serve']
       },
       livereload: {
         options: {
@@ -215,8 +167,8 @@ module.exports = function (grunt) {
     }
   });
 
-  grunt.registerTask('indexTemplate:serve', function () {
-    grunt.file.write('.tmp/serve/index.html', indexTemplate({
+  grunt.registerTask('index:serve', function () {
+    grunt.file.write('.tmp/serve/index.html', injectIntoHtml(indexTemplate, {
       scripts: [
         'node_modules/requirejs/require.js',
         'main.js'
@@ -224,44 +176,25 @@ module.exports = function (grunt) {
     }));
   });
 
-  grunt.registerTask('requirejsOptimize', function () {
+  grunt.registerTask('optimize', function () {
     var done = this.async(); // eslint-disable-line no-invalid-this
-    multiprotocol.build({}, function (error, results) {
+    optimize({
+      baseUrl: 'app',
+      mainConfigFile: 'app/main.js',
+      name: 'node_modules/almond/almond',
+      include: 'main',
+      pragmasOnSave: {
+        excludeRequireCss: true
+      },
+      dir: 'build',
+      libDir: 'node_modules',
+      htmlIndex: 'app/index.html'
+    }, function (error) {
       if (error) {
-        throw error;
+        console.error(error);
+        done(false);
       }
-      grunt.requirejsOptimize = results;
       done();
-    });
-  });
-
-  /**
-   * Make `summary` keys and values relative to the path `relativeTo`.
-   */
-  var relativeSummary = function (relativeTo, summary) {
-    return mapKeys(mapValues(summary, function (value) {
-      return path.relative(relativeTo, value);
-    }), function (value, key) {
-      return path.relative(relativeTo, key);
-    });
-  };
-
-  grunt.registerTask('replaceReferences', function () {
-    var fSummary = grunt.filerev.summary;
-    var rSummary = grunt.requirejsOptimize.summary;
-    forEach(['build/http1/internal.js', 'build/http2/main.js'], function (name) {
-      var dir = path.dirname(name);
-      name = fSummary[name];
-      var summary = assign({}, relativeSummary(dir, fSummary), rSummary);
-      fs.writeFileSync(name, replaceRequirePaths(fs.readFileSync(name, 'utf8'), summary));
-    });
-    forEach(['build/http1', 'build/http2'], function (dir) {
-      var name = path.join(dir, 'index.html');
-      var summary = assign({}, relativeSummary(dir, fSummary));
-      if (name === 'build/http2/index.html') {
-        assign(summary, rSummary);
-      }
-      fs.writeFileSync(name, replaceHtmlFiles(fs.readFileSync(name, 'utf8'), summary));
     });
   });
 
@@ -275,7 +208,7 @@ module.exports = function (grunt) {
 
   grunt.registerTask('serve', [
     'clean:serve',
-    'indexTemplate:serve',
+    'index:serve',
     'sync:styles',
     'postcss:serve',
     'connect:serve',
@@ -285,12 +218,7 @@ module.exports = function (grunt) {
   grunt.registerTask('build', [
     'clean:build',
     'sync:build',
-    'requirejsOptimize',
-    'filerev:build',
-    'replaceReferences',
-    'postcss:build',
-    'cssmin:build',
-    'uglify:build',
+    'optimize',
     'htmlmin:build'
   ]);
 
