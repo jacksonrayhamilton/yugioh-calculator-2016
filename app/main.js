@@ -13,6 +13,7 @@ require.config({
 require([
   './yc',
   './app',
+  'css!./fonts.css',
   'css!./global.css',
   'css!./button.css',
   'css!./layout.css',

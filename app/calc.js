@@ -38,11 +38,11 @@ define([
 
         ]),
         m('.yc-layout-row.yc-layout-functions', [
-          m('.yc-button.yc-reset-button', {onclick: reset}, 'R'),
+          m('.yc-button.yc-reset-button.yc-icon-ccw', {onclick: reset}),
           m('.yc-button.yc-cancel-button', {onclick: cancel}, 'C'),
-          m('.yc-button.yc-back-button', {onclick: back}, 'B'),
-          m('.yc-button.yc-history-button', {onclick: historyMode}, 'H'),
-          m('.yc-button.yc-undo-button', {onclick: undo}, 'U')
+          m('.yc-button.yc-back-button.yc-icon-erase', {onclick: back}),
+          m('.yc-button.yc-history-button.yc-icon-book', {onclick: historyMode}),
+          m('.yc-button.yc-undo-button.yc-icon-back', {onclick: undo})
         ]),
         YC.times(2, function (n) {
           var someDigits = digits.slice(n * 5, (n * 5) + 5);

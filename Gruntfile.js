@@ -126,7 +126,8 @@ module.exports = function (grunt) {
           expand: true,
           cwd: 'app',
           src: [
-            'robots.txt'
+            'robots.txt',
+            'fonts/**/*'
           ],
           dest: 'build'
         }]
