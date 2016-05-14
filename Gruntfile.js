@@ -4,12 +4,16 @@
 'use strict';
 
 var autoprefixer = require('autoprefixer');
+var cssnano = require('cssnano');
+var cloneDeep = require('lodash/cloneDeep');
 var fs = require('fs');
+var includes = require('lodash/includes');
 var loadGruntTasks = require('load-grunt-tasks');
 var path = require('path');
+var pull = require('lodash/pull');
 
-var optimize = require('./etc/optimize');
 var injectIntoHtml = require('./etc/inject-into-html');
+var replaceRequirePaths = require('./etc/replace-require-paths');
 
 var indexTemplate = fs.readFileSync(path.join(__dirname, 'app/index.html'), 'utf8');
 
@@ -21,6 +25,36 @@ module.exports = function (grunt) {
     serve: 1024,
     livereload: 1025,
     karma: 1026
+  };
+
+  var libs = [
+    'node_modules/require-css/css.js',
+    'node_modules/mithril/mithril.js',
+    'node_modules/fastclick/lib/fastclick.js'
+  ];
+
+  var isSensitiveScript = function (file) {
+    return includes([
+      'node_modules/almond/almond.js',
+      'main.js'
+    ], file);
+  };
+
+  var addSeparateSuffixAlways = function (file) {
+    var parsed = path.parse(file);
+    return path.join(parsed.dir, parsed.name + '.separate' + parsed.ext);
+  };
+
+  var addSeparateSuffix = function (file) {
+    if (!isSensitiveScript(file)) {
+      return addSeparateSuffixAlways(file);
+    }
+    return file;
+  };
+
+  var removeSeparateSuffix = function (file) {
+    var parsed = path.parse(file);
+    return path.join(parsed.dir, parsed.name.replace(/\.separate$/, '') + parsed.ext);
   };
 
   grunt.initConfig({
@@ -40,7 +74,14 @@ module.exports = function (grunt) {
       }
     },
     clean: {
-      build: ['build/**'],
+      build1: [
+        '.tmp/build/**',
+        'build/**'
+      ],
+      build2: [
+        'build/node_modules/almond/almond.js',
+        'build/main.js'
+      ],
       serve: ['.tmp/serve/**']
     },
     connect: {
@@ -53,6 +94,67 @@ module.exports = function (grunt) {
         }
       }
     },
+    copy: (function () {
+      var build1 = {
+        files: [{
+          expand: true,
+          cwd: '.',
+          src: libs.concat([
+            'node_modules/almond/almond.js',
+            'node_modules/require-css/css-builder.js',
+            'node_modules/require-css/normalize.js'
+          ]),
+          dest: 'build'
+        }, {
+          expand: true,
+          cwd: 'app',
+          src: [
+            '**/*',
+            '!test-main.js',
+            '!*-test.js'
+          ],
+          dest: 'build'
+        }]
+      };
+      var build2 = cloneDeep(build1);
+      pull(build2.files[1].src, '**/*.css'); // Don't re-copy the CSS.
+      var rename = function (dest, src) {
+        // Copy over the original files, but with their (potentially) suffixed
+        // and revved names.
+        var diskName = path.join(dest, addSeparateSuffix(src));
+        var mappedName = grunt.filerev.summary[diskName];
+        if (mappedName) {
+          diskName = mappedName;
+        }
+        return diskName;
+      };
+      build2.files[0].rename = rename;
+      build2.files[1].rename = rename;
+      return {
+        build1: build1,
+        build2: build2
+      };
+    }()),
+    filerev: (function () {
+      var defer = [
+        'build/node_modules/almond/almond.js',
+        'build/main.js'
+      ];
+      return {
+        build1: {
+          src: [
+            'build/**/*.{css,js}'
+          ].concat(defer.map(function (d) {
+            return '!' + d;
+          }))
+        },
+        build2: {
+          src: defer.concat(
+            'build/**/*.{combined,separate}.{css,js}'
+          )
+        }
+      };
+    }()),
     htmlmin: {
       build: {
         options: {
@@ -82,14 +184,13 @@ module.exports = function (grunt) {
     },
     karma: {
       options: {
-        files: [
-          {pattern: 'node_modules/require-css/css.js', included: false},
-          {pattern: 'node_modules/mithril/mithril.js', included: false},
-          {pattern: 'node_modules/fastclick/lib/fastclick.js', included: false},
+        files: libs.map(function (lib) {
+          return {pattern: lib, included: false};
+        }).concat([
           {pattern: 'node_modules/chai/chai.js', included: false},
           {pattern: 'app/**/*.+(css|js)', included: false},
           'app/test-main.js'
-        ],
+        ]),
         frameworks: ['mocha', 'requirejs'],
         browsers: ['Chrome', 'Firefox'],
         port: ports.karma
@@ -106,38 +207,205 @@ module.exports = function (grunt) {
       }
     },
     postcss: {
-      options: {
-        processors: [
-          autoprefixer({
-            browsers: '> 0%'
-          })
-        ]
+      build: {
+        options: {
+          processors: [
+            autoprefixer({browsers: '> 0%'}),
+            cssnano({safe: true})
+          ]
+        },
+        src: 'build/*.css'
       },
       serve: {
         options: {
+          processors: [
+            autoprefixer({browsers: '> 0%'})
+          ],
           map: true
         },
         src: '.tmp/serve/*.css'
       }
     },
+    requirejs: (function () {
+      var wrapFile = function (moduleName, fileName, contents) {
+        return '//>>fileStart("' + fileName + '")\n' + contents + '\n//>>fileEnd("' + fileName + '")\n';
+      };
+      var fileStartRegExp = /fileStart\s*\(\s*["'](.*?)["']\s*\)/;
+      var extractFiles = function (fileContents, callback) {
+        var foundIndex, lineEndIndex;
+        var startIndex = 0;
+        while ((foundIndex = fileContents.indexOf('//>>', startIndex)) !== -1) {
+          // Found a boundary. Get the boundary line.
+          lineEndIndex = fileContents.indexOf('\n', foundIndex);
+          if (lineEndIndex === -1) {
+            lineEndIndex = fileContents.length - 1;
+          }
+
+          // Increment startIndex past the line so the next boundary search can be done.
+          startIndex = lineEndIndex + 1;
+
+          // Break apart the boundary.
+          var fileStartLine = fileContents.substring(foundIndex, lineEndIndex + 1);
+          var matches = fileStartLine.match(fileStartRegExp);
+          if (matches) {
+            var marker = matches[1];
+
+            // Find the endpoint marker.
+            var endRegExp = new RegExp('\\/\\/\\>\\>\\s*fileEnd\\(\\s*[\'"]' + marker + '[\'"]\\s*\\)', 'g');
+            var endMatches = endRegExp.exec(fileContents.substring(startIndex, fileContents.length));
+            if (endMatches) {
+              var endMarkerIndex = startIndex + endRegExp.lastIndex - endMatches[0].length;
+
+              // Find the next line return based on the match position.
+              lineEndIndex = fileContents.indexOf('\n', endMarkerIndex);
+              if (lineEndIndex === -1) {
+                lineEndIndex = fileContents.length - 1;
+              }
+
+              // Remove the boundary comments.
+              var extractedFileContents = fileContents.substring(startIndex, endMarkerIndex);
+              callback(marker, extractedFileContents);
+
+              // Move startIndex to lineEndIndex, since that is the new position
+              // in the file where we need to look for more boundaries in the
+              // next while loop pass.
+              startIndex = lineEndIndex;
+            } else {
+              throw new Error('Cannot find end marker for start: ' + fileStartLine);
+            }
+          }
+        }
+      };
+      var reverseFileName = function (fileName) {
+        var summary = grunt.filerev && grunt.filerev.summary;
+        if (summary) {
+          var reversed;
+          Object.keys(summary).some(function (original) {
+            if (fileName === path.relative('build', summary[original])) {
+              reversed = removeSeparateSuffix(path.relative('build', original));
+              return true;
+            }
+            return false;
+          });
+          if (reversed) {
+            return reversed;
+          }
+        }
+        return fileName;
+      };
+      var normalizeFile = function (fileName, contents) {
+        if (/!/.test(fileName)) {
+          fileName = fileName.split('!')[1];
+          contents = fs.readFileSync(path.join('build', fileName), 'utf8');
+        }
+        if (/^\//.test(fileName)) {
+          fileName = path.relative(path.resolve('build'), fileName);
+        }
+        if (reverseFileName(fileName) === 'node_modules/require-css/css.js') {
+          // Fix bug that prevents almond from working.
+          contents = contents.replace(
+            'var cssAPI = {};',
+            'var cssAPI = {load: function (n, r, load) { load(); }};'
+          );
+        }
+        return {
+          fileName: fileName,
+          contents: contents
+        };
+      };
+      var deleteFile = function (file) {
+        fs.unlinkSync(path.join('build', file));
+      };
+      var writeFile = function (file, data) {
+        fs.writeFileSync(path.join('build', file), data);
+      };
+      var addToFile = function (file, data) {
+        var out = path.join('build', file);
+        if (fs.existsSync(out)) {
+          fs.appendFileSync(out, data);
+        } else {
+          fs.writeFileSync(out, data);
+        }
+      };
+      var getFileExtractor = function (separator) {
+        return function (contents) {
+          extractFiles(contents, separator);
+        };
+      };
+      var build1Separator = function (fileName, contents) {
+        var normalized = normalizeFile(fileName, contents);
+        var separateName = addSeparateSuffix(normalized.fileName);
+        deleteFile(normalized.fileName);
+        writeFile(separateName, normalized.contents);
+      };
+      var build2Separator = function (fileName, contents) {
+        var normalized = normalizeFile(fileName, contents);
+        var parsed = path.parse(normalized.fileName);
+        var combinedName =
+            (/^node_modules/.test(normalized.fileName) ? 'external' : 'internal') +
+            '.combined' +
+            parsed.ext;
+        var separateName = normalized.fileName;
+        if (isSensitiveScript(separateName)) {
+          separateName = addSeparateSuffixAlways(separateName);
+        }
+        var addSemiColon = function (text) {
+          return text + (parsed.ext === '.js' && (/;\s*$/).test(normalized.contents) ? '' : ';');
+        };
+        writeFile(separateName, normalized.contents);
+        addToFile(combinedName, addSemiColon(normalized.contents));
+        grunt.requirejs = grunt.requirejs || {combined: [], separate: []};
+        if (!includes(grunt.requirejs.combined, combinedName)) {
+          grunt.requirejs.combined.push(combinedName);
+        }
+        grunt.requirejs.separate.push(separateName);
+      };
+      return {
+        options: {
+          baseUrl: 'build',
+          cssDir: 'build', // Option in our fork of css.js to handle `out` as a function.
+          mainConfigFile: 'build/main.js',
+          name: 'node_modules/almond/almond',
+          include: 'main',
+          pragmasOnSave: {
+            excludeRequireCss: true
+          },
+          optimize: 'none',
+          normalizeDirDefines: 'all',
+          onBuildWrite: wrapFile
+        },
+        build1: {
+          options: {
+            out: getFileExtractor(build1Separator)
+          }
+        },
+        build2: {
+          options: {
+            out: getFileExtractor(build2Separator)
+          }
+        }
+      };
+    }()),
     sync: {
-      build: {
-        files: [{
-          expand: true,
-          cwd: 'app',
-          src: [
-            'robots.txt',
-            'fonts/**/*'
-          ],
-          dest: 'build'
-        }]
-      },
       styles: {
         files: [{
           expand: true,
           cwd: 'app/',
           src: '*.css',
           dest: '.tmp/serve/'
+        }]
+      }
+    },
+    uglify: {
+      options: {
+        screwIE8: true
+      },
+      build: {
+        files: [{
+          expand: true,
+          cwd: 'build',
+          src: ['**/*.js'],
+          dest: 'build'
         }]
       }
     },
@@ -168,6 +436,23 @@ module.exports = function (grunt) {
     }
   });
 
+  var replaceableSummary = function (relativeTo, summary) {
+    var mapped = {};
+    Object.keys(summary).forEach(function (key) {
+      var value = summary[key];
+      var mappedKey = removeSeparateSuffix(path.relative(relativeTo, key));
+      var mappedValue = path.relative(relativeTo, value);
+      mapped[mappedKey] = mappedValue;
+    });
+    return mapped;
+  };
+
+  grunt.registerTask('replacePaths:build', function () {
+    var relative = replaceableSummary('build', grunt.filerev.summary);
+    var replaced = replaceRequirePaths(grunt.file.read('build/main.js'), relative);
+    grunt.file.write('build/main.js', replaced);
+  });
+
   grunt.registerTask('index:serve', function () {
     grunt.file.write('.tmp/serve/index.html', injectIntoHtml(indexTemplate, [
       'node_modules/requirejs/require.js',
@@ -175,26 +460,19 @@ module.exports = function (grunt) {
     ]));
   });
 
-  grunt.registerTask('optimize', function () {
-    var done = this.async(); // eslint-disable-line no-invalid-this
-    optimize({
-      baseUrl: 'app',
-      mainConfigFile: 'app/main.js',
-      name: 'node_modules/almond/almond',
-      include: 'main',
-      pragmasOnSave: {
-        excludeRequireCss: true
-      },
-      dir: 'build',
-      libDir: 'node_modules',
-      htmlIndex: 'app/index.html'
-    }, function (error) {
-      if (error) {
-        console.error(error);
-        done(false);
+  var mapRevisions = function (scripts) {
+    return scripts.map(function (script) {
+      var revision = grunt.filerev.summary[path.join('build', script)];
+      if (revision) {
+        return path.relative('build', revision);
       }
-      done();
+      return script;
     });
+  };
+
+  grunt.registerTask('index:build', function () {
+    grunt.file.write('build/index.combined.html', injectIntoHtml(indexTemplate, mapRevisions(grunt.requirejs.combined)));
+    grunt.file.write('build/index.separate.html', injectIntoHtml(indexTemplate, mapRevisions(grunt.requirejs.separate)));
   });
 
   grunt.registerTask('test', [
@@ -215,9 +493,20 @@ module.exports = function (grunt) {
   ]);
 
   grunt.registerTask('build', [
-    'clean:build',
-    'sync:build',
-    'optimize',
+    'clean:build1',
+    'copy:build1',
+    'requirejs:build1',
+    'postcss:build',
+    'uglify:build',
+    'filerev:build1',
+    'copy:build2',
+    'replacePaths:build',
+    'requirejs:build2',
+    'clean:build2',
+    'postcss:build',
+    'uglify:build',
+    'filerev:build2',
+    'index:build',
     'htmlmin:build'
   ]);
 
