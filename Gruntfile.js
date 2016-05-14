@@ -219,6 +219,8 @@ module.exports = function (grunt) {
         options: {
           processors: [
             cachebuster({
+              // In our fork of cachebuster, `type` can be a function that
+              // returns a new pathname for the asset.
               type: function (assetPath) {
                 if (grunt.filerev) {
                   return path.relative('build', grunt.filerev.summary[path.relative('.', assetPath)]);
