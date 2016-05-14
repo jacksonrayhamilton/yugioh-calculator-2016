@@ -5,6 +5,7 @@
 
 var _ = require('lodash');
 var autoprefixer = require('autoprefixer');
+var cachebuster = require('postcss-cachebuster');
 var cssnano = require('cssnano');
 var fs = require('fs');
 var loadGruntTasks = require('load-grunt-tasks');
@@ -123,6 +124,7 @@ module.exports = function (grunt) {
         }]
       };
       var buildRenamed = _.cloneDeep(buildInitial);
+      buildRenamed.files[1].src.push('!fonts/*');
       var rename = function (dest, src) {
         // Copy over the original files, but with their (potentially) suffixed
         // and revved names.
@@ -148,7 +150,7 @@ module.exports = function (grunt) {
       return {
         buildExceptDeferred: {
           src: [
-            'build/**/*.{css,js}',
+            'build/**/*.{css,js,eot,svg,ttf,woff}',
             '!build/node_modules/require-css/{css-builder.js,normalize.js}'
           ].concat(_.map(deferred, function (d) {
             return '!' + d;
@@ -216,6 +218,14 @@ module.exports = function (grunt) {
       build: {
         options: {
           processors: [
+            cachebuster({
+              type: function (assetPath) {
+                if (grunt.filerev) {
+                  return path.relative('build', grunt.filerev.summary[path.relative('.', assetPath)]);
+                }
+                return assetPath;
+              }
+            }),
             autoprefixer({browsers: '> 0%'}),
             cssnano({safe: true})
           ]
