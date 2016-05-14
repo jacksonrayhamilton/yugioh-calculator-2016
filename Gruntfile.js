@@ -55,13 +55,35 @@ module.exports = function (grunt) {
     return path.join(parsed.dir, parsed.name.replace(/\.separate$/, '') + parsed.ext);
   };
 
+  var reverseFileName = function (fileName) {
+    var summary = grunt.filerev && grunt.filerev.summary;
+    if (summary) {
+      var original = _.find(_.keys(summary), function (key) {
+        return fileName === path.relative('build', summary[key]);
+      });
+      if (original) {
+        return removeSeparateSuffix(path.relative('build', original));
+      }
+    }
+    return fileName;
+  };
+
+  // r.js doesn't let us use `exclude` if we use `out`.
+  var isExcludedModule = function (file) {
+    return _.includes([
+      'node_modules/require-css/normalize.js'
+    ], reverseFileName(file));
+  };
+
   grunt.initConfig({
     clean: {
       buildDirs: [
         '.tmp/build/**',
         'build/**'
       ],
-      buildSensitives: [
+      buildLeftovers: [
+        'build/node_modules/require-css/css-builder.js',
+        'build/node_modules/require-css/normalize.js',
         'build/node_modules/almond/almond.js',
         'build/main.js'
       ],
@@ -93,6 +115,7 @@ module.exports = function (grunt) {
           cwd: 'app',
           src: [
             '**/*',
+            '!index.html',
             '!test-main.js',
             '!*-test.js'
           ],
@@ -100,16 +123,15 @@ module.exports = function (grunt) {
         }]
       };
       var buildRenamed = _.cloneDeep(buildInitial);
-      _.pull(buildRenamed.files[1].src, '**/*.css'); // Don't re-copy the CSS.
       var rename = function (dest, src) {
         // Copy over the original files, but with their (potentially) suffixed
         // and revved names.
-        var diskName = path.join(dest, addSeparateSuffix(src));
-        var mappedName = grunt.filerev.summary[diskName];
+        var separateName = path.join(dest, addSeparateSuffix(src));
+        var mappedName = grunt.filerev.summary[separateName];
         if (mappedName) {
-          diskName = mappedName;
+          return mappedName;
         }
-        return diskName;
+        return path.join(dest, src);
       };
       buildRenamed.files[0].rename = rename;
       buildRenamed.files[1].rename = rename;
@@ -126,7 +148,8 @@ module.exports = function (grunt) {
       return {
         buildExceptDeferred: {
           src: [
-            'build/**/*.{css,js}'
+            'build/**/*.{css,js}',
+            '!build/node_modules/require-css/{css-builder.js,normalize.js}'
           ].concat(_.map(deferred, function (d) {
             return '!' + d;
           }))
@@ -210,10 +233,13 @@ module.exports = function (grunt) {
       }
     },
     requirejs: (function () {
+
       var wrapFile = function (moduleName, fileName, contents) {
         return '//>>fileStart("' + fileName + '")\n' + contents + '\n//>>fileEnd("' + fileName + '")\n';
       };
+
       var fileStartRegExp = /fileStart\s*\(\s*["'](.*?)["']\s*\)/;
+
       var extractFiles = function (fileContents, callback) {
         var foundIndex, lineEndIndex;
         var startIndex = 0;
@@ -259,18 +285,7 @@ module.exports = function (grunt) {
           }
         }
       };
-      var reverseFileName = function (fileName) {
-        var summary = grunt.filerev && grunt.filerev.summary;
-        if (summary) {
-          var original = _.find(_.keys(summary), function (key) {
-            return fileName === path.relative('build', summary[key]);
-          });
-          if (original) {
-            return removeSeparateSuffix(path.relative('build', original));
-          }
-        }
-        return fileName;
-      };
+
       var normalizeFile = function (fileName, contents) {
         if (_.includes(fileName, '!')) {
           fileName = fileName.split('!')[1];
@@ -291,12 +306,15 @@ module.exports = function (grunt) {
           contents: contents
         };
       };
+
       var deleteFile = function (file) {
         fs.unlinkSync(path.join('build', file));
       };
+
       var writeFile = function (file, data) {
         fs.writeFileSync(path.join('build', file), data);
       };
+
       var addToFile = function (file, data) {
         var out = path.join('build', file);
         if (fs.existsSync(out)) {
@@ -305,19 +323,22 @@ module.exports = function (grunt) {
           fs.writeFileSync(out, data);
         }
       };
-      var getFileExtractor = function (separator) {
-        return function (contents) {
-          extractFiles(contents, separator);
-        };
-      };
+
       var buildJustSeparate = function (fileName, contents) {
         var normalized = normalizeFile(fileName, contents);
+        if (isExcludedModule(normalized.fileName)) {
+          return;
+        }
         var separateName = addSeparateSuffix(normalized.fileName);
         deleteFile(normalized.fileName);
         writeFile(separateName, normalized.contents);
       };
+
       var buildAlsoCombine = function (fileName, contents) {
         var normalized = normalizeFile(fileName, contents);
+        if (isExcludedModule(normalized.fileName)) {
+          return;
+        }
         var parsed = path.parse(normalized.fileName);
         var combinedName =
             (/^node_modules/.test(normalized.fileName) ? 'external' : 'internal') +
@@ -338,6 +359,13 @@ module.exports = function (grunt) {
         }
         grunt.requirejs.separate.push(separateName);
       };
+
+      var getFileExtractor = function (separator) {
+        return function (contents) {
+          extractFiles(contents, separator);
+        };
+      };
+
       return {
         options: {
           baseUrl: 'build',
@@ -363,6 +391,7 @@ module.exports = function (grunt) {
           }
         }
       };
+
     }()),
     sync: {
       styles: {
@@ -479,7 +508,7 @@ module.exports = function (grunt) {
     'copy:buildRenamed',
     'replacePaths:build',
     'requirejs:buildAlsoCombine',
-    'clean:buildSensitives',
+    'clean:buildLeftovers',
     'postcss:build',
     'uglify:build',
     'filerev:buildDeferred',
