@@ -414,19 +414,19 @@ module.exports = function (grunt) {
     }
   });
 
-  var replaceableSummary = function (relativeTo, summary) {
+  var replaceableSummary = function (summary) {
     var mapped = {};
     _.forOwn(summary, function (value, key) {
-      var mappedKey = removeSeparateSuffix(path.relative(relativeTo, key));
-      var mappedValue = path.relative(relativeTo, value);
+      var mappedKey = removeSeparateSuffix(path.relative('build', key));
+      var mappedValue = path.relative('build', value);
       mapped[mappedKey] = mappedValue;
     });
     return mapped;
   };
 
   grunt.registerTask('replacePaths:build', function () {
-    var relative = replaceableSummary('build', grunt.filerev.summary);
-    var replaced = replaceRequirePaths(grunt.file.read('build/main.js'), relative);
+    var replaceable = replaceableSummary(grunt.filerev.summary);
+    var replaced = replaceRequirePaths(grunt.file.read('build/main.js'), replaceable);
     grunt.file.write('build/main.js', replaced);
   });
 
