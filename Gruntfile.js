@@ -57,11 +57,11 @@ module.exports = function (grunt) {
 
   grunt.initConfig({
     clean: {
-      build1: [
+      buildDirs: [
         '.tmp/build/**',
         'build/**'
       ],
-      build2: [
+      buildSensitives: [
         'build/node_modules/almond/almond.js',
         'build/main.js'
       ],
@@ -78,7 +78,7 @@ module.exports = function (grunt) {
       }
     },
     copy: (function () {
-      var build1 = {
+      var buildInitial = {
         files: [{
           expand: true,
           cwd: '.',
@@ -99,8 +99,8 @@ module.exports = function (grunt) {
           dest: 'build'
         }]
       };
-      var build2 = _.cloneDeep(build1);
-      _.pull(build2.files[1].src, '**/*.css'); // Don't re-copy the CSS.
+      var buildRenamed = _.cloneDeep(buildInitial);
+      _.pull(buildRenamed.files[1].src, '**/*.css'); // Don't re-copy the CSS.
       var rename = function (dest, src) {
         // Copy over the original files, but with their (potentially) suffixed
         // and revved names.
@@ -111,28 +111,28 @@ module.exports = function (grunt) {
         }
         return diskName;
       };
-      build2.files[0].rename = rename;
-      build2.files[1].rename = rename;
+      buildRenamed.files[0].rename = rename;
+      buildRenamed.files[1].rename = rename;
       return {
-        build1: build1,
-        build2: build2
+        buildInitial: buildInitial,
+        buildRenamed: buildRenamed
       };
     }()),
     filerev: (function () {
-      var defer = [
+      var deferred = [
         'build/node_modules/almond/almond.js',
         'build/main.js'
       ];
       return {
-        build1: {
+        buildExceptDeferred: {
           src: [
             'build/**/*.{css,js}'
-          ].concat(_.map(defer, function (d) {
+          ].concat(_.map(deferred, function (d) {
             return '!' + d;
           }))
         },
-        build2: {
-          src: defer.concat(
+        buildDeferred: {
+          src: deferred.concat(
             'build/**/*.{combined,separate}.{css,js}'
           )
         }
@@ -310,13 +310,13 @@ module.exports = function (grunt) {
           extractFiles(contents, separator);
         };
       };
-      var build1Separator = function (fileName, contents) {
+      var buildJustSeparate = function (fileName, contents) {
         var normalized = normalizeFile(fileName, contents);
         var separateName = addSeparateSuffix(normalized.fileName);
         deleteFile(normalized.fileName);
         writeFile(separateName, normalized.contents);
       };
-      var build2Separator = function (fileName, contents) {
+      var buildAlsoCombine = function (fileName, contents) {
         var normalized = normalizeFile(fileName, contents);
         var parsed = path.parse(normalized.fileName);
         var combinedName =
@@ -352,14 +352,14 @@ module.exports = function (grunt) {
           normalizeDirDefines: 'all',
           onBuildWrite: wrapFile
         },
-        build1: {
+        buildJustSeparate: {
           options: {
-            out: getFileExtractor(build1Separator)
+            out: getFileExtractor(buildJustSeparate)
           }
         },
-        build2: {
+        buildAlsoCombine: {
           options: {
-            out: getFileExtractor(build2Separator)
+            out: getFileExtractor(buildAlsoCombine)
           }
         }
       };
@@ -470,19 +470,19 @@ module.exports = function (grunt) {
   ]);
 
   grunt.registerTask('build', [
-    'clean:build1',
-    'copy:build1',
-    'requirejs:build1',
+    'clean:buildDirs',
+    'copy:buildInitial',
+    'requirejs:buildJustSeparate',
     'postcss:build',
     'uglify:build',
-    'filerev:build1',
-    'copy:build2',
+    'filerev:buildExceptDeferred',
+    'copy:buildRenamed',
     'replacePaths:build',
-    'requirejs:build2',
-    'clean:build2',
+    'requirejs:buildAlsoCombine',
+    'clean:buildSensitives',
     'postcss:build',
     'uglify:build',
-    'filerev:build2',
+    'filerev:buildDeferred',
     'index:build',
     'htmlmin:build'
   ]);
