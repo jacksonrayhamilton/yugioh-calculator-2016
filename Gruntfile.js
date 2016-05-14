@@ -142,7 +142,7 @@ module.exports = function (grunt) {
         build1: {
           src: [
             'build/**/*.{css,js}'
-          ].concat(defer.map(function (d) {
+          ].concat(_.map(defer, function (d) {
             return '!' + d;
           }))
         },
@@ -182,7 +182,7 @@ module.exports = function (grunt) {
     },
     karma: {
       options: {
-        files: libs.map(function (lib) {
+        files: _.map(libs, function (lib) {
           return {pattern: lib, included: false};
         }).concat([
           {pattern: 'node_modules/chai/chai.js', included: false},
@@ -277,26 +277,21 @@ module.exports = function (grunt) {
       var reverseFileName = function (fileName) {
         var summary = grunt.filerev && grunt.filerev.summary;
         if (summary) {
-          var reversed;
-          Object.keys(summary).some(function (original) {
-            if (fileName === path.relative('build', summary[original])) {
-              reversed = removeSeparateSuffix(path.relative('build', original));
-              return true;
-            }
-            return false;
+          var original = _.find(_.keys(summary), function (key) {
+            return fileName === path.relative('build', summary[key]);
           });
-          if (reversed) {
-            return reversed;
+          if (original) {
+            return removeSeparateSuffix(path.relative('build', original));
           }
         }
         return fileName;
       };
       var normalizeFile = function (fileName, contents) {
-        if (/!/.test(fileName)) {
+        if (_.includes(fileName, '!')) {
           fileName = fileName.split('!')[1];
           contents = fs.readFileSync(path.join('build', fileName), 'utf8');
         }
-        if (/^\//.test(fileName)) {
+        if (_.startsWith(fileName, '/')) {
           fileName = path.relative(path.resolve('build'), fileName);
         }
         if (reverseFileName(fileName) === 'node_modules/require-css/css.js') {
@@ -436,8 +431,7 @@ module.exports = function (grunt) {
 
   var replaceableSummary = function (relativeTo, summary) {
     var mapped = {};
-    Object.keys(summary).forEach(function (key) {
-      var value = summary[key];
+    _.forOwn(summary, function (value, key) {
       var mappedKey = removeSeparateSuffix(path.relative(relativeTo, key));
       var mappedValue = path.relative(relativeTo, value);
       mapped[mappedKey] = mappedValue;
