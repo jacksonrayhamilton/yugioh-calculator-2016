@@ -56,21 +56,6 @@ module.exports = function (grunt) {
   };
 
   grunt.initConfig({
-    aws_s3: {
-      options: {
-        awsProfile: 'yugiohcalculator',
-        bucket: 'new.yugiohcalculator.com'
-      },
-      deploy: {
-        options: {
-          differential: true
-        },
-        files: [
-          {cwd: 'build/', dest: '/', action: 'delete'},
-          {expand: true, cwd: 'build/', src: ['**'], dest: '/', action: 'upload'}
-        ]
-      }
-    },
     clean: {
       build1: [
         '.tmp/build/**',
@@ -500,11 +485,6 @@ module.exports = function (grunt) {
     'filerev:build2',
     'index:build',
     'htmlmin:build'
-  ]);
-
-  grunt.registerTask('deploy', [
-    'build',
-    'aws_s3:deploy'
   ]);
 
   grunt.registerTask('default', 'build');
