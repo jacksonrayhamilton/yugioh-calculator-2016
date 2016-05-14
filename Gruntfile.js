@@ -3,14 +3,12 @@
 
 'use strict';
 
+var _ = require('lodash');
 var autoprefixer = require('autoprefixer');
 var cssnano = require('cssnano');
-var cloneDeep = require('lodash/cloneDeep');
 var fs = require('fs');
-var includes = require('lodash/includes');
 var loadGruntTasks = require('load-grunt-tasks');
 var path = require('path');
-var pull = require('lodash/pull');
 
 var injectIntoHtml = require('./etc/inject-into-html');
 var replaceRequirePaths = require('./etc/replace-require-paths');
@@ -34,7 +32,7 @@ module.exports = function (grunt) {
   ];
 
   var isSensitiveScript = function (file) {
-    return includes([
+    return _.includes([
       'node_modules/almond/almond.js',
       'main.js'
     ], file);
@@ -116,8 +114,8 @@ module.exports = function (grunt) {
           dest: 'build'
         }]
       };
-      var build2 = cloneDeep(build1);
-      pull(build2.files[1].src, '**/*.css'); // Don't re-copy the CSS.
+      var build2 = _.cloneDeep(build1);
+      _.pull(build2.files[1].src, '**/*.css'); // Don't re-copy the CSS.
       var rename = function (dest, src) {
         // Copy over the original files, but with their (potentially) suffixed
         // and revved names.
@@ -355,7 +353,7 @@ module.exports = function (grunt) {
         writeFile(separateName, normalized.contents);
         addToFile(combinedName, addSemiColon(normalized.contents));
         grunt.requirejs = grunt.requirejs || {combined: [], separate: []};
-        if (!includes(grunt.requirejs.combined, combinedName)) {
+        if (!_.includes(grunt.requirejs.combined, combinedName)) {
           grunt.requirejs.combined.push(combinedName);
         }
         grunt.requirejs.separate.push(separateName);

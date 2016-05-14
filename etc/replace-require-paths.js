@@ -2,14 +2,10 @@
 
 'use strict';
 
+var _ = require('lodash');
 var acorn = require('acorn');
-var escapeRegExp = require('lodash/escapeRegExp');
 var escodegen = require('escodegen');
-var find = require('lodash/find');
-var forEach = require('lodash/forEach');
-var forOwn = require('lodash/forOwn');
 var path = require('path');
-var includes = require('lodash/includes');
 var walk = require('acorn/dist/walk');
 
 /**
@@ -37,7 +33,7 @@ var replaceRequirePaths = function (source, map) {
   var callExpressionHandler = function (node) {
     if (node.callee.type === 'MemberExpression' &&
         node.callee.object.type === 'Identifier' &&
-        includes(['require', 'requirejs'], node.callee.object.name) &&
+        _.includes(['require', 'requirejs'], node.callee.object.name) &&
         node.callee.property.name === 'config' &&
         node.arguments[0] && node.arguments[0].type === 'ObjectExpression') {
       // Matched `require.config({})` or `requirejs.config({})`.
@@ -64,7 +60,7 @@ var replaceRequirePaths = function (source, map) {
   }
 
   var removeExtension = function (string, extension) {
-    var extensionRegExp = new RegExp(escapeRegExp(extension) + '$');
+    var extensionRegExp = new RegExp(_.escapeRegExp(extension) + '$');
     return string.replace(extensionRegExp, '');
   };
 
@@ -81,13 +77,13 @@ var replaceRequirePaths = function (source, map) {
   };
 
   var revisePropertyValues = function (objectExpression) {
-    forEach(objectExpression.properties, function (property) {
+    _.forEach(objectExpression.properties, function (property) {
       reviseProperty(property, 'value');
     });
   };
 
   var reviseMapConfig = function (mapObjectExpression) {
-    forEach(mapObjectExpression.properties, function (property) {
+    _.forEach(mapObjectExpression.properties, function (property) {
       var keyString = keyValueToString(property.key);
       if (keyString !== '*') {
         reviseProperty(property, 'key');
@@ -101,7 +97,7 @@ var replaceRequirePaths = function (source, map) {
   var pathsObjectExpression;
   var mapObjectExpression;
 
-  forEach(configObjectExpression.properties, function (property) {
+  _.forEach(configObjectExpression.properties, function (property) {
     var keyString = keyValueToString(property.key);
     if (keyString === 'paths' &&
         property.value.type === 'ObjectExpression') {
@@ -146,7 +142,7 @@ var replaceRequirePaths = function (source, map) {
 
   reviseMapConfig(mapObjectExpression);
 
-  var wildcardMapProperty = find(mapObjectExpression.properties, {key: {value: '*'}});
+  var wildcardMapProperty = _.find(mapObjectExpression.properties, {key: {value: '*'}});
 
   if (!wildcardMapProperty) {
     wildcardMapProperty = {
@@ -176,7 +172,7 @@ var replaceRequirePaths = function (source, map) {
   };
 
   // Add new revisioned paths.
-  forOwn(map, function (newPath, oldPath) {
+  _.forOwn(map, function (newPath, oldPath) {
     wildcardMapProperty.value.properties.push({
       type: 'Property',
       key: {
