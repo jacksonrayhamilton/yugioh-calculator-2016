@@ -10,26 +10,10 @@ define(['./yc'], function (YC) {
   };
 
   /**
-   * Gets a timestamp in the format "hh:mm:ss A".
+   * Gets a timestamp.
    */
   YC.getTimestamp = function (ms) {
-    var date = ms === undefined ? new Date() : new Date(ms);
-    var hours = date.getHours();
-    var minutes = date.getMinutes();
-    var seconds = date.getSeconds();
-    var period;
-    if (hours < 12) {
-      if (hours === 0) {
-        hours = 12;
-      }
-      period = 'AM';
-    } else {
-      if (hours > 12) {
-        hours -= 12;
-      }
-      period = 'PM';
-    }
-    return [pad(hours), pad(minutes), pad(seconds)].join(':') + ' ' + period;
+    return new Date(ms).toLocaleTimeString();
   };
 
   /**
