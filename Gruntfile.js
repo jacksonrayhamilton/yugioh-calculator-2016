@@ -10,6 +10,7 @@ var cssnano = require('cssnano');
 var fs = require('fs');
 var loadGruntTasks = require('load-grunt-tasks');
 var path = require('path');
+var serveStatic = require('serve-static');
 
 var injectIntoHtml = require('./etc/inject-into-html');
 var replaceRequirePaths = require('./etc/replace-require-paths');
@@ -108,7 +109,11 @@ module.exports = function (grunt) {
           port: ports.serve,
           livereload: ports.livereload,
           hostname: '*',
-          base: ['.tmp/serve', 'app']
+          base: ['.tmp/serve', 'app'],
+          middleware: function (connect, options, middlewares) {
+            middlewares.push(connect().use('/node_modules', serveStatic('./node_modules')));
+            return middlewares;
+          }
         }
       }
     },
