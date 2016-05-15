@@ -91,7 +91,11 @@ define([
             var previousEvent = events[index + 1];
             if (previousEvent && YC.startOfDay(previousEvent.time) > YC.startOfDay(event.time)) {
               // Separate days.
-              previous = previous.concat(m('.yc-history-break', YC.getDaystamp(event.time)));
+              previous = previous.concat(
+                m('.yc-history-break', [
+                  m('span.yc-history-break-text', YC.getDaystamp(event.time))
+                ])
+              );
             }
             return previous.concat(m('.yc-history-row', eventView(event)));
           }, [])
