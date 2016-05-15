@@ -1,3 +1,7 @@
+body {
+  font-family: 'Ubuntu Mono', monospace;
+}
+
 .yc-lp-val,
 .yc-lp-gain,
 .yc-lp-lose,
