@@ -76,6 +76,18 @@ module.exports = function (grunt) {
     ], reverseFileName(file));
   };
 
+  var canBeAsync = function (file) {
+    if (path.extname(file) !== '.js') {
+      return false;
+    }
+    return !_.includes([
+      'node_modules/requirejs/require.js',
+      'node_modules/almond/almond.js',
+      'internal.combined.js',
+      'external.combined.js'
+    ], reverseFileName(file));
+  };
+
   grunt.initConfig({
     clean: {
       buildDirs: [
@@ -478,13 +490,19 @@ module.exports = function (grunt) {
     ]));
   });
 
-  var mapRevisions = function (scripts) {
-    return scripts.map(function (script) {
-      var revision = grunt.filerev.summary[path.join('build', script)];
+  var mapRevisions = function (files) {
+    return files.map(function (file) {
+      var revision = grunt.filerev.summary[path.join('build', file)];
       if (revision) {
-        return path.relative('build', revision);
+        file = path.relative('build', revision);
       }
-      return script;
+      if (canBeAsync(file)) {
+        file = {
+          url: file,
+          async: true
+        };
+      }
+      return file;
     });
   };
 
