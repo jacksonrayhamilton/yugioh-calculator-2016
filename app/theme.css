@@ -9,15 +9,6 @@
   border-radius: 3px;
 }
 
-.yc-lp-gain,
-.yc-lp-lose,
-.yc-timer,
-.yc-button,
-.yc-digit,
-.yc-layout-revert {
-  position: relative;
-}
-
 .yc-lp-gain:active,
 .yc-lp-lose:active,
 .yc-button:active,
@@ -60,19 +51,25 @@
 
 .yc-reset-button,
 .yc-cancel-button,
-.yc-back-button {
+.yc-back-button,
+.yc-history-button,
+.yc-undo-button,
+.yc-digit {
   color: #fff;
+}
+
+.yc-reset-button,
+.yc-cancel-button,
+.yc-back-button {
   background-color: #ce312d;
 }
 
 .yc-history-button,
 .yc-undo-button {
-  color: #fff;
   background-color: #2c999a;
 }
 
 .yc-digit {
-  color: #fff;
   background-color: #333;
 }
 
