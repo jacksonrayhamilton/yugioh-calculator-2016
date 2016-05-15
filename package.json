@@ -4,7 +4,8 @@
     "fastclick": "^1.0.6",
     "mithril": "^0.2.4",
     "require-css": "jacksonrayhamilton/require-css#8f330ed",
-    "requirejs": "^2.2.0"
+    "requirejs": "^2.2.0",
+    "text": "github:requirejs/text"
   },
   "devDependencies": {
     "autoprefixer": "^6.3.6",

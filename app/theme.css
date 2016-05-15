@@ -25,6 +25,22 @@ body {
   background-color: #ddd;
 }
 
+.yc-icon-container {
+  position: relative;
+}
+
+.yc-icon-container > * {
+  /* Hack to make an SVG fill but constrain by container width/height. */
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  left: 0;
+  top: 0;
+
+  /* Ensure space around edges. */
+  padding: 5px;
+}
+
 .yc-lp-val {
   background-color: #eee;
   margin: 5px 5px 0 5px;
@@ -53,6 +69,8 @@ body {
   margin: 5px;
 }
 
+.yc-lp-gain,
+.yc-lp-lose,
 .yc-reset-button,
 .yc-cancel-button,
 .yc-back-button,
@@ -60,6 +78,7 @@ body {
 .yc-undo-button,
 .yc-digit {
   color: #fff;
+  fill: #fff;
 }
 
 .yc-reset-button,

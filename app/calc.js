@@ -2,8 +2,12 @@
 
 define([
   'm',
-  './yc'
-], function (m, YC) {
+  './yc',
+  'text!./icons/reset.svg',
+  'text!./icons/backspace.svg',
+  'text!./icons/book.svg',
+  'text!./icons/undo.svg'
+], function (m, YC, resetSvg, backspaceSvg, bookSvg, undoSvg) {
 
   YC.Calc = function (spec) {
     spec = spec === undefined ? {} : spec;
@@ -38,11 +42,11 @@ define([
 
         ]),
         m('.yc-layout-row.yc-layout-functions', [
-          m('.yc-button.yc-reset-button.yc-icon-ccw', {onclick: reset}),
+          m('.yc-button.yc-icon-container.yc-reset-button', {onclick: reset}, m.trust(resetSvg)),
           m('.yc-button.yc-cancel-button', {onclick: cancel}, 'C'),
-          m('.yc-button.yc-back-button.yc-icon-erase', {onclick: back}),
-          m('.yc-button.yc-history-button.yc-icon-book', {onclick: historyMode}),
-          m('.yc-button.yc-undo-button.yc-icon-back', {onclick: undo})
+          m('.yc-button.yc-icon-container.yc-back-button', {onclick: back}, m.trust(backspaceSvg)),
+          m('.yc-button.yc-icon-container.yc-history-button', {onclick: historyMode}, m.trust(bookSvg)),
+          m('.yc-button.yc-icon-container.yc-undo-button', {onclick: undo}, m.trust(undoSvg))
         ]),
         YC.times(2, function (n) {
           var someDigits = digits.slice(n * 5, (n * 5) + 5);

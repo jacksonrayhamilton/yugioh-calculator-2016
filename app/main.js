@@ -4,6 +4,7 @@ require.config({
   map: {
     '*': {
       'css': 'node_modules/require-css/css',
+      'text': 'node_modules/text/text',
       'm': 'node_modules/mithril/mithril',
       'FastClick': 'node_modules/fastclick/lib/fastclick'
     }
