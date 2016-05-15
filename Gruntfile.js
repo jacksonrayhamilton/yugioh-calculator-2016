@@ -148,7 +148,7 @@ module.exports = function (grunt) {
         }]
       };
       var buildRenamed = _.cloneDeep(buildInitial);
-      buildRenamed.files[1].src.push('!fonts/*');
+      buildRenamed.files[1].src.push('!{fonts,icons}/*');
       var rename = function (dest, src) {
         // Copy over the original files, but with their (potentially) suffixed
         // and revved names.
@@ -323,12 +323,22 @@ module.exports = function (grunt) {
       };
 
       var normalizeFile = function (fileName, contents) {
+        var originalFileName, originalContents;
         if (_.includes(fileName, '!')) {
           var split = fileName.split('!');
           var plugin = split[0];
           fileName = split[1];
-          if (reverseFileName(plugin + '.js') === 'node_modules/text/text.js' || _.endsWith(fileName, '.css')) {
-            contents = fs.readFileSync(path.join('build', fileName), 'utf8');
+          if (reverseFileName(plugin + '.js') === 'node_modules/text/text.js') {
+            originalFileName = fileName;
+            fileName += '.js';
+          }
+          if (originalFileName || _.endsWith(fileName, '.css')) {
+            var readContents = fs.readFileSync(path.join('build', originalFileName || fileName), 'utf8');
+            if (originalFileName) {
+              originalContents = readContents;
+            } else {
+              contents = readContents;
+            }
           }
         }
         if (_.startsWith(fileName, '/')) {
@@ -342,6 +352,8 @@ module.exports = function (grunt) {
           );
         }
         return {
+          originalFileName: originalFileName,
+          originalContents: originalContents,
           fileName: fileName,
           contents: contents
         };
@@ -369,9 +381,13 @@ module.exports = function (grunt) {
         if (isExcludedModule(normalized.fileName)) {
           return;
         }
-        var separateName = addSeparateSuffix(normalized.fileName);
-        deleteFile(normalized.fileName);
-        writeFile(separateName, normalized.contents);
+        if (normalized.originalFileName) {
+          deleteFile(normalized.originalFileName);
+          writeFile(addSeparateSuffix(normalized.originalFileName), normalized.originalContents);
+        } else {
+          deleteFile(normalized.fileName);
+          writeFile(addSeparateSuffix(normalized.fileName), normalized.contents);
+        }
       };
 
       var buildAlsoCombine = function (fileName, contents) {
@@ -411,7 +427,7 @@ module.exports = function (grunt) {
           baseUrl: 'build',
           cssDir: 'build', // Option in our fork of css.js to handle `out` as a function.
           mainConfigFile: 'build/main.js',
-          name: 'node_modules/requirejs/require',
+          name: 'node_modules/almond/almond',
           include: 'main',
           pragmasOnSave: {
             excludeRequireCss: true
