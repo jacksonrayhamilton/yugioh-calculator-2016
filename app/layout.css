@@ -35,32 +35,17 @@
 
 .yc-layout-operand-table {
   width: calc(40% + 5px);
-  display: flex;
-  align-items: flex-end;
-}
-
-.yc-layout-operand-spacer {
-  height: 100%;
-  flex: 2;
+  position: relative;
 }
 
 .yc-layout-operand-cell {
   height: 100%;
-  flex: 1;
-  display: flex;
-  justify-content: center;
-}
-
-.yc-layout-operand-anchor {
-  height: 100%;
-  position: relative;
-}
-
-.yc-layout-operand-anchor .yc-operand {
-  height: 100%;
   position: absolute;
-  top: 0;
-  right: 0;
+  right: 5px;
+}
+
+.yc-layout-operand-cell .yc-operand {
+  height: 100%;
 }
 
 .yc-layout-functions,

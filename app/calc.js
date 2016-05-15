@@ -29,17 +29,10 @@ define([
         m('.yc-layout-row.yc-layout-status', [
           timer.view(),
           m('.yc-layout-operand-table', [
-            m('.yc-layout-operand-spacer'),
             m('.yc-layout-operand-cell', [
-              m('.yc-layout-operand-anchor', [
-                // Center some text to position the operand relative to the "right
-                // edge" of the below digit.
-                m.trust('&nbsp;'),
-                operand.view()
-              ])
+              operand.view()
             ])
           ])
-
         ]),
         m('.yc-layout-row.yc-layout-functions', [
           m('.yc-button.yc-icon-container.yc-reset-button', {onclick: reset}, m.trust(resetSvg)),
