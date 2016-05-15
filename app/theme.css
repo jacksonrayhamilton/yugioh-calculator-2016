@@ -9,7 +9,7 @@ body {
 .yc-layout-operand-table,
 .yc-button,
 .yc-digit,
-.yc-layout-revert {
+.yc-close {
   border-radius: 3px;
 }
 
@@ -17,11 +17,12 @@ body {
 .yc-lp-lose:active,
 .yc-button:active,
 .yc-digit:active,
-.yc-layout-revert:active {
+.yc-close:active {
   opacity: 0.8;
 }
 
-.yc-timer:active {
+.yc-timer:active,
+.yc-close:active {
   background-color: #ddd;
 }
 

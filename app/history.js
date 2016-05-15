@@ -3,9 +3,10 @@
 define([
   'm',
   './yc',
+  'text!./icons/close.svg',
   'css!./history.css',
   './persistence'
-], function (m, YC) {
+], function (m, YC, closeSvg) {
 
   YC.History = function (spec) {
     var maxEvents = 150;
@@ -83,7 +84,7 @@ define([
       return [
         m('.yc-layout-row.yc-layout-status', [
           timer.view(),
-          m('.yc-layout-revert', {onclick: revertMode}, 'Back')
+          m('.yc-close.yc-icon-container', {onclick: revertMode}, m.trust(closeSvg))
         ]),
         m('.yc-history', [
           events.reduceRight(function (previous, event, index) {
