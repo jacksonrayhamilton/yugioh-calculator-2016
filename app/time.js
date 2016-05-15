@@ -43,4 +43,19 @@ define(['./yc'], function (YC) {
     return pad(minutes) + ':' + pad(seconds);
   };
 
+  /**
+   * Get the first millisecond value (midnight) for the day represented by `ms`.
+   */
+  YC.startOfDay = function (ms) {
+    var date = new Date(ms);
+    return new Date(date.getFullYear(), date.getMonth(), date.getDate()).getTime();
+  };
+
+  /**
+   * Get a representation of the current day.
+   */
+  YC.getDaystamp = function (ms) {
+    return new Date(ms).toLocaleDateString();
+  };
+
 });

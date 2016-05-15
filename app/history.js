@@ -86,7 +86,12 @@ define([
           m('.yc-layout-revert', {onclick: revertMode}, 'Back')
         ]),
         m('.yc-history', [
-          events.reduceRight(function (previous, event) {
+          events.reduceRight(function (previous, event, index) {
+            var previousEvent = events[index + 1];
+            if (previousEvent && YC.startOfDay(previousEvent.time) > YC.startOfDay(event.time)) {
+              // Separate days.
+              previous = previous.concat(m('.yc-history-break', YC.getDaystamp(event.time)));
+            }
             return previous.concat(m('.yc-history-row', eventView(event)));
           }, [])
         ])

@@ -17,3 +17,18 @@
   flex: 1;
   text-align: center;
 }
+
+/* From http://stackoverflow.com/a/12648699/1468130; create "horizontal rule"
+   with padded text in the center. */
+
+.yc-history-break {
+  text-align: center;
+  height: 0.5em;
+  border-bottom: 2px solid #000;
+  margin-top: 1em;
+  margin-bottom: calc(0.5em + 1em);
+}
+
+.yc-history-break:first-line {
+  background-color: #fff;
+}
