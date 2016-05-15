@@ -20,11 +20,14 @@
 
 .yc-lp-gain:active,
 .yc-lp-lose:active,
-.yc-timer:active,
 .yc-button:active,
 .yc-digit:active,
 .yc-layout-revert:active {
-  top: 1px;
+  opacity: 0.8;
+}
+
+.yc-timer:active {
+  background-color: #ddd;
 }
 
 .yc-lp-val {
@@ -64,6 +67,7 @@
 
 .yc-history-button,
 .yc-undo-button {
+  color: #fff;
   background-color: #2c999a;
 }
 
