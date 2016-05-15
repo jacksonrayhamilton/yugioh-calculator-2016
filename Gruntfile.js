@@ -27,17 +27,27 @@ module.exports = function (grunt) {
     karma: 1026
   };
 
+  var amdLibs = [
+    'node_modules/requirejs/require.js',
+    'node_modules/almond/almond.js'
+  ];
+
+  var buildLibs = amdLibs.concat([
+    'node_modules/require-css/css-builder.js',
+    'node_modules/require-css/normalize.js'
+  ]);
+
   var libs = [
     'node_modules/require-css/css.js',
+    'node_modules/text/text.js',
     'node_modules/mithril/mithril.js',
     'node_modules/fastclick/lib/fastclick.js'
   ];
 
   var isSensitiveScript = function (file) {
-    return _.includes([
-      'node_modules/almond/almond.js',
+    return _.includes(amdLibs.concat([
       'main.js'
-    ], file);
+    ]), file);
   };
 
   var addSeparateSuffixAlways = function (file) {
@@ -81,12 +91,10 @@ module.exports = function (grunt) {
     if (path.extname(file) !== '.js') {
       return false;
     }
-    return !_.includes([
-      'node_modules/requirejs/require.js',
-      'node_modules/almond/almond.js',
+    return !_.includes(amdLibs.concat([
       'internal.combined.js',
       'external.combined.js'
-    ], reverseFileName(file));
+    ]), reverseFileName(file));
   };
 
   grunt.initConfig({
@@ -95,12 +103,15 @@ module.exports = function (grunt) {
         '.tmp/build/**',
         'build/**'
       ],
-      buildLeftovers: [
-        'build/node_modules/require-css/css-builder.js',
-        'build/node_modules/require-css/normalize.js',
-        'build/node_modules/almond/almond.js',
-        'build/main.js'
-      ],
+      buildLeftovers: {
+        files: [{
+          expand: true,
+          cwd: 'build',
+          src: buildLibs.concat([
+            'main.js'
+          ])
+        }]
+      },
       serve: ['.tmp/serve/**']
     },
     connect: {
@@ -122,11 +133,7 @@ module.exports = function (grunt) {
         files: [{
           expand: true,
           cwd: '.',
-          src: libs.concat([
-            'node_modules/almond/almond.js',
-            'node_modules/require-css/css-builder.js',
-            'node_modules/require-css/normalize.js'
-          ]),
+          src: buildLibs.concat(libs),
           dest: 'build'
         }, {
           expand: true,
@@ -160,23 +167,23 @@ module.exports = function (grunt) {
       };
     }()),
     filerev: (function () {
-      var deferred = [
-        'build/node_modules/almond/almond.js',
-        'build/main.js'
-      ];
+      var deferred = amdLibs.concat([
+        'main.js'
+      ]);
       return {
         buildExceptDeferred: {
           src: [
-            'build/**/*.{css,js,eot,svg,ttf,woff}',
-            '!build/node_modules/require-css/{css-builder.js,normalize.js}'
-          ].concat(_.map(deferred, function (d) {
-            return '!' + d;
+            'build/**/*.{css,js,eot,svg,ttf,woff,woff2}'
+          ].concat(_.map(buildLibs.concat(deferred), function (d) {
+            return '!' + path.join('build', d);
           }))
         },
         buildDeferred: {
-          src: deferred.concat(
+          src: [
             'build/**/*.{combined,separate}.{css,js}'
-          )
+          ].concat(_.map(deferred, function (d) {
+            return path.join('build', d);
+          }))
         }
       };
     }()),
@@ -317,8 +324,12 @@ module.exports = function (grunt) {
 
       var normalizeFile = function (fileName, contents) {
         if (_.includes(fileName, '!')) {
-          fileName = fileName.split('!')[1];
-          contents = fs.readFileSync(path.join('build', fileName), 'utf8');
+          var split = fileName.split('!');
+          var plugin = split[0];
+          fileName = split[1];
+          if (reverseFileName(plugin + '.js') === 'node_modules/text/text.js' || _.endsWith(fileName, '.css')) {
+            contents = fs.readFileSync(path.join('build', fileName), 'utf8');
+          }
         }
         if (_.startsWith(fileName, '/')) {
           fileName = path.relative(path.resolve('build'), fileName);
@@ -400,7 +411,7 @@ module.exports = function (grunt) {
           baseUrl: 'build',
           cssDir: 'build', // Option in our fork of css.js to handle `out` as a function.
           mainConfigFile: 'build/main.js',
-          name: 'node_modules/almond/almond',
+          name: 'node_modules/requirejs/require',
           include: 'main',
           pragmasOnSave: {
             excludeRequireCss: true
