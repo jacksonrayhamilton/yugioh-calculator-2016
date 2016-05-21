@@ -1,17 +1,11 @@
 {
-  "dependencies": {
-    "almond": "^0.3.2",
-    "fastclick": "^1.0.6",
-    "mithril": "^0.2.4",
-    "require-css": "jacksonrayhamilton/require-css#8f330ed",
-    "requirejs": "^2.2.0",
-    "text": "github:requirejs/text"
-  },
   "devDependencies": {
+    "almond": "^0.3.2",
     "autoprefixer": "^6.3.6",
     "chai": "^3.5.0",
     "cheerio": "^0.20.0",
     "cssnano": "^3.5.2",
+    "fastclick": "^1.0.6",
     "grunt": "^1.0.1",
     "grunt-contrib-clean": "^1.0.0",
     "grunt-contrib-connect": "^1.0.2",
@@ -31,8 +25,12 @@
     "karma-requirejs": "^1.0.0",
     "load-grunt-tasks": "^3.5.0",
     "lodash": "^4.11.1",
+    "mithril": "^0.2.4",
     "mocha": "^2.4.5",
     "postcss-cachebuster": "jacksonrayhamilton/postcss-cachebuster#a876cd1",
-    "serve-static": "^1.10.2"
+    "require-css": "jacksonrayhamilton/require-css#8f330ed",
+    "requirejs": "^2.2.0",
+    "serve-static": "^1.10.2",
+    "text": "github:requirejs/text"
   }
 }
