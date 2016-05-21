@@ -523,7 +523,7 @@ module.exports = function (grunt) {
   });
 
   var mapRevisions = function (files) {
-    return files.map(function (file) {
+    return _.map(files, function (file) {
       var revision = grunt.filerev.summary[path.join('build', file)];
       if (revision) {
         file = path.relative('build', revision);
@@ -538,9 +538,20 @@ module.exports = function (grunt) {
     });
   };
 
+  var preloadedFiles = [
+    // Only Chrome supports <link rel="preload"> right now, and since Chrome
+    // will download every font type it supports, only send woff2.  (In the
+    // future we might want to preload regular woff as well.)
+    'fonts/ubuntu-mono.woff2'
+  ];
+
+  var prepareHtml = function (files) {
+    return injectIntoHtml(indexTemplate, mapRevisions(files));
+  };
+
   grunt.registerTask('index:build', function () {
-    grunt.file.write('build/index.combined.html', injectIntoHtml(indexTemplate, mapRevisions(grunt.requirejs.combined)));
-    grunt.file.write('build/index.separate.html', injectIntoHtml(indexTemplate, mapRevisions(grunt.requirejs.separate)));
+    grunt.file.write('build/index.combined.html', prepareHtml(grunt.requirejs.combined.concat(preloadedFiles)));
+    grunt.file.write('build/index.separate.html', prepareHtml(grunt.requirejs.separate.concat(preloadedFiles)));
   });
 
   grunt.registerTask('test', [
