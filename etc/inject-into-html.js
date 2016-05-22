@@ -2,6 +2,7 @@
 
 'use strict';
 
+var _ = require('lodash');
 var cheerio = require('cheerio');
 var path = require('path');
 
@@ -10,11 +11,11 @@ var path = require('path');
  */
 var injectIntoHtml = function (html, files) {
   var $ = cheerio.load(html);
-  files.forEach(function (file) {
-    var url, async;
+  _.forEach(files, function (file) {
+    var url, attrs;
     if (file && typeof file === 'object') {
       url = file.url;
-      async = file.async;
+      attrs = file.attrs || {};
     } else {
       url = file;
     }
@@ -33,7 +34,11 @@ var injectIntoHtml = function (html, files) {
     }
     if (ext === '.js') {
       $('script[src="' + url + '"]').remove();
-      $('body').append($('<script src="' + url + '"' + (async ? ' async=""' : '') + '></script>'));
+      var script = $('<script src="' + url + '"></script>');
+      _.forOwn(attrs, function (value, name) {
+        script.attr(name, value);
+      });
+      $('body').append(script);
     }
   });
   return $.html();

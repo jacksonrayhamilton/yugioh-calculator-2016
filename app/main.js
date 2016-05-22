@@ -23,7 +23,7 @@ require([
 
   // eslint-disable-next-line no-new
   new YC.App({
-    element: document.body
+    element: document.querySelector('.yc-app')
   });
 
 });

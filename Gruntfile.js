@@ -87,7 +87,7 @@ module.exports = function (grunt) {
     ], reverseFileName(file));
   };
 
-  var canBeAsync = function (file) {
+  var isModule = function (file) {
     if (path.extname(file) !== '.js') {
       return false;
     }
@@ -427,7 +427,7 @@ module.exports = function (grunt) {
           baseUrl: 'build',
           cssDir: 'build', // Option in our fork of css.js to handle `out` as a function.
           mainConfigFile: 'build/main.js',
-          name: 'node_modules/almond/almond',
+          name: 'node_modules/requirejs/require',
           include: 'main',
           pragmasOnSave: {
             excludeRequireCss: true
@@ -525,14 +525,17 @@ module.exports = function (grunt) {
   var mapRevisions = function (files) {
     return _.map(files, function (file) {
       var revision = grunt.filerev.summary[path.join('build', file)];
+      file = {
+        url: file,
+        attrs: {}
+      };
       if (revision) {
-        file = path.relative('build', revision);
+        file.url = path.relative('build', revision);
       }
-      if (canBeAsync(file)) {
-        file = {
-          url: file,
-          async: true
-        };
+      if (isModule(file.url)) {
+        file.attrs['async'] = '';
+        file.attrs['data-requirecontext'] = '_';
+        file.attrs['data-requiremodule'] = file.url.replace(/\.js$/, '');
       }
       return file;
     });

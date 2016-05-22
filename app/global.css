@@ -11,3 +11,7 @@ body {
 body {
   margin: 0;
 }
+
+.yc-app {
+  height: 100%;
+}
