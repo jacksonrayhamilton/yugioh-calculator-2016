@@ -35,8 +35,8 @@
     "mkdirp": "^0.5.1",
     "mocha": "^2.4.5",
     "postcss-cachebuster": "^0.1.3",
-    "require-css": "jacksonrayhamilton/require-css#1f283cd",
-    "requirejs": "jacksonrayhamilton/requirejs-npm#55e6052",
-    "text": "github:requirejs/text"
+    "require-css": "github:jacksonrayhamilton/require-css#1f283cd",
+    "requirejs": "github:jacksonrayhamilton/requirejs-npm#55e6052",
+    "text": "github:requirejs/text#2.0.15"
   }
 }
