@@ -8,6 +8,7 @@
     "spdy": "^3.3.3"
   },
   "devDependencies": {
+    "amodro-trace": "^0.2.0",
     "autoprefixer": "^6.3.6",
     "chai": "^3.5.0",
     "cheerio": "^0.20.0",
@@ -18,7 +19,6 @@
     "grunt-contrib-connect": "^1.0.2",
     "grunt-contrib-copy": "^1.0.0",
     "grunt-contrib-htmlmin": "^1.4.0",
-    "grunt-contrib-requirejs": "^1.0.0",
     "grunt-contrib-uglify": "^1.0.1",
     "grunt-contrib-watch": "^1.0.0",
     "grunt-filerev": "^2.3.1",
@@ -32,9 +32,10 @@
     "karma-requirejs": "^1.0.0",
     "load-grunt-tasks": "^3.5.0",
     "mithril": "^0.2.4",
+    "mkdirp": "^0.5.1",
     "mocha": "^2.4.5",
     "postcss-cachebuster": "jacksonrayhamilton/postcss-cachebuster#a876cd1",
-    "require-css": "jacksonrayhamilton/require-css#8f330ed",
+    "require-css": "jacksonrayhamilton/require-css#1f283cd",
     "requirejs": "jacksonrayhamilton/requirejs-npm#55e6052",
     "text": "github:requirejs/text"
   }

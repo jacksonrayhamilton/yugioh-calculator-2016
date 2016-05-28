@@ -5,15 +5,18 @@
 
 var _ = require('lodash');
 var autoprefixer = require('autoprefixer');
+var allWriteTransforms = require('amodro-trace/write/all');
+var amodroConfig = require('amodro-trace/config');
+var amodroTrace = require('amodro-trace');
 var cachebuster = require('postcss-cachebuster');
 var cssnano = require('cssnano');
 var fs = require('fs');
 var loadGruntTasks = require('load-grunt-tasks');
+var mkdirp = require('mkdirp');
 var path = require('path');
 var serveStatic = require('serve-static');
 
 var injectIntoHtml = require('./etc/inject-into-html');
-var replaceRequirePaths = require('./etc/replace-require-paths');
 
 var indexTemplate = fs.readFileSync(path.join(__dirname, 'app/index.html'), 'utf8');
 
@@ -27,15 +30,7 @@ module.exports = function (grunt) {
     karma: 1026
   };
 
-  var amdLibs = [
-    'node_modules/requirejs/require.js',
-    'node_modules/almond/almond.js'
-  ];
-
-  var buildLibs = amdLibs.concat([
-    'node_modules/require-css/css-builder.js',
-    'node_modules/require-css/normalize.js'
-  ]);
+  var amdLib = 'node_modules/requirejs/require.js';
 
   var libs = [
     'node_modules/require-css/css.js',
@@ -44,74 +39,29 @@ module.exports = function (grunt) {
     'node_modules/fastclick/lib/fastclick.js'
   ];
 
-  var isSensitiveScript = function (file) {
-    return _.includes(amdLibs.concat([
-      'main.js'
-    ]), file);
-  };
-
-  var addSeparateSuffixAlways = function (file) {
-    var parsed = path.parse(file);
-    return path.join(parsed.dir, parsed.name + '.separate' + parsed.ext);
-  };
-
-  var addSeparateSuffix = function (file) {
-    if (!isSensitiveScript(file)) {
-      return addSeparateSuffixAlways(file);
-    }
-    return file;
-  };
-
-  var removeSeparateSuffix = function (file) {
-    var parsed = path.parse(file);
-    return path.join(parsed.dir, parsed.name.replace(/\.separate$/, '') + parsed.ext);
-  };
-
-  var reverseFileName = function (fileName) {
-    var summary = grunt.filerev && grunt.filerev.summary;
-    if (summary) {
-      var original = _.find(_.keys(summary), function (key) {
-        return fileName === path.relative('build', summary[key]);
-      });
-      if (original) {
-        return removeSeparateSuffix(path.relative('build', original));
-      }
-    }
-    return fileName;
-  };
-
-  // r.js doesn't let us use `exclude` if we use `out`.
   var isExcludedModule = function (file) {
     return _.includes([
       'node_modules/require-css/normalize.js'
-    ], reverseFileName(file));
+    ], file);
   };
 
-  var isModule = function (file) {
-    if (path.extname(file) !== '.js') {
-      return false;
-    }
-    return !_.includes(amdLibs.concat([
-      'internal.combined.js',
-      'external.combined.js'
-    ]), reverseFileName(file));
+  var combinedMainScript = 'build/main.combined.js';
+  var separateMainScript = 'build/main.separate.js';
+  var mainScripts = [
+    combinedMainScript,
+    separateMainScript
+  ];
+
+  var stripExtension = function (file) {
+    var parsed = path.parse(file);
+    return path.join(parsed.dir, parsed.name);
   };
 
   grunt.initConfig({
     clean: {
       buildDirs: [
-        '.tmp/build/**',
         'build/**'
       ],
-      buildLeftovers: {
-        files: [{
-          expand: true,
-          cwd: 'build',
-          src: buildLibs.concat([
-            'main.js'
-          ])
-        }]
-      },
       serve: ['.tmp/serve/**']
     },
     connect: {
@@ -128,65 +78,40 @@ module.exports = function (grunt) {
         }
       }
     },
-    copy: (function () {
-      var buildInitial = {
+    copy: {
+      build: {
         files: [{
           expand: true,
           cwd: '.',
-          src: buildLibs.concat(libs),
+          src: amdLib,
           dest: 'build'
         }, {
           expand: true,
           cwd: 'app',
-          src: [
-            '**/*',
-            '!index.html',
-            '!test-main.js',
-            '!*-test.js'
-          ],
+          src: 'fonts/**/*',
           dest: 'build'
         }]
-      };
-      var buildRenamed = _.cloneDeep(buildInitial);
-      buildRenamed.files[1].src.push('!{fonts,icons}/*');
-      var rename = function (dest, src) {
-        // Copy over the original files, but with their (potentially) suffixed
-        // and revved names.
-        var separateName = path.join(dest, addSeparateSuffix(src));
-        var mappedName = grunt.filerev.summary[separateName];
-        if (mappedName) {
-          return mappedName;
-        }
-        return path.join(dest, src);
-      };
-      buildRenamed.files[0].rename = rename;
-      buildRenamed.files[1].rename = rename;
-      return {
-        buildInitial: buildInitial,
-        buildRenamed: buildRenamed
-      };
-    }()),
-    filerev: (function () {
-      var deferred = amdLibs.concat([
-        'main.js'
-      ]);
-      return {
-        buildExceptDeferred: {
-          src: [
-            'build/**/*.{css,js,eot,svg,ttf,woff,woff2}'
-          ].concat(_.map(buildLibs.concat(deferred), function (d) {
-            return '!' + path.join('build', d);
-          }))
-        },
-        buildDeferred: {
-          src: [
-            'build/**/*.{combined,separate}.{css,js}'
-          ].concat(_.map(deferred, function (d) {
-            return path.join('build', d);
-          }))
-        }
-      };
-    }()),
+      }
+    },
+    filerev: {
+      buildFirst: {
+        src: [
+          'build/**/*.{js,eot,svg,ttf,woff,woff2}'
+        ].concat(_.map(mainScripts, function (file) {
+          // Main scripts must maintain their names for modifyConfig.
+          return '!' + file;
+        }))
+      },
+      buildCss: {
+        // CSS references other revved files (like fonts) but is also referenced
+        // by RequireJS so has to come before main scripts.
+        src: 'build/**/*.css'
+      },
+      buildMain: {
+        // Main scripts reference other JS and CSS.
+        src: mainScripts
+      }
+    },
     htmlmin: {
       build: {
         options: {
@@ -247,16 +172,16 @@ module.exports = function (grunt) {
               // returns a new pathname for the asset.
               type: function (assetPath) {
                 if (grunt.filerev) {
-                  return path.relative('build', grunt.filerev.summary[path.relative('.', assetPath)]);
+                  assetPath = path.relative('build', grunt.filerev.summary[path.relative('.', assetPath)]);
                 }
-                return assetPath;
+                return path.join('..', assetPath);
               }
             }),
             autoprefixer({browsers: '> 0%'}),
             cssnano({safe: true})
           ]
         },
-        src: 'build/*.css'
+        src: 'build/**/*.css'
       },
       serve: {
         options: {
@@ -265,196 +190,15 @@ module.exports = function (grunt) {
           ],
           map: true
         },
-        src: '.tmp/serve/*.css'
+        src: '.tmp/serve/**/*.css'
       }
     },
-    requirejs: (function () {
-
-      var wrapFile = function (moduleName, fileName, contents) {
-        return '//>>fileStart("' + fileName + '")\n' + contents + '\n//>>fileEnd("' + fileName + '")\n';
-      };
-
-      var fileStartRegExp = /fileStart\s*\(\s*["'](.*?)["']\s*\)/;
-
-      var extractFiles = function (fileContents, callback) {
-        var foundIndex, lineEndIndex;
-        var startIndex = 0;
-        while ((foundIndex = fileContents.indexOf('//>>', startIndex)) !== -1) {
-          // Found a boundary. Get the boundary line.
-          lineEndIndex = fileContents.indexOf('\n', foundIndex);
-          if (lineEndIndex === -1) {
-            lineEndIndex = fileContents.length - 1;
-          }
-
-          // Increment startIndex past the line so the next boundary search can be done.
-          startIndex = lineEndIndex + 1;
-
-          // Break apart the boundary.
-          var fileStartLine = fileContents.substring(foundIndex, lineEndIndex + 1);
-          var matches = fileStartLine.match(fileStartRegExp);
-          if (matches) {
-            var marker = matches[1];
-
-            // Find the endpoint marker.
-            var endRegExp = new RegExp('\\/\\/\\>\\>\\s*fileEnd\\(\\s*[\'"]' + marker + '[\'"]\\s*\\)', 'g');
-            var endMatches = endRegExp.exec(fileContents.substring(startIndex, fileContents.length));
-            if (endMatches) {
-              var endMarkerIndex = startIndex + endRegExp.lastIndex - endMatches[0].length;
-
-              // Find the next line return based on the match position.
-              lineEndIndex = fileContents.indexOf('\n', endMarkerIndex);
-              if (lineEndIndex === -1) {
-                lineEndIndex = fileContents.length - 1;
-              }
-
-              // Remove the boundary comments.
-              var extractedFileContents = fileContents.substring(startIndex, endMarkerIndex);
-              callback(marker, extractedFileContents);
-
-              // Move startIndex to lineEndIndex, since that is the new position
-              // in the file where we need to look for more boundaries in the
-              // next while loop pass.
-              startIndex = lineEndIndex;
-            } else {
-              throw new Error('Cannot find end marker for start: ' + fileStartLine);
-            }
-          }
-        }
-      };
-
-      var normalizeFile = function (fileName, contents) {
-        var originalFileName, originalContents;
-        if (_.includes(fileName, '!')) {
-          var split = fileName.split('!');
-          var plugin = split[0];
-          fileName = split[1];
-          if (reverseFileName(plugin + '.js') === 'node_modules/text/text.js') {
-            originalFileName = fileName;
-            fileName += '.js';
-          }
-          if (originalFileName || _.endsWith(fileName, '.css')) {
-            var readContents = fs.readFileSync(path.join('build', originalFileName || fileName), 'utf8');
-            if (originalFileName) {
-              originalContents = readContents;
-            } else {
-              contents = readContents;
-            }
-          }
-        }
-        if (_.startsWith(fileName, '/')) {
-          fileName = path.relative(path.resolve('build'), fileName);
-        }
-        if (reverseFileName(fileName) === 'node_modules/require-css/css.js') {
-          // Fix bug that prevents almond from working.
-          contents = contents.replace(
-            'var cssAPI = {};',
-            'var cssAPI = {load: function (n, r, load) { load(); }};'
-          );
-        }
-        return {
-          originalFileName: originalFileName,
-          originalContents: originalContents,
-          fileName: fileName,
-          contents: contents
-        };
-      };
-
-      var deleteFile = function (file) {
-        fs.unlinkSync(path.join('build', file));
-      };
-
-      var writeFile = function (file, data) {
-        fs.writeFileSync(path.join('build', file), data);
-      };
-
-      var addToFile = function (file, data) {
-        var out = path.join('build', file);
-        if (fs.existsSync(out)) {
-          fs.appendFileSync(out, data);
-        } else {
-          fs.writeFileSync(out, data);
-        }
-      };
-
-      var buildJustSeparate = function (fileName, contents) {
-        var normalized = normalizeFile(fileName, contents);
-        if (isExcludedModule(normalized.fileName)) {
-          return;
-        }
-        if (normalized.originalFileName) {
-          deleteFile(normalized.originalFileName);
-          writeFile(addSeparateSuffix(normalized.originalFileName), normalized.originalContents);
-        } else {
-          deleteFile(normalized.fileName);
-          writeFile(addSeparateSuffix(normalized.fileName), normalized.contents);
-        }
-      };
-
-      var buildAlsoCombine = function (fileName, contents) {
-        var normalized = normalizeFile(fileName, contents);
-        if (isExcludedModule(normalized.fileName)) {
-          return;
-        }
-        var parsed = path.parse(normalized.fileName);
-        var combinedName =
-            (/^node_modules/.test(normalized.fileName) ? 'external' : 'internal') +
-            '.combined' +
-            parsed.ext;
-        var separateName = normalized.fileName;
-        if (isSensitiveScript(separateName)) {
-          separateName = addSeparateSuffixAlways(separateName);
-        }
-        var addSemiColon = function (text) {
-          return text + (parsed.ext === '.js' && (/;\s*$/).test(normalized.contents) ? '' : ';');
-        };
-        writeFile(separateName, normalized.contents);
-        addToFile(combinedName, addSemiColon(normalized.contents));
-        grunt.requirejs = grunt.requirejs || {combined: [], separate: []};
-        if (!_.includes(grunt.requirejs.combined, combinedName)) {
-          grunt.requirejs.combined.push(combinedName);
-        }
-        grunt.requirejs.separate.push(separateName);
-      };
-
-      var getFileExtractor = function (separator) {
-        return function (contents) {
-          extractFiles(contents, separator);
-        };
-      };
-
-      return {
-        options: {
-          baseUrl: 'build',
-          cssDir: 'build', // Option in our fork of css.js to handle `out` as a function.
-          mainConfigFile: 'build/main.js',
-          name: 'node_modules/requirejs/require',
-          include: 'main',
-          pragmasOnSave: {
-            excludeRequireCss: true
-          },
-          optimize: 'none',
-          normalizeDirDefines: 'all',
-          onBuildWrite: wrapFile
-        },
-        buildJustSeparate: {
-          options: {
-            out: getFileExtractor(buildJustSeparate)
-          }
-        },
-        buildAlsoCombine: {
-          options: {
-            out: getFileExtractor(buildAlsoCombine)
-          }
-        }
-      };
-
-    }()),
     sync: {
       styles: {
         files: [{
           expand: true,
           cwd: 'app/',
-          src: '*.css',
+          src: '**/*.css',
           dest: '.tmp/serve/'
         }]
       }
@@ -463,24 +207,38 @@ module.exports = function (grunt) {
       options: {
         screwIE8: true
       },
-      build: {
+      buildFirst: {
         files: [{
           expand: true,
           cwd: 'build',
-          src: ['**/*.js'],
+          src: [
+            '**/*.js'
+          ].concat(_.map(mainScripts, function (file) {
+            return '!' + path.relative('build', file);
+          })),
+          dest: 'build'
+        }]
+      },
+      buildMain: {
+        files: [{
+          expand: true,
+          cwd: 'build',
+          src: _.map(mainScripts, function (file) {
+            return path.relative('build', file);
+          }),
           dest: 'build'
         }]
       }
     },
     watch: {
       scripts: {
-        files: ['app/*.js', '!app/*-test.js'],
+        files: ['app/**/*.js', '!app/*-test.js'],
         options: {
           livereload: ports.livereload
         }
       },
       styles: {
-        files: ['app/*.css'],
+        files: ['app/**/*.css'],
         tasks: [
           'sync:styles',
           'postcss:serve'
@@ -491,28 +249,171 @@ module.exports = function (grunt) {
         tasks: ['index:serve']
       },
       livereload: {
+        files: ['.tmp/serve/**/*.{html,css}'],
         options: {
           livereload: ports.livereload
-        },
-        files: ['.tmp/serve/*.{html,css}']
+        }
       }
     }
   });
 
-  var replaceableSummary = function (summary) {
-    var mapped = {};
-    _.forOwn(summary, function (value, key) {
-      var mappedKey = removeSeparateSuffix(path.relative('build', key));
-      var mappedValue = path.relative('build', value);
-      mapped[mappedKey] = mappedValue;
+  grunt.registerTask('amd:build', function () {
+    var done = this.async(); // eslint-disable-line no-invalid-this
+
+    // Track module associations so we can generate HTML for them later.
+    grunt.modules = grunt.modules || {combined: [amdLib], separate: [amdLib]};
+    grunt.bundles = grunt.bundles || {combined: {}, separate: {}};
+
+    var readFile = function (file) {
+      return fs.readFileSync(path.join('app', file), 'utf8');
+    };
+
+    var writeFile = function (file, data) {
+      file = path.join('build', file);
+      mkdirp.sync(path.dirname(file));
+      fs.writeFileSync(file, data);
+    };
+
+    var addToFile = function (file, data) {
+      var out = path.join('build', file);
+      if (fs.existsSync(out)) {
+        fs.appendFileSync(out, data);
+      } else {
+        writeFile(file, data);
+      }
+    };
+
+    // Make scripts safe to concatenate.
+    var addSemiColon = function (file, text) {
+      // Check for JS since this might be used with other file types.
+      return text + (_.endsWith(file, '.js') && (/;\s*$/).test(text) ? '' : ';');
+    };
+
+    var addSuffix = function (file, suffix) {
+      var parsed = path.parse(file);
+      return path.join(parsed.dir, parsed.name + suffix + parsed.ext);
+    };
+
+    var handleModule = function (id, contents) {
+      var fileName = id;
+      var plugin;
+      if (_.includes(fileName, '!')) {
+        var split = fileName.split('!');
+        plugin = split[0];
+        fileName = split[1];
+      }
+      var fileNameNoExt = fileName;
+      if (plugin && plugin === 'node_modules/require-css/css') {
+        // We'll include actual CSS files in the build, since CSS generally
+        // works better as CSS rather than as JS.
+        fileName += '.css';
+        contents = readFile(fileName);
+      } else {
+        // Any other module, including text modules, will be served as JS, so
+        // give it the right extension so the browser always infers the MIME
+        // type correctly.  (JS modules have no extension per RequireJS idioms
+        // and text modules' original suffix will just be lost.)
+        fileName += '.js';
+      }
+      if (isExcludedModule(fileName)) {
+        return;
+      }
+      var separateName = fileName;
+      if (fileName === 'main.js') {
+        separateName = addSuffix(fileName, '.separate');
+      }
+      writeFile(separateName, contents);
+      var parsed = path.parse(fileName);
+      // NPM handles dependency management.  Separate externally-maintained
+      // scripts into another file since they probably will change less often
+      // and thus will cache longer.
+      var combinedName = path.join(
+        parsed.dir === 'styles' ? parsed.dir : '',
+        (fileName === 'main.js' ? 'main' :
+         (/^node_modules/).test(fileName) ? 'external' :
+         'internal') + parsed.ext
+      );
+      if (fileName === 'main.js') {
+        combinedName = addSuffix(fileName, '.combined');
+      }
+      addToFile(combinedName, addSemiColon(fileName, contents));
+      if (!_.includes(grunt.modules.combined, combinedName)) {
+        grunt.modules.combined.push(combinedName);
+      }
+      grunt.modules.separate.push({
+        // Store module ID and file name so we can generate the proper <script>
+        // attributes to imitate RequireJS loading.
+        id: id,
+        file: separateName
+      });
+      // Main can't be bundled since it would have a reference to itself which
+      // would make its revision hash unfaithful.
+      if (fileName !== 'main.js') {
+        if (!Object.prototype.hasOwnProperty.call(grunt.bundles.combined, combinedName)) {
+          grunt.bundles.combined[combinedName] = [];
+        }
+        grunt.bundles.combined[combinedName].push(fileNameNoExt);
+        grunt.bundles.separate[separateName] = [fileNameNoExt];
+      }
+    };
+
+    // In case the modules were not located in the right order, ensure they do
+    // load in the right order.
+    var sortModules = function (modules) {
+      modules.sort(function (a, b) {
+        if (path.parse(a).name === 'external' && path.parse(b).name !== 'external' && b !== amdLib) {
+          return -1;
+        }
+        if (path.parse(a).name !== 'external' && a !== amdLib && path.parse(b).name === 'external') {
+          return 1;
+        }
+        return 0;
+      });
+    };
+
+    var loaderConfig = amodroConfig.find(fs.readFileSync('app/main.js', 'utf8'));
+    loaderConfig.dir = 'build'; // For require-css.
+
+    amodroTrace({
+      rootDir: path.join(__dirname, 'app'),
+      id: 'main',
+      includeContents: true,
+      writeTransform: allWriteTransforms()
+    }, loaderConfig).then(function (traceResult) {
+      _.forEach(traceResult.traced, function (result) {
+        handleModule(result.id, result.contents);
+      });
+      sortModules(grunt.modules.combined);
+      done();
+    }).catch(function (reason) {
+      console.error(reason);
+      done(false);
     });
-    return mapped;
+  });
+
+  var mapBundlesThroughSummary = function (bundles, summary) {
+    return _.mapKeys(bundles, function (value, key) {
+      return stripExtension(path.relative('build', summary[path.join('build', key)]));
+    });
   };
 
-  grunt.registerTask('replacePaths:build', function () {
-    var replaceable = replaceableSummary(grunt.filerev.summary);
-    var replaced = replaceRequirePaths(grunt.file.read('build/main.js'), replaceable);
-    grunt.file.write('build/main.js', replaced);
+  grunt.registerTask('modifyConfig:build', function () {
+    _.forEach([{
+      mainScript: combinedMainScript,
+      bundles: grunt.bundles.combined
+    }, {
+      mainScript: separateMainScript,
+      bundles: grunt.bundles.separate
+    }], function (pair) {
+      var mainScript = pair.mainScript;
+      var bundles = pair.bundles;
+      var replaced = amodroConfig.modify(grunt.file.read(mainScript), function (currentConfig) {
+        currentConfig.bundles = currentConfig.bundles || {};
+        _.defaults(currentConfig.bundles, mapBundlesThroughSummary(bundles, grunt.filerev.summary));
+        return currentConfig;
+      });
+      grunt.file.write(mainScript, replaced);
+    });
   });
 
   grunt.registerTask('index:serve', function () {
@@ -524,6 +425,11 @@ module.exports = function (grunt) {
 
   var mapRevisions = function (files) {
     return _.map(files, function (file) {
+      var moduleId;
+      if (_.isObject(file)) {
+        moduleId = file.id;
+        file = file.file;
+      }
       var revision = grunt.filerev.summary[path.join('build', file)];
       file = {
         url: file,
@@ -532,10 +438,10 @@ module.exports = function (grunt) {
       if (revision) {
         file.url = path.relative('build', revision);
       }
-      if (isModule(file.url)) {
+      if (moduleId) {
         file.attrs['async'] = '';
         file.attrs['data-requirecontext'] = '_';
-        file.attrs['data-requiremodule'] = file.url.replace(/\.js$/, '');
+        file.attrs['data-requiremodule'] = moduleId;
       }
       return file;
     });
@@ -553,8 +459,8 @@ module.exports = function (grunt) {
   };
 
   grunt.registerTask('index:build', function () {
-    grunt.file.write('build/index.combined.html', prepareHtml(grunt.requirejs.combined.concat(preloadedFiles)));
-    grunt.file.write('build/index.separate.html', prepareHtml(grunt.requirejs.separate.concat(preloadedFiles)));
+    grunt.file.write('build/index.combined.html', prepareHtml(grunt.modules.combined.concat(preloadedFiles)));
+    grunt.file.write('build/index.separate.html', prepareHtml(grunt.modules.separate.concat(preloadedFiles)));
   });
 
   grunt.registerTask('test', [
@@ -576,18 +482,15 @@ module.exports = function (grunt) {
 
   grunt.registerTask('build', [
     'clean:buildDirs',
-    'copy:buildInitial',
-    'requirejs:buildJustSeparate',
+    'copy:build',
+    'amd:build',
+    'uglify:buildFirst',
+    'filerev:buildFirst',
     'postcss:build',
-    'uglify:build',
-    'filerev:buildExceptDeferred',
-    'copy:buildRenamed',
-    'replacePaths:build',
-    'requirejs:buildAlsoCombine',
-    'clean:buildLeftovers',
-    'postcss:build',
-    'uglify:build',
-    'filerev:buildDeferred',
+    'filerev:buildCss',
+    'modifyConfig:build',
+    'uglify:buildMain',
+    'filerev:buildMain',
     'index:build',
     'htmlmin:build'
   ]);
