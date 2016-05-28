@@ -333,12 +333,16 @@ module.exports = function (grunt) {
          (/^node_modules/).test(fileName) ? 'external' :
          'internal') + parsed.ext
       );
+      var combinedId = stripExtension(combinedName);
       if (fileName === 'main.js') {
         combinedName = addSuffix(fileName, '.combined');
       }
       addToFile(combinedName, addSemiColon(fileName, contents));
-      if (!_.includes(grunt.modules.combined, combinedName)) {
-        grunt.modules.combined.push(combinedName);
+      if (!_.find(grunt.modules.combined, {id: combinedId})) {
+        grunt.modules.combined.push({
+          id: combinedId,
+          file: combinedName
+        });
       }
       grunt.modules.separate.push({
         // Store module ID and file name so we can generate the proper <script>
@@ -361,6 +365,12 @@ module.exports = function (grunt) {
     // load in the right order.
     var sortModules = function (modules) {
       modules.sort(function (a, b) {
+        if (_.isObject(a)) {
+          a = a.file;
+        }
+        if (_.isObject(b)) {
+          b = b.file;
+        }
         if (path.parse(a).name === 'external' && path.parse(b).name !== 'external' && b !== amdLib) {
           return -1;
         }
