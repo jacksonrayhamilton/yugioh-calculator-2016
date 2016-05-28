@@ -6,7 +6,7 @@ define([
   './events',
   './persistence',
   './time',
-  'css!./timer.css'
+  'css!./styles/timer'
 ], function (m, YC) {
 
   /**

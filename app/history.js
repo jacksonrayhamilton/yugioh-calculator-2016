@@ -4,7 +4,7 @@ define([
   'm',
   './yc',
   'text!./icons/close.svg',
-  'css!./history.css',
+  'css!./styles/history',
   './persistence'
 ], function (m, YC, closeSvg) {
 

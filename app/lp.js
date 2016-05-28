@@ -5,7 +5,7 @@ define([
   './yc',
   'text!./icons/plus.svg',
   'text!./icons/minus.svg',
-  'css!./lp.css'
+  'css!./styles/lp'
 ], function (m, YC, plusSvg, minusSvg) {
 
   YC.Lp = function (spec) {

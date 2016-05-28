@@ -3,7 +3,7 @@
 define([
   'm',
   './yc',
-  'css!./operand.css',
+  'css!./styles/operand',
   './utils'
 ], function (m, YC) {
 

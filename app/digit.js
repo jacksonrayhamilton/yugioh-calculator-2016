@@ -3,7 +3,7 @@
 define([
   'm',
   './yc',
-  'css!./digit.css'
+  'css!./styles/digit'
 ], function (m, YC) {
 
   YC.Digit = function (spec) {

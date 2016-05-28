@@ -14,11 +14,11 @@ require.config({
 require([
   './yc',
   './app',
-  'css!./fonts.css',
-  'css!./global.css',
-  'css!./button.css',
-  'css!./layout.css',
-  'css!./theme.css'
+  'css!./styles/fonts',
+  'css!./styles/global',
+  'css!./styles/button',
+  'css!./styles/layout',
+  'css!./styles/theme'
 ], function (YC) {
 
   // eslint-disable-next-line no-new

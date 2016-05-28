@@ -1,0 +1,7 @@
+@font-face {
+  font-family: 'Ubuntu Mono';
+  src: url('../fonts/ubuntu-mono.woff2') format('woff2'),
+       url('../fonts/ubuntu-mono.woff') format('woff');
+  font-weight: normal;
+  font-style: normal;
+}
