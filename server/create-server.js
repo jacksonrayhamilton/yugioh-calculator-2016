@@ -27,7 +27,7 @@ var createServer = function (options) {
 
   _.forEach(options.dirs, function (dir) {
     var baseOptions = options.cache ? {
-      maxAge: '1d',
+      maxAge: '1y',
       setHeaders: setCustomCacheControl
     } : {};
     var serveSeparate = serveStatic(dir, _.defaults({
