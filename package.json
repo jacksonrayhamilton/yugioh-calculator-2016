@@ -29,7 +29,7 @@
     "karma-chrome-launcher": "^1.0.1",
     "karma-firefox-launcher": "^1.0.0",
     "karma-mocha": "^1.0.1",
-    "karma-requirejs": "^1.0.0",
+    "karma-requirejs": "github:jacksonrayhamilton/karma-requirejs#7482a3a",
     "load-grunt-tasks": "^3.5.0",
     "mithril": "^0.2.4",
     "mkdirp": "^0.5.1",

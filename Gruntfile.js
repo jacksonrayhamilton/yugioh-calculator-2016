@@ -32,13 +32,6 @@ module.exports = function (grunt) {
 
   var amdLib = 'node_modules/requirejs/require.js';
 
-  var libs = [
-    'node_modules/require-css/css.js',
-    'node_modules/text/text.js',
-    'node_modules/mithril/mithril.js',
-    'node_modules/fastclick/lib/fastclick.js'
-  ];
-
   var isExcludedModule = function (file) {
     return _.includes([
       'node_modules/require-css/normalize.js'
@@ -141,16 +134,23 @@ module.exports = function (grunt) {
     },
     karma: {
       options: {
-        files: _.map(libs, function (lib) {
-          return {pattern: lib, included: false};
-        }).concat([
-          {pattern: 'node_modules/chai/chai.js', included: false},
+        files: [
           {pattern: 'app/**/*.+(css|js)', included: false},
           'app/test-main.js'
-        ]),
+        ],
         frameworks: ['mocha', 'requirejs'],
         browsers: ['Chrome', 'Firefox'],
-        port: ports.karma
+        port: ports.karma,
+        middleware: ['static'],
+        plugins: [
+          'karma-*', // Default
+          {'middleware:static': ['factory', function () {
+            return require('connect')().use('/base/app/node_modules', serveStatic('./node_modules'));
+          }]}
+        ],
+        client: {
+          requireJsShowNoTimestampsError: '^(?!.*(^/base/app/node_modules/))'
+        }
       },
       single: {
         options: {
