@@ -381,12 +381,24 @@ module.exports = function (grunt) {
       });
     };
 
+    // Override file handling logic so we can organize our code more nicely.
+    var fileHandler = function (defaultHandler, id, filePath) {
+      if (/^node_modules/.test(id) && !(/!/).test(id)) {
+        // Resolve `node_modules` one level up, as it isn't actually inside the
+        // `app` directory.
+        return defaultHandler(id, path.resolve(path.relative('app', filePath)));
+      }
+      return defaultHandler(id, filePath);
+    };
+
     var loaderConfig = amodroConfig.find(fs.readFileSync('app/main.js', 'utf8'));
     loaderConfig.dir = 'build'; // For require-css.
 
     amodroTrace({
       rootDir: path.join(__dirname, 'app'),
       id: 'main',
+      fileExists: fileHandler,
+      fileRead: fileHandler,
       includeContents: true,
       writeTransform: allWriteTransforms()
     }, loaderConfig).then(function (traceResult) {
