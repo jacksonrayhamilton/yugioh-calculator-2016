@@ -38,8 +38,8 @@ define([
           m('.yc-button.yc-icon-container.yc-reset-button', {onclick: reset}, m.trust(resetSvg)),
           m('.yc-button.yc-cancel-button', {onclick: cancel}, 'C'),
           m('.yc-button.yc-icon-container.yc-back-button', {onclick: back}, m.trust(backspaceSvg)),
-          m('.yc-button.yc-icon-container.yc-history-button', {onclick: historyMode}, m.trust(bookSvg)),
-          m('.yc-button.yc-icon-container.yc-undo-button', {onclick: undo}, m.trust(undoSvg))
+          m('.yc-button.yc-icon-container.yc-undo-button', {onclick: undo}, m.trust(undoSvg)),
+          m('.yc-button.yc-icon-container.yc-history-button', {onclick: historyMode}, m.trust(bookSvg))
         ]),
         YC.times(2, function (n) {
           var someDigits = digits.slice(n * 5, (n * 5) + 5);
