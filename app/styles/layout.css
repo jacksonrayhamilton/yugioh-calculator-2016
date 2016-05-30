@@ -1,3 +1,7 @@
+.yc-app {
+  height: 100%;
+}
+
 .yc-layout {
   display: flex;
   flex-direction: column;
