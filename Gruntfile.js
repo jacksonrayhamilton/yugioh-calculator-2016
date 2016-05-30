@@ -53,6 +53,7 @@ module.exports = function (grunt) {
   grunt.initConfig({
     clean: {
       buildDirs: [
+        '.tmp/build/**',
         'build/**'
       ],
       serve: ['.tmp/serve/**']
@@ -83,7 +84,31 @@ module.exports = function (grunt) {
           cwd: 'app',
           src: 'fonts/**/*',
           dest: 'build'
+        }, {
+          expand: true,
+          cwd: 'app',
+          // The index will get modified by grunt-favicons before being used as
+          // a template for the separate and combined HTML documents.
+          src: 'index.html',
+          dest: '.tmp/build'
         }]
+      }
+    },
+    favicons: {
+      options: {
+        androidHomescreen: true,
+        appleTouchBackgroundColor: 'none',
+        appleTouchPadding: 0,
+        tileBlackWhite: false,
+        tileColor: 'none',
+        trueColor: true
+      },
+      build: {
+        options: {
+          html: '.tmp/build/index.html'
+        },
+        src: 'design/icon.png',
+        dest: 'build'
       }
     },
     filerev: {
@@ -477,7 +502,8 @@ module.exports = function (grunt) {
   ];
 
   var prepareHtml = function (files) {
-    return injectIntoHtml(indexTemplate, mapRevisions(files));
+    var html = grunt.file.read('.tmp/build/index.html');
+    return injectIntoHtml(html, mapRevisions(files));
   };
 
   grunt.registerTask('index:build', function () {
@@ -513,6 +539,7 @@ module.exports = function (grunt) {
     'modifyConfig:build',
     'uglify:buildMain',
     'filerev:buildMain',
+    'favicons:build',
     'index:build',
     'htmlmin:build'
   ]);
