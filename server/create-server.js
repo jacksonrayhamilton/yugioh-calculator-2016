@@ -5,6 +5,8 @@ var compression = require('compression');
 var connect = require('connect');
 var fs = require('fs');
 var http = require('http');
+var ms = require('ms');
+var path = require('path');
 var spdy = require('spdy');
 var serveStatic = require('serve-static');
 var url = require('url');
@@ -13,21 +15,22 @@ var createServer = function (options) {
   options = options === undefined ? {} : options;
   options.dirs = options.dirs === undefined ? [] : options.dirs;
   options.cache = options.cache === undefined ? false : options.cache;
+  var staticAssets = options.staticAssets === undefined ? [] : options.staticAssets;
 
   var app = connect();
 
   app.use(compression());
 
-  var setCustomCacheControl = function (res, path) {
-    if (serveStatic.mime.lookup(path) === 'text/html') {
+  var setCustomCacheControl = function (res, filePath) {
+    if (_.includes(staticAssets, path.relative('.', filePath))) {
       // Custom Cache-Control for HTML files
-      res.setHeader('Cache-Control', 'public, max-age=0');
+      res.setHeader('Cache-Control', 'public, max-age=' + (ms('1 year') / 1000));
     }
   };
 
   _.forEach(options.dirs, function (dir) {
     var baseOptions = options.cache ? {
-      maxAge: '1y',
+      maxAge: '1 hour',
       setHeaders: setCustomCacheControl
     } : {};
     var serveSeparate = serveStatic(dir, _.defaults({

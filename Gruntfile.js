@@ -511,6 +511,12 @@ module.exports = function (grunt) {
     grunt.file.write('build/index.separate.html', prepareHtml(grunt.modules.separate.concat(preloadedFiles)));
   });
 
+  grunt.registerTask('staticAssets:build', function () {
+    // Save the paths to the static assets so the web server can safely
+    // determine what to set high expiration headers on.
+    grunt.file.write('build/static-assets.json', JSON.stringify(_.values(grunt.filerev.summary)));
+  });
+
   grunt.registerTask('test', [
     'karma:single'
   ]);
@@ -541,7 +547,8 @@ module.exports = function (grunt) {
     'filerev:buildMain',
     'favicons:build',
     'index:build',
-    'htmlmin:build'
+    'htmlmin:build',
+    'staticAssets:build'
   ]);
 
   grunt.registerTask('default', 'build');
