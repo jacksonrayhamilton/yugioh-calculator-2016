@@ -97,7 +97,7 @@ module.exports = function (grunt) {
     favicons: {
       options: {
         androidHomescreen: true,
-        appleTouchBackgroundColor: 'none',
+        appleTouchBackgroundColor: '#ffffff',
         appleTouchPadding: 0,
         tileBlackWhite: false,
         tileColor: 'none',
