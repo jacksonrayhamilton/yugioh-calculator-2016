@@ -352,7 +352,7 @@ module.exports = function (grunt) {
     loaderConfig.dir = 'build'; // For require-css.
 
     amodroTrace({
-      rootDir: path.join(__dirname, 'app'),
+      rootDir: 'app',
       id: 'main',
       fileExists: fileHandler,
       fileRead: fileHandler,
