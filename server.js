@@ -15,7 +15,7 @@ var serveStatic = require('serve-static');
 var url = require('url');
 
 var dir = 'build';
-var staticAssets = JSON.parse(fs.readFileSync('build/static-assets.json', 'utf8'));
+var staticAssets = JSON.parse(fs.readFileSync('config/static.json', 'utf8'));
 
 var options = nopt({
   'http-port': Number,

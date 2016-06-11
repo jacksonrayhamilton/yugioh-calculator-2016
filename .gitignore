@@ -2,4 +2,5 @@
 .tmp/
 build/
 certs/
+config/static.json
 node_modules/

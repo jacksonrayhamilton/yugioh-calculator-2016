@@ -25,7 +25,7 @@ module.exports = function (grunt) {
 
   grunt.initConfig({
     clean: {
-      build: ['build/**'],
+      build: ['build/**', 'config/static.json'],
       serve: ['.tmp/serve/**']
     },
     connect: {
@@ -461,7 +461,7 @@ module.exports = function (grunt) {
     // Save the paths to the static assets so the web server can safely
     // determine what to set high expiration headers on.
     var staticAssets = _.values(grunt.filerev.summary);
-    grunt.file.write('build/static-assets.json', JSON.stringify(staticAssets));
+    grunt.file.write('config/static.json', JSON.stringify(staticAssets));
   });
 
   grunt.registerTask('test', [
