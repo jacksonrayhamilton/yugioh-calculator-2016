@@ -4,24 +4,11 @@
 'use strict';
 
 var _ = require('lodash');
-var autoprefixer = require('autoprefixer');
-var allWriteTransforms = require('amodro-trace/write/all');
-var amodroConfig = require('amodro-trace/config');
-var amodroTrace = require('amodro-trace');
-var postcssUrl = require('postcss-url');
-var cssnano = require('cssnano');
-var fs = require('fs');
-var loadGruntTasks = require('load-grunt-tasks');
-var mkdirp = require('mkdirp');
 var path = require('path');
-var serveStatic = require('serve-static');
-
-var injectIntoHtml = require('./etc/inject-into-html');
-var indexTemplate = fs.readFileSync(path.join(__dirname, 'app/index.html'), 'utf8');
 
 module.exports = function (grunt) {
 
-  loadGruntTasks(grunt);
+  require('jit-grunt')(grunt);
 
   var ports = {
     serve: 1024,
@@ -34,6 +21,7 @@ module.exports = function (grunt) {
   var excludedModules = [
     'node_modules/require-css/normalize.js'
   ];
+  var indexTemplate = grunt.file.read('app/index.html');
 
   grunt.initConfig({
     clean: {
@@ -48,7 +36,10 @@ module.exports = function (grunt) {
           hostname: '*',
           base: ['.tmp/serve', 'app'],
           middleware: function (connect, options, middlewares) {
-            middlewares.push(connect().use('/node_modules', serveStatic('./node_modules')));
+            middlewares.push(
+              // Serve node_modules as if it were at the root of `app`.
+              connect().use('/node_modules', require('serve-static')('./node_modules'))
+            );
             return middlewares;
           }
         }
@@ -59,7 +50,7 @@ module.exports = function (grunt) {
         files: [{
           expand: true,
           cwd: 'app',
-          src: ['index.html', 'fonts/**/*'],
+          src: ['**/*.html', 'fonts/**/*'],
           dest: 'build'
         }]
       }
@@ -138,7 +129,11 @@ module.exports = function (grunt) {
         plugins: [
           'karma-*', // Default
           {'middleware:static': ['factory', function () {
-            return require('connect')().use('/base/app/node_modules', serveStatic('./node_modules'));
+            return require('connect')().use(
+              // Serve node_modules as if it were at the root of `app`.
+              '/base/app/node_modules',
+              require('serve-static')('./node_modules')
+            );
           }]}
         ],
         client: {
@@ -160,7 +155,7 @@ module.exports = function (grunt) {
       build: {
         options: {
           processors: [
-            postcssUrl({
+            require('postcss-url')({
               url: function (url, decl, from, dirname) {
                 if (grunt.filerev) {
                   // Determined the revisioned URL.
@@ -173,8 +168,8 @@ module.exports = function (grunt) {
                 return url;
               }
             }),
-            autoprefixer({browsers: '> 0%'}),
-            cssnano({safe: true})
+            require('autoprefixer')({browsers: '> 0%'}),
+            require('cssnano')({safe: true})
           ]
         },
         src: 'build/**/*.css'
@@ -182,7 +177,7 @@ module.exports = function (grunt) {
       serve: {
         options: {
           processors: [
-            autoprefixer({browsers: '> 0%'})
+            require('autoprefixer')({browsers: '> 0%'})
           ],
           map: true
         },
@@ -251,6 +246,12 @@ module.exports = function (grunt) {
   });
 
   grunt.registerTask('amd:build', function () {
+    var allWriteTransforms = require('amodro-trace/write/all');
+    var amodroConfig = require('amodro-trace/config');
+    var amodroTrace = require('amodro-trace');
+    var fs = require('fs');
+    var mkdirp = require('mkdirp');
+
     var done = this.async(); // eslint-disable-line no-invalid-this
 
     // Track module associations so we can generate HTML for them later.
@@ -391,9 +392,39 @@ module.exports = function (grunt) {
   };
 
   grunt.registerTask('modifyConfig:build', function () {
+    var amodroConfig = require('amodro-trace/config');
     var modifiedConfig = amodroConfig.modify(grunt.file.read(mainScript), modifyConfig);
     grunt.file.write(mainScript, modifiedConfig);
   });
+
+  // Inject `files` into `html`, where `files` are ".css" or ".js" files.
+  var injectIntoHtml = function (html, files) {
+    var $ = require('cheerio').load(html);
+    _.forEach(files, function (url) {
+      var ext = path.extname(url);
+      if (ext === '.css') {
+        $('link[href="' + url + '"]').remove();
+        $('head').append($('<link rel="stylesheet" href="' + url + '" />'));
+      }
+      if (ext === '.woff' || ext === '.woff2') {
+        $('link[href="' + url + '"]').remove();
+        var type = {
+          '.woff': 'font/woff',
+          '.woff2': 'font/woff2'
+        }[ext];
+        $('head').append($(
+          '<link rel="preload" href="' + url + '" as="font" ' +
+            'type="' + type + '" crossorigin />'
+        ));
+      }
+      if (ext === '.js') {
+        $('script[src="' + url + '"]').remove();
+        var script = $('<script src="' + url + '"></script>');
+        $('body').append(script);
+      }
+    });
+    return $.html();
+  };
 
   grunt.registerTask('index:serve', function () {
     grunt.file.write('.tmp/serve/index.html', injectIntoHtml(indexTemplate, [
