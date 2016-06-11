@@ -58,11 +58,6 @@ module.exports = function (grunt) {
       build: {
         files: [{
           expand: true,
-          cwd: '.',
-          src: amdLib,
-          dest: 'build'
-        }, {
-          expand: true,
           cwd: 'app',
           src: ['index.html', 'fonts/**/*'],
           dest: 'build'
@@ -363,6 +358,7 @@ module.exports = function (grunt) {
       includeContents: true,
       writeTransform: allWriteTransforms()
     }, loaderConfig).then(function (traceResult) {
+      handleModule(amdLib, grunt.file.read(amdLib));
       _.forEach(traceResult.traced, function (result) {
         handleModule(result.id, result.contents);
       });
@@ -426,7 +422,7 @@ module.exports = function (grunt) {
   };
 
   grunt.registerTask('index:build', function () {
-    var htmlFiles = preloadedFiles.concat([amdLib], grunt.modules);
+    var htmlFiles = preloadedFiles.concat(grunt.modules);
     grunt.file.write('build/index.html', prepareHtml(htmlFiles));
   });
 
