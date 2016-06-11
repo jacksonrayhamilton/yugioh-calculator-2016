@@ -8,7 +8,7 @@ var autoprefixer = require('autoprefixer');
 var allWriteTransforms = require('amodro-trace/write/all');
 var amodroConfig = require('amodro-trace/config');
 var amodroTrace = require('amodro-trace');
-var cachebuster = require('postcss-cachebuster');
+var postcssUrl = require('postcss-url');
 var cssnano = require('cssnano');
 var fs = require('fs');
 var loadGruntTasks = require('load-grunt-tasks');
@@ -165,14 +165,17 @@ module.exports = function (grunt) {
       build: {
         options: {
           processors: [
-            cachebuster({
-              // In our fork of cachebuster, `type` can be a function that
-              // returns a new pathname for the asset.
-              type: function (assetPath) {
+            postcssUrl({
+              url: function (url, decl, from, dirname) {
                 if (grunt.filerev) {
-                  assetPath = path.relative('build', grunt.filerev.summary[path.relative('.', assetPath)]);
+                  // Determined the revisioned URL.
+                  var buildPath = path.join(path.relative('.', dirname), url);
+                  var revisionPath = grunt.filerev.summary[buildPath];
+                  if (revisionPath) {
+                    return path.join(path.dirname(url), path.basename(revisionPath));
+                  }
                 }
-                return path.join('..', assetPath);
+                return url;
               }
             }),
             autoprefixer({browsers: '> 0%'}),
