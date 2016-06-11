@@ -11,14 +11,7 @@ var path = require('path');
  */
 var injectIntoHtml = function (html, files) {
   var $ = cheerio.load(html);
-  _.forEach(files, function (file) {
-    var url, attrs;
-    if (file && typeof file === 'object') {
-      url = file.url;
-      attrs = file.attrs || {};
-    } else {
-      url = file;
-    }
+  _.forEach(files, function (url) {
     var ext = path.extname(url);
     if (ext === '.css') {
       $('link[href="' + url + '"]').remove();
@@ -35,9 +28,6 @@ var injectIntoHtml = function (html, files) {
     if (ext === '.js') {
       $('script[src="' + url + '"]').remove();
       var script = $('<script src="' + url + '"></script>');
-      _.forOwn(attrs, function (value, name) {
-        script.attr(name, value);
-      });
       $('body').append(script);
     }
   });
