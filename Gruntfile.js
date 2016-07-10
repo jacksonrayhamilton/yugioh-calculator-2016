@@ -4,25 +4,11 @@
 'use strict';
 
 var _ = require('lodash');
-var autoprefixer = require('autoprefixer');
-var allWriteTransforms = require('amodro-trace/write/all');
-var amodroConfig = require('amodro-trace/config');
-var amodroTrace = require('amodro-trace');
-var cachebuster = require('postcss-cachebuster');
-var cssnano = require('cssnano');
-var fs = require('fs');
-var loadGruntTasks = require('load-grunt-tasks');
-var mkdirp = require('mkdirp');
 var path = require('path');
-var serveStatic = require('serve-static');
-
-var injectIntoHtml = require('./etc/inject-into-html');
-
-var indexTemplate = fs.readFileSync(path.join(__dirname, 'app/index.html'), 'utf8');
 
 module.exports = function (grunt) {
 
-  loadGruntTasks(grunt);
+  require('jit-grunt')(grunt);
 
   var ports = {
     serve: 1024,
@@ -31,31 +17,15 @@ module.exports = function (grunt) {
   };
 
   var amdLib = 'node_modules/requirejs/require.js';
-
-  var isExcludedModule = function (file) {
-    return _.includes([
-      'node_modules/require-css/normalize.js'
-    ], file);
-  };
-
-  var combinedMainScript = 'build/main.combined.js';
-  var separateMainScript = 'build/main.separate.js';
-  var mainScripts = [
-    combinedMainScript,
-    separateMainScript
+  var mainScript = 'build/main.js';
+  var excludedModules = [
+    'node_modules/require-css/normalize.js'
   ];
-
-  var stripExtension = function (file) {
-    var parsed = path.parse(file);
-    return path.join(parsed.dir, parsed.name);
-  };
+  var indexTemplate = grunt.file.read('app/index.html');
 
   grunt.initConfig({
     clean: {
-      buildDirs: [
-        '.tmp/build/**',
-        'build/**'
-      ],
+      build: ['build/**', 'config/static.json'],
       serve: ['.tmp/serve/**']
     },
     connect: {
@@ -66,7 +36,10 @@ module.exports = function (grunt) {
           hostname: '*',
           base: ['.tmp/serve', 'app'],
           middleware: function (connect, options, middlewares) {
-            middlewares.push(connect().use('/node_modules', serveStatic('./node_modules')));
+            middlewares.push(
+              // Serve node_modules as if it were at the root of `app`.
+              connect().use('/node_modules', require('serve-static')('./node_modules'))
+            );
             return middlewares;
           }
         }
@@ -76,21 +49,9 @@ module.exports = function (grunt) {
       build: {
         files: [{
           expand: true,
-          cwd: '.',
-          src: amdLib,
-          dest: 'build'
-        }, {
-          expand: true,
           cwd: 'app',
-          src: 'fonts/**/*',
+          src: ['**/*.html', 'fonts/**/*'],
           dest: 'build'
-        }, {
-          expand: true,
-          cwd: 'app',
-          // The index will get modified by grunt-favicons before being used as
-          // a template for the separate and combined HTML documents.
-          src: 'index.html',
-          dest: '.tmp/build'
         }]
       }
     },
@@ -105,7 +66,7 @@ module.exports = function (grunt) {
       },
       build: {
         options: {
-          html: '.tmp/build/index.html'
+          html: 'build/index.html'
         },
         src: 'design/icon.png',
         dest: 'build'
@@ -114,20 +75,18 @@ module.exports = function (grunt) {
     filerev: {
       buildFirst: {
         src: [
-          'build/**/*.{js,eot,svg,ttf,woff,woff2}'
-        ].concat(_.map(mainScripts, function (file) {
-          // Main scripts must maintain their names for modifyConfig.
-          return '!' + file;
-        }))
+          'build/**/*.{js,eot,svg,ttf,woff,woff2}',
+          '!' + mainScript
+        ]
       },
       buildCss: {
         // CSS references other revved files (like fonts) but is also referenced
-        // by RequireJS so has to come before main scripts.
+        // by RequireJS so has to come before the main script.
         src: 'build/**/*.css'
       },
       buildMain: {
-        // Main scripts reference other JS and CSS.
-        src: mainScripts
+        // Main script references other JS and CSS.
+        src: mainScript
       }
     },
     htmlmin: {
@@ -170,7 +129,11 @@ module.exports = function (grunt) {
         plugins: [
           'karma-*', // Default
           {'middleware:static': ['factory', function () {
-            return require('connect')().use('/base/app/node_modules', serveStatic('./node_modules'));
+            return require('connect')().use(
+              // Serve node_modules as if it were at the root of `app`.
+              '/base/app/node_modules',
+              require('serve-static')('./node_modules')
+            );
           }]}
         ],
         client: {
@@ -192,18 +155,21 @@ module.exports = function (grunt) {
       build: {
         options: {
           processors: [
-            cachebuster({
-              // In our fork of cachebuster, `type` can be a function that
-              // returns a new pathname for the asset.
-              type: function (assetPath) {
+            require('postcss-url')({
+              url: function (url, decl, from, dirname) {
                 if (grunt.filerev) {
-                  assetPath = path.relative('build', grunt.filerev.summary[path.relative('.', assetPath)]);
+                  // Determined the revisioned URL.
+                  var buildPath = path.join(path.relative('.', dirname), url);
+                  var revisionPath = grunt.filerev.summary[buildPath];
+                  if (revisionPath) {
+                    return path.join(path.dirname(url), path.basename(revisionPath));
+                  }
                 }
-                return path.join('..', assetPath);
+                return url;
               }
             }),
-            autoprefixer({browsers: '> 0%'}),
-            cssnano({safe: true})
+            require('autoprefixer')({browsers: '> 0%'}),
+            require('cssnano')({safe: true})
           ]
         },
         src: 'build/**/*.css'
@@ -211,7 +177,7 @@ module.exports = function (grunt) {
       serve: {
         options: {
           processors: [
-            autoprefixer({browsers: '> 0%'})
+            require('autoprefixer')({browsers: '> 0%'})
           ],
           map: true
         },
@@ -237,10 +203,9 @@ module.exports = function (grunt) {
           expand: true,
           cwd: 'build',
           src: [
-            '**/*.js'
-          ].concat(_.map(mainScripts, function (file) {
-            return '!' + path.relative('build', file);
-          })),
+            '**/*.js',
+            '!' + path.relative('build', mainScript)
+          ],
           dest: 'build'
         }]
       },
@@ -248,9 +213,7 @@ module.exports = function (grunt) {
         files: [{
           expand: true,
           cwd: 'build',
-          src: _.map(mainScripts, function (file) {
-            return path.relative('build', file);
-          }),
+          src: path.relative('build', mainScript),
           dest: 'build'
         }]
       }
@@ -283,20 +246,20 @@ module.exports = function (grunt) {
   });
 
   grunt.registerTask('amd:build', function () {
+    var allWriteTransforms = require('amodro-trace/write/all');
+    var amodroConfig = require('amodro-trace/config');
+    var amodroTrace = require('amodro-trace');
+    var fs = require('fs');
+    var mkdirp = require('mkdirp');
+
     var done = this.async(); // eslint-disable-line no-invalid-this
 
     // Track module associations so we can generate HTML for them later.
-    grunt.modules = grunt.modules || {combined: [amdLib], separate: [amdLib]};
-    grunt.bundles = grunt.bundles || {combined: {}, separate: {}};
+    grunt.modules = grunt.modules || [];
+    grunt.bundles = grunt.bundles || {};
 
     var readFile = function (file) {
       return fs.readFileSync(path.join('app', file), 'utf8');
-    };
-
-    var writeFile = function (file, data) {
-      file = path.join('build', file);
-      mkdirp.sync(path.dirname(file));
-      fs.writeFileSync(file, data);
     };
 
     var addToFile = function (file, data) {
@@ -304,7 +267,8 @@ module.exports = function (grunt) {
       if (fs.existsSync(out)) {
         fs.appendFileSync(out, data);
       } else {
-        writeFile(file, data);
+        mkdirp.sync(path.dirname(out));
+        fs.writeFileSync(out, data);
       }
     };
 
@@ -312,11 +276,6 @@ module.exports = function (grunt) {
     var addSemiColon = function (file, text) {
       // Check for JS since this might be used with other file types.
       return text + (_.endsWith(file, '.js') && (/;\s*$/).test(text) ? '' : ';');
-    };
-
-    var addSuffix = function (file, suffix) {
-      var parsed = path.parse(file);
-      return path.join(parsed.dir, parsed.name + suffix + parsed.ext);
     };
 
     var handleModule = function (id, contents) {
@@ -340,14 +299,9 @@ module.exports = function (grunt) {
         // and text modules' original suffix will just be lost.)
         fileName += '.js';
       }
-      if (isExcludedModule(fileName)) {
+      if (_.includes(excludedModules, fileName)) {
         return;
       }
-      var separateName = fileName;
-      if (fileName === 'main.js') {
-        separateName = addSuffix(fileName, '.separate');
-      }
-      writeFile(separateName, contents);
       var parsed = path.parse(fileName);
       // NPM handles dependency management.  Separate externally-maintained
       // scripts into another file since they probably will change less often
@@ -358,31 +312,17 @@ module.exports = function (grunt) {
          (/^node_modules/).test(fileName) ? 'external' :
          'internal') + parsed.ext
       );
-      var combinedId = stripExtension(combinedName);
-      if (fileName === 'main.js') {
-        combinedName = addSuffix(fileName, '.combined');
-      }
       addToFile(combinedName, addSemiColon(fileName, contents));
-      if (!_.find(grunt.modules.combined, {id: combinedId})) {
-        grunt.modules.combined.push({
-          id: combinedId,
-          file: combinedName
-        });
+      if (!_.includes(grunt.modules, combinedName)) {
+        grunt.modules.push(combinedName);
       }
-      grunt.modules.separate.push({
-        // Store module ID and file name so we can generate the proper <script>
-        // attributes to imitate RequireJS loading.
-        id: id,
-        file: separateName
-      });
       // Main can't be bundled since it would have a reference to itself which
       // would make its revision hash unfaithful.
       if (fileName !== 'main.js') {
-        if (!Object.prototype.hasOwnProperty.call(grunt.bundles.combined, combinedName)) {
-          grunt.bundles.combined[combinedName] = [];
+        if (!Object.prototype.hasOwnProperty.call(grunt.bundles, combinedName)) {
+          grunt.bundles[combinedName] = [];
         }
-        grunt.bundles.combined[combinedName].push(fileNameNoExt);
-        grunt.bundles.separate[separateName] = [fileNameNoExt];
+        grunt.bundles[combinedName].push(fileNameNoExt);
       }
     };
 
@@ -390,19 +330,11 @@ module.exports = function (grunt) {
     // load in the right order.
     var sortModules = function (modules) {
       modules.sort(function (a, b) {
-        if (_.isObject(a)) {
-          a = a.file;
-        }
-        if (_.isObject(b)) {
-          b = b.file;
-        }
-        if (path.parse(a).name === 'external' && path.parse(b).name !== 'external' && b !== amdLib) {
-          return -1;
-        }
-        if (path.parse(a).name !== 'external' && a !== amdLib && path.parse(b).name === 'external') {
-          return 1;
-        }
-        return 0;
+        return (
+          (path.parse(a).name === 'external' && path.parse(b).name !== 'external') ? -1 :
+          (path.parse(a).name !== 'external' && path.parse(b).name === 'external') ? 1 :
+          0
+        );
       });
     };
 
@@ -420,17 +352,18 @@ module.exports = function (grunt) {
     loaderConfig.dir = 'build'; // For require-css.
 
     amodroTrace({
-      rootDir: path.join(__dirname, 'app'),
+      rootDir: 'app',
       id: 'main',
       fileExists: fileHandler,
       fileRead: fileHandler,
       includeContents: true,
       writeTransform: allWriteTransforms()
     }, loaderConfig).then(function (traceResult) {
+      handleModule(amdLib, grunt.file.read(amdLib));
       _.forEach(traceResult.traced, function (result) {
         handleModule(result.id, result.contents);
       });
-      sortModules(grunt.modules.combined);
+      sortModules(grunt.modules);
       done();
     }).catch(function (reason) {
       console.error(reason);
@@ -438,59 +371,72 @@ module.exports = function (grunt) {
     });
   });
 
+  var stripExtension = function (file) {
+    var parsed = path.parse(file);
+    return path.join(parsed.dir, parsed.name);
+  };
+
   var mapBundlesThroughSummary = function (bundles, summary) {
     return _.mapKeys(bundles, function (value, key) {
       return stripExtension(path.relative('build', summary[path.join('build', key)]));
     });
   };
 
+  var modifyConfig = function (currentConfig) {
+    currentConfig.bundles = currentConfig.bundles || {};
+    _.defaults(
+      currentConfig.bundles,
+      mapBundlesThroughSummary(grunt.bundles, grunt.filerev.summary)
+    );
+    return currentConfig;
+  };
+
   grunt.registerTask('modifyConfig:build', function () {
-    _.forEach([{
-      mainScript: combinedMainScript,
-      bundles: grunt.bundles.combined
-    }, {
-      mainScript: separateMainScript,
-      bundles: grunt.bundles.separate
-    }], function (pair) {
-      var mainScript = pair.mainScript;
-      var bundles = pair.bundles;
-      var replaced = amodroConfig.modify(grunt.file.read(mainScript), function (currentConfig) {
-        currentConfig.bundles = currentConfig.bundles || {};
-        _.defaults(currentConfig.bundles, mapBundlesThroughSummary(bundles, grunt.filerev.summary));
-        return currentConfig;
-      });
-      grunt.file.write(mainScript, replaced);
-    });
+    var amodroConfig = require('amodro-trace/config');
+    var modifiedConfig = amodroConfig.modify(grunt.file.read(mainScript), modifyConfig);
+    grunt.file.write(mainScript, modifiedConfig);
   });
+
+  // Inject `files` into `html`, where `files` are ".css" or ".js" files.
+  var injectIntoHtml = function (html, files) {
+    var $ = require('cheerio').load(html);
+    _.forEach(files, function (url) {
+      var ext = path.extname(url);
+      if (ext === '.css') {
+        $('link[href="' + url + '"]').remove();
+        $('head').append($('<link rel="stylesheet" href="' + url + '" />'));
+      }
+      if (ext === '.woff' || ext === '.woff2') {
+        $('link[href="' + url + '"]').remove();
+        var type = {
+          '.woff': 'font/woff',
+          '.woff2': 'font/woff2'
+        }[ext];
+        $('head').append($(
+          '<link rel="preload" href="' + url + '" as="font" ' +
+            'type="' + type + '" crossorigin />'
+        ));
+      }
+      if (ext === '.js') {
+        $('script[src="' + url + '"]').remove();
+        var script = $('<script src="' + url + '"></script>');
+        $('body').append(script);
+      }
+    });
+    return $.html();
+  };
 
   grunt.registerTask('index:serve', function () {
     grunt.file.write('.tmp/serve/index.html', injectIntoHtml(indexTemplate, [
-      'node_modules/requirejs/require.js',
+      amdLib,
       'main.js'
     ]));
   });
 
   var mapRevisions = function (files) {
     return _.map(files, function (file) {
-      var moduleId;
-      if (_.isObject(file)) {
-        moduleId = file.id;
-        file = file.file;
-      }
       var revision = grunt.filerev.summary[path.join('build', file)];
-      file = {
-        url: file,
-        attrs: {}
-      };
-      if (revision) {
-        file.url = path.relative('build', revision);
-      }
-      if (moduleId) {
-        file.attrs['async'] = '';
-        file.attrs['data-requirecontext'] = '_';
-        file.attrs['data-requiremodule'] = moduleId;
-      }
-      return file;
+      return revision ? path.relative('build', revision) : file;
     });
   };
 
@@ -502,19 +448,20 @@ module.exports = function (grunt) {
   ];
 
   var prepareHtml = function (files) {
-    var html = grunt.file.read('.tmp/build/index.html');
+    var html = grunt.file.read('build/index.html');
     return injectIntoHtml(html, mapRevisions(files));
   };
 
   grunt.registerTask('index:build', function () {
-    grunt.file.write('build/index.combined.html', prepareHtml(grunt.modules.combined.concat(preloadedFiles)));
-    grunt.file.write('build/index.separate.html', prepareHtml(grunt.modules.separate.concat(preloadedFiles)));
+    var htmlFiles = preloadedFiles.concat(grunt.modules);
+    grunt.file.write('build/index.html', prepareHtml(htmlFiles));
   });
 
   grunt.registerTask('staticAssets:build', function () {
     // Save the paths to the static assets so the web server can safely
     // determine what to set high expiration headers on.
-    grunt.file.write('build/static-assets.json', JSON.stringify(_.values(grunt.filerev.summary)));
+    var staticAssets = _.values(grunt.filerev.summary);
+    grunt.file.write('config/static.json', JSON.stringify(staticAssets));
   });
 
   grunt.registerTask('test', [
@@ -535,7 +482,7 @@ module.exports = function (grunt) {
   ]);
 
   grunt.registerTask('build', [
-    'clean:buildDirs',
+    'clean:build',
     'copy:build',
     'amd:build',
     'uglify:buildFirst',
