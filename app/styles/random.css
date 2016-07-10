@@ -1,0 +1,28 @@
+.yc-random {
+  display: flex;
+  flex-direction: column;
+}
+
+.yc-random-cell {
+  flex: 1;
+  margin: 0 5px 5px 5px;
+  /* Prevent animations from causing scrollbars. */
+  overflow: hidden;
+
+  /* Center text. */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  font-size: 20vh;
+}
+
+@keyframes yc-pulsate {
+  50% {
+    transform: scale(1.1);
+  }
+}
+
+.yc-pulsate {
+  animation: yc-pulsate 300ms cubic-bezier(0.4, 0.0, 0.2, 1);
+}

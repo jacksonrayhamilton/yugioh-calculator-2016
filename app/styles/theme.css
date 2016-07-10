@@ -33,12 +33,14 @@ body {
    https://www.google.com/design/spec/style/color.html#color-color-palette */
 
 .yc-lp-val,
-.yc-layout-status > * {
+.yc-layout-status > *,
+.yc-random-cell {
   background-color: #eeeeee;    /* MD Grey 200*/
 }
 
 .yc-timer:active,
-.yc-close:active {
+.yc-close:active,
+.yc-random-cell:active {
   background-color: #e0e0e0;    /* MD Grey 300 */
 }
 
@@ -79,8 +81,8 @@ body {
 .yc-lp-gain,
 .yc-lp-lose,
 .yc-reset-button,
-.yc-cancel-button,
 .yc-back-button,
+.yc-random-button,
 .yc-history-button,
 .yc-undo-button,
 .yc-digit {
@@ -89,22 +91,22 @@ body {
 }
 
 .yc-reset-button,
-.yc-cancel-button,
 .yc-back-button {
   background-color: #f44336;   /* MD Red 500 */
 }
 
 .yc-reset-button:active,
-.yc-cancel-button:active,
 .yc-back-button:active {
   background-color: #ef5350;   /* MD Red 400 */
 }
 
+.yc-random-button,
 .yc-history-button,
 .yc-undo-button {
   background-color: #009688;    /* MD Teal 500 */
 }
 
+.yc-random-button:active,
 .yc-history-button:active,
 .yc-undo-button:active {
   background-color: #26a69a;    /* MD Teal 400 */

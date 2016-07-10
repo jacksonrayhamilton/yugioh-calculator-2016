@@ -5,9 +5,10 @@ define([
   './yc',
   'text!./icons/reset.svg',
   'text!./icons/backspace.svg',
+  'text!./icons/dice-5.svg',
   'text!./icons/book.svg',
   'text!./icons/undo.svg'
-], function (m, YC, resetSvg, backspaceSvg, bookSvg, undoSvg) {
+], function (m, YC, resetSvg, backspaceSvg, dieSvg, bookSvg, undoSvg) {
 
   YC.Calc = function (spec) {
     spec = spec === undefined ? {} : spec;
@@ -15,8 +16,8 @@ define([
     var lps = spec.lps;
     var timer = spec.timer;
     var reset = spec.reset;
-    var cancel = spec.cancel;
     var back = spec.back;
+    var randomMode = spec.randomMode;
     var historyMode = spec.historyMode;
     var undo = spec.undo;
     var operand = spec.operand;
@@ -36,8 +37,8 @@ define([
         ]),
         m('.yc-layout-row.yc-layout-functions', [
           m('.yc-button.yc-icon-container.yc-reset-button', {onclick: reset}, m.trust(resetSvg)),
-          m('.yc-button.yc-cancel-button', {onclick: cancel}, 'C'),
           m('.yc-button.yc-icon-container.yc-back-button', {onclick: back}, m.trust(backspaceSvg)),
+          m('.yc-button.yc-icon-container.yc-random-button', {onclick: randomMode}, m.trust(dieSvg)),
           m('.yc-button.yc-icon-container.yc-undo-button', {onclick: undo}, m.trust(undoSvg)),
           m('.yc-button.yc-icon-container.yc-history-button', {onclick: historyMode}, m.trust(bookSvg))
         ]),

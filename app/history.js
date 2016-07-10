@@ -6,7 +6,7 @@ define([
   'text!./icons/close.svg',
   'css!./styles/history',
   './persistence'
-], function (m, YC, closeSvg) {
+], function (m, YC) {
 
   YC.History = function (spec) {
     var maxEvents = 150;
@@ -17,7 +17,6 @@ define([
     var players = spec.players;
     var timer = spec.timer;
     var undos = spec.undos;
-    var revertMode = spec.revertMode;
     var persist = function () {
       YC.queuePersist('yc-history', {
         events: events
@@ -82,10 +81,6 @@ define([
     };
     history.view = function () {
       return [
-        m('.yc-layout-row.yc-layout-status', [
-          timer.view(),
-          m('.yc-close.yc-icon-container', {onclick: revertMode}, m.trust(closeSvg))
-        ]),
         m('.yc-history', [
           events.reduceRight(function (previous, event, index) {
             var previousEvent = events[index + 1];

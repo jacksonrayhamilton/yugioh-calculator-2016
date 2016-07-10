@@ -71,7 +71,8 @@
   width: 20%;
 }
 
-.yc-layout .yc-history {
+.yc-layout .yc-history,
+.yc-layout .yc-random {
   flex: 90;
 }
 

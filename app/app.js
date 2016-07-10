@@ -3,6 +3,7 @@
 define([
   'm',
   './yc',
+  'text!./icons/close.svg',
   './events',
   './operand',
   './lp',
@@ -11,9 +12,10 @@ define([
   './player',
   './timer',
   './undos',
+  './random',
   './history',
   './utils'
-], function (m, YC) {
+], function (m, YC, closeSvg) {
 
   YC.App = function (spec) {
     spec = spec === undefined ? {} : spec;
@@ -25,6 +27,7 @@ define([
     var digits;
     var timer;
     var calc;
+    var random;
     var history;
     var undos;
     var mode;
@@ -46,16 +49,17 @@ define([
       calc = new YC.Calc({
         lps: lps,
         reset: reset, // eslint-disable-line no-use-before-define
-        cancel: cancel, // eslint-disable-line no-use-before-define
         back: back, // eslint-disable-line no-use-before-define
         operand: operand,
         digits: digits,
         timer: timer,
+        randomMode: randomMode, // eslint-disable-line no-use-before-define
         historyMode: historyMode, // eslint-disable-line no-use-before-define
         undo: undo // eslint-disable-line no-use-before-define
       });
       modes = {
         calc: calc,
+        random: random,
         history: history
       };
     };
@@ -71,6 +75,7 @@ define([
         players: players,
         timer: timer
       });
+      random = new YC.Random();
       history = new YC.PersistedHistory({
         app: app,
         players: players,
@@ -117,14 +122,14 @@ define([
         m.endComputation();
       }
     };
-    var cancel = function () {
-      operand.reset();
-    };
     var back = function () {
       operand.deleteLastDigit();
     };
     var revertMode = function () {
       mode = 'calc';
+    };
+    var randomMode = function () {
+      mode = 'random';
     };
     var historyMode = function () {
       mode = 'history';
@@ -134,6 +139,12 @@ define([
     };
     app.view = function () {
       return m('.yc-layout', [
+        mode !== 'calc' ? [
+          m('.yc-layout-row.yc-layout-status', [
+            timer.view(),
+            m('.yc-close.yc-icon-container', {onclick: revertMode}, m.trust(closeSvg))
+          ]),
+        ] : [],
         modes[mode].view()
       ]);
     };
