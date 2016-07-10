@@ -80,8 +80,7 @@ define([
         app: app,
         players: players,
         timer: timer,
-        undos: undos,
-        revertMode: revertMode // eslint-disable-line no-use-before-define
+        undos: undos
       });
       mode = 'calc';
       initNth();
