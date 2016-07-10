@@ -11,7 +11,8 @@ define([
   'text!./icons/dice-6.svg',
   'text!./icons/coin-heads.svg',
   'text!./icons/coin-tails.svg',
-  'css!./styles/random'
+  'css!./styles/random',
+  './events'
 ], function (m, YC, dice1Svg, dice2Svg, dice3Svg, dice4Svg, dice5Svg, dice6Svg, coinHeadsSvg, coinTailsSvg) {
 
   var getRandomInt = function (min, max) {
@@ -20,7 +21,7 @@ define([
 
   YC.Random = function (spec) {
     spec = spec === undefined ? {} : spec;
-    var random = {};
+    var random = new YC.Events(spec);
     var dieResult;
     var coinResult;
     var handleAnimation = function (event, callback) {
@@ -42,6 +43,9 @@ define([
     var rolling = false;
     var roll = function (event) {
       dieResult = getRandomInt(0, 5);
+      random.emit('roll', {
+        value: dieResult + 1
+      });
       rolling = true;
       handleAnimation(event, function () {
         rolling = false;
@@ -50,6 +54,9 @@ define([
     var flipping = false;
     var flip = function () {
       coinResult = getRandomInt(0, 1);
+      random.emit('flip', {
+        value: coinResult === 0 ? 'heads' : 'tails'
+      });
       flipping = true;
       handleAnimation(event, function () {
         flipping = false;

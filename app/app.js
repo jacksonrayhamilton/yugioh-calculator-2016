@@ -80,7 +80,8 @@ define([
         app: app,
         players: players,
         timer: timer,
-        undos: undos
+        undos: undos,
+        random: random
       });
       mode = 'calc';
       initNth();

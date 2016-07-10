@@ -17,6 +17,7 @@ define([
     var players = spec.players;
     var timer = spec.timer;
     var undos = spec.undos;
+    var random = spec.random;
     var persist = function () {
       YC.queuePersist('yc-history', {
         events: events
@@ -52,6 +53,12 @@ define([
     undos.on('lifePointsChangeRevert', function (event) {
       log('lifePointsChangeRevert', event);
     });
+    random.on('roll', function (event) {
+      log('roll', event);
+    });
+    random.on('flip', function (event) {
+      log('flip', event);
+    });
     var eventView = function (event) {
       var playerId = event.id;
       var description = '';
@@ -69,6 +76,10 @@ define([
         description = 'Timer reset';
       } else if (event.name === 'timerResetRevert') {
         description = 'Timer reset reverted';
+      } else if (event.name === 'roll') {
+        description = 'Rolled ' + event.value;
+      } else if (event.name === 'flip') {
+        description = 'Flipped ' + event.value;
       }
       var name =
           playerId !== undefined ? 'P' + (playerId + 1) :
