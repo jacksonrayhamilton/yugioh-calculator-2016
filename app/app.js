@@ -4,6 +4,7 @@ define([
   'm',
   './yc',
   'text!./icons/close.svg',
+  './analytics',
   './events',
   './operand',
   './lp',
@@ -70,12 +71,21 @@ define([
         });
       });
       timer = new YC.PersistedTimer();
+      timer.on('timerReset', function () {
+        YC.Analytics.event('Action', 'Restart Timer');
+      });
       undos = new YC.PersistedUndos({
         app: app,
         players: players,
         timer: timer
       });
       random = new YC.Random();
+      random.on('roll', function () {
+        YC.Analytics.event('Random', 'Roll Die');
+      });
+      random.on('flip', function () {
+        YC.Analytics.event('Random', 'Flip Coin');
+      });
       history = new YC.PersistedHistory({
         app: app,
         players: players,
@@ -87,6 +97,7 @@ define([
       initNth();
     };
     var reset = function () {
+      YC.Analytics.event('Action', 'Reset Life Points');
       var areAllPlayersDefault = players.every(function (player) {
         return player.areLifePointsDefault();
       });
@@ -129,12 +140,15 @@ define([
       mode = 'calc';
     };
     var randomMode = function () {
+      YC.Analytics.event('Random', 'Show Random');
       mode = 'random';
     };
     var historyMode = function () {
+      YC.Analytics.event('History', 'Show History');
       mode = 'history';
     };
     var undo = function () {
+      YC.Analytics.event('Action', 'Undo');
       undos.undo();
     };
     app.view = function () {

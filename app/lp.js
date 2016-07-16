@@ -5,7 +5,8 @@ define([
   './yc',
   'text!./icons/plus.svg',
   'text!./icons/minus.svg',
-  'css!./styles/lp'
+  'css!./styles/lp',
+  './analytics'
 ], function (m, YC, plusSvg, minusSvg) {
 
   YC.Lp = function (spec) {
@@ -15,10 +16,12 @@ define([
     var operand = spec.operand;
     lp.type = 'lp';
     var gain = function () {
+      YC.Analytics.event('Action', 'Add');
       player.gain(operand.getNumericValue());
       operand.reset();
     };
     var lose = function () {
+      YC.Analytics.event('Action', 'Subtract');
       player.lose(operand.getNumericValue());
       operand.reset();
     };
