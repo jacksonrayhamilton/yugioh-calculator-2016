@@ -8,8 +8,6 @@ define(['./yc'], function (YC) {
 
   YC.Analytics.queue = function () {
     if (location.host !== 'www.yugiohcalculator.com') {
-      // eslint-disable-next-line no-console
-      console.log.apply(console, ['Queued:'].concat(Array.prototype.slice.call(arguments)));
       return undefined;
     }
     return ga.apply(this, arguments);
