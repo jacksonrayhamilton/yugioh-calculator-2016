@@ -52,7 +52,7 @@ define([
       });
     };
     var flipping = false;
-    var flip = function () {
+    var flip = function (event) {
       coinResult = getRandomInt(0, 1);
       random.emit('flip', {
         value: coinResult === 0 ? 'heads' : 'tails'
