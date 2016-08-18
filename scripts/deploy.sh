@@ -9,7 +9,7 @@ nvm exec grunt build
 
 # Package the application and extract it on the server.
 tar --verbose --create --gzip \
-    build/ config/ server.js .nvmrc package.json \
+    build/ config/ scripts/start.sh server.js .nvmrc package.json \
     | ssh ${ssh_login} \
           'mkdir -p ~/yc/ && tar --verbose --extract --gzip -C ~/yc/'
 
