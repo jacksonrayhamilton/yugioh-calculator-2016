@@ -1,7 +1,7 @@
 {
   "private": true,
   "scripts": {
-    "start": "brunch watch --server",
+    "start": "rm -rf public && brunch watch --server",
     "build": "rm -rf public && brunch build --production && grunt",
     "test": "karma start --single-run",
     "test-auto": "karma start"
