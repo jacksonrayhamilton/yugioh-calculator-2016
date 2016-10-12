@@ -1,45 +1,17 @@
 {
-  "dependencies": {
-    "compression": "^1.6.2",
-    "connect": "^3.4.1",
-    "lodash": "^4.11.1",
-    "ms": "^0.7.1",
-    "nopt": "^3.0.6",
-    "serve-static": "^1.10.2",
-    "spdy": "^3.3.3"
+  "private": true,
+  "scripts": {
+    "start": "brunch watch --server"
   },
   "devDependencies": {
-    "amodro-trace": "^0.2.0",
+    "auto-reload-brunch": "^2.7.1",
     "autoprefixer": "^6.3.6",
+    "brunch": "^2.8.2",
     "chai": "^3.5.0",
-    "cheerio": "^0.20.0",
-    "cssnano": "^3.5.2",
+    "css-brunch": "^2.6.1",
     "fastclick": "^1.0.6",
-    "grunt": "^1.0.1",
-    "grunt-contrib-clean": "^1.0.0",
-    "grunt-contrib-connect": "^1.0.2",
-    "grunt-contrib-copy": "^1.0.0",
-    "grunt-contrib-htmlmin": "^1.4.0",
-    "grunt-contrib-uglify": "^1.0.1",
-    "grunt-contrib-watch": "^1.0.0",
-    "grunt-favicons": "^0.8.0",
-    "grunt-filerev": "^2.3.1",
-    "grunt-karma": "^2.0.0",
-    "grunt-postcss": "^0.8.0",
-    "grunt-sync": "^0.5.2",
-    "jit-grunt": "^0.10.0",
-    "karma": "^0.13.22",
-    "karma-chrome-launcher": "^1.0.1",
-    "karma-firefox-launcher": "^1.0.0",
-    "karma-mocha": "^1.0.1",
-    "karma-requirejs": "github:jacksonrayhamilton/karma-requirejs#7482a3a",
-    "load-grunt-tasks": "^3.5.0",
     "mithril": "^0.2.4",
-    "mkdirp": "^0.5.1",
-    "mocha": "^2.4.5",
-    "postcss-url": "^5.1.2",
-    "require-css": "github:jacksonrayhamilton/require-css#1f283cd",
-    "requirejs": "^2.2.0",
-    "text": "github:requirejs/text#2.0.15"
+    "postcss-brunch": "^2.0.3",
+    "text-brunch": "^1.0.0"
   }
 }

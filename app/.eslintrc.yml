@@ -1,6 +1,6 @@
 env:
-  amd: true
   browser: true
+  commonjs: true
 
 globals:
   Assertion: false
