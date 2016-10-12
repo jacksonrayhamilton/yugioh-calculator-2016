@@ -2,6 +2,9 @@
 
 'use strict';
 
+var autoprefixer = require('autoprefixer')({remove: false, browsers: ['> 0%']});
+var cssnano = require('cssnano')({safe: true});
+
 module.exports = {
   files: {
     javascripts: {joinTo: 'app.js'},
@@ -22,7 +25,14 @@ module.exports = {
     }
   },
   plugins: {
-    postcss: {processors: [require('autoprefixer')({remove: false, browsers: ['> 0%']})]},
+    postcss: {processors: [autoprefixer]},
     text: {pattern: /^app\/icons\//}
+  },
+  overrides: {
+    production: {
+      plugins: {
+        postcss: {processors: [autoprefixer, cssnano]}
+      }
+    }
   }
 };

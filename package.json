@@ -1,7 +1,8 @@
 {
   "private": true,
   "scripts": {
-    "start": "brunch watch --server"
+    "start": "brunch watch --server",
+    "build": "brunch build --production"
   },
   "devDependencies": {
     "auto-reload-brunch": "^2.7.1",
@@ -9,9 +10,11 @@
     "brunch": "^2.8.2",
     "chai": "^3.5.0",
     "css-brunch": "^2.6.1",
+    "cssnano": "^3.7.7",
     "fastclick": "^1.0.6",
     "mithril": "^0.2.4",
     "postcss-brunch": "^2.0.3",
-    "text-brunch": "^1.0.0"
+    "text-brunch": "^1.0.0",
+    "uglify-js-brunch": "^2.0.1"
   }
 }
