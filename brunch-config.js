@@ -7,7 +7,12 @@ var cssnano = require('cssnano')({safe: true});
 
 module.exports = {
   files: {
-    javascripts: {joinTo: 'app.js'},
+    javascripts: {
+      joinTo: {
+        'app.js': [/.*/, '!app/test-main.js'],
+        'test.js': ['app/test-main.js']
+      }
+    },
     stylesheets: {
       joinTo: 'app.css',
       order: {before: ['app/styles/global.css']}
@@ -16,7 +21,7 @@ module.exports = {
   },
   modules: {
     autoRequire: {
-      'app.js': ['app/main']
+      'test.js': ['app/test-main']
     },
     nameCleaner: function (path) {
       // Don't strip "app/" from module paths to ensure ability to require.
@@ -30,6 +35,19 @@ module.exports = {
   },
   overrides: {
     production: {
+      files: {
+        javascripts: {
+          joinTo: {
+            'app.js': [
+              'app/*.js',
+              '!app/test-main.js',
+              '!app/*-test.js',
+              /^node_modules\/mithril\//,
+              /^node_modules\/fastclick\//
+            ]
+          }
+        }
+      },
       plugins: {
         postcss: {processors: [autoprefixer, cssnano]}
       }
