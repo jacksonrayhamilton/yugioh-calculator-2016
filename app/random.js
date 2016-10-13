@@ -21,8 +21,8 @@ var Random = function (spec) {
   var random = new Events(spec);
   var dieResult;
   var coinResult;
-  var handleAnimation = function (event, callback) {
-    var target = event.currentTarget;
+  var handleAnimation = function (clickEvent, callback) {
+    var target = clickEvent.currentTarget;
     var ended = false;
     var onAnimationEnd = function () {
       if (ended) {
@@ -38,24 +38,24 @@ var Random = function (spec) {
     target.addEventListener('animationend', onAnimationEnd);
   };
   var rolling = false;
-  var roll = function (event) {
+  var roll = function (clickEvent) {
     dieResult = getRandomInt(0, 5);
     random.emit('roll', {
       value: dieResult + 1
     });
     rolling = true;
-    handleAnimation(event, function () {
+    handleAnimation(clickEvent, function () {
       rolling = false;
     });
   };
   var flipping = false;
-  var flip = function (event) {
+  var flip = function (clickEvent) {
     coinResult = getRandomInt(0, 1);
     random.emit('flip', {
       value: coinResult === 0 ? 'heads' : 'tails'
     });
     flipping = true;
-    handleAnimation(event, function () {
+    handleAnimation(clickEvent, function () {
       flipping = false;
     });
   };

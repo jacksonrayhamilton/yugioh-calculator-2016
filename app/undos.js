@@ -12,26 +12,26 @@ var Undos = function (spec) {
   var app = spec.app;
   var players = spec.players;
   var timer = spec.timer;
-  app.on('lifePointsReset', function (event) {
+  app.on('lifePointsReset', function (eventObject) {
     // eslint-disable-next-line no-use-before-define
     push({
       type: 'lifePointsReset',
-      players: event.previous
+      players: eventObject.previous
     });
   });
-  timer.on('timerReset', function (event) {
+  timer.on('timerReset', function (eventObject) {
     // eslint-disable-next-line no-use-before-define
     push({
       type: 'timerReset',
-      timer: event.previous
+      timer: eventObject.previous
     });
   });
   players.forEach(function (player) {
-    player.on('lifePointsChange', function (event) {
+    player.on('lifePointsChange', function (eventObject) {
       // eslint-disable-next-line no-use-before-define
       push({
         type: 'lifePointsChange',
-        change: event
+        change: eventObject
       });
     });
   });

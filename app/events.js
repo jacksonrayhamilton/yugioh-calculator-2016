@@ -8,28 +8,28 @@ var Utils = require('./utils');
 var Events = function () {
   var events = {};
   var map = {};
-  events.on = function (event, handler) {
-    if (!Utils.hasOwn(map, event)) {
-      map[event] = [];
+  events.on = function (eventName, handler) {
+    if (!Utils.hasOwn(map, eventName)) {
+      map[eventName] = [];
     }
-    map[event].push(handler);
+    map[eventName].push(handler);
   };
-  events.off = function (event, handler) {
+  events.off = function (eventName, handler) {
     if (handler === undefined) {
-      map[event] = [];
+      map[eventName] = [];
     } else {
       for (;;) {
-        var index = map[event].indexOf(handler);
+        var index = map[eventName].indexOf(handler);
         if (index === -1) {
           break;
         }
-        map[event].splice(index, 1);
+        map[eventName].splice(index, 1);
       }
     }
   };
-  events.emit = function (event, data) {
-    if (Utils.hasOwn(map, event)) {
-      map[event].forEach(function (handler) {
+  events.emit = function (eventName, data) {
+    if (Utils.hasOwn(map, eventName)) {
+      map[eventName].forEach(function (handler) {
         handler(data);
       });
     }

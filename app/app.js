@@ -27,7 +27,7 @@ var App = function (spec) {
   var timer;
   var calc;
   var random;
-  var history;
+  var historyComponent;
   var undos;
   var mode;
   var modes;
@@ -59,7 +59,7 @@ var App = function (spec) {
     modes = {
       calc: calc,
       random: random,
-      history: history
+      history: historyComponent
     };
   };
   var init = function () {
@@ -84,7 +84,7 @@ var App = function (spec) {
     random.on('flip', function () {
       Analytics.event('Random', 'Flip Coin');
     });
-    history = new PersistedHistory({
+    historyComponent = new PersistedHistory({
       app: app,
       players: players,
       timer: timer,
@@ -117,10 +117,10 @@ var App = function (spec) {
     });
     initNth();
   };
-  var onKeydown = function (event) {
-    var keyCode = event.keyCode;
+  var onKeydown = function (keydownEvent) {
+    var keyCode = keydownEvent.keyCode;
     if (keyCode === 8) { // backspace
-      event.preventDefault(); // Don't navigate back one page.
+      keydownEvent.preventDefault(); // Don't navigate back one page.
       m.startComputation();
       operand.deleteLastDigit();
       m.endComputation();

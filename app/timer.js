@@ -49,13 +49,13 @@ var Timer = function (spec) {
     timer.emit('timerRestore');
   };
   timer.reset = function () {
-    var event = {
+    var eventObject = {
       previous: {
         startTime: startTime
       }
     };
     restore(Date.now());
-    timer.emit('timerReset', event);
+    timer.emit('timerReset', eventObject);
   };
   timer.view = function () {
     return m('.yc-timer', {onclick: timer.reset},

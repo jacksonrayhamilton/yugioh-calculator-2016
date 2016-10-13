@@ -6,10 +6,10 @@ var Persistence = require('./persistence');
 var Time = require('./time');
 var Utils = require('./utils');
 
-var History = function (spec) {
+var HistoryComponent = function (spec) {
   var maxEvents = 150;
   spec = spec === undefined ? {} : spec;
-  var history = {};
+  var historyComponent = {};
   var events = spec.events || [];
   var app = spec.app;
   var players = spec.players;
@@ -21,11 +21,11 @@ var History = function (spec) {
       events: events
     });
   };
-  var log = function (name, event) {
-    event = event || {};
-    event.name = name;
-    event.time = Date.now();
-    events.push(event);
+  var log = function (eventName, eventObject) {
+    eventObject = eventObject || {};
+    eventObject.name = eventName;
+    eventObject.time = Date.now();
+    events.push(eventObject);
     if (events.length > maxEvents) {
       events = events.slice(-1 * maxEvents);
     }
@@ -44,77 +44,77 @@ var History = function (spec) {
     log('timerResetRevert');
   });
   players.forEach(function (player) {
-    player.on('lifePointsChange', function (event) {
-      log('lifePointsChange', event);
+    player.on('lifePointsChange', function (eventObject) {
+      log('lifePointsChange', eventObject);
     });
   });
-  undos.on('lifePointsChangeRevert', function (event) {
-    log('lifePointsChangeRevert', event);
+  undos.on('lifePointsChangeRevert', function (eventObject) {
+    log('lifePointsChangeRevert', eventObject);
   });
-  random.on('roll', function (event) {
-    log('roll', event);
+  random.on('roll', function (eventObject) {
+    log('roll', eventObject);
   });
-  random.on('flip', function (event) {
-    log('flip', event);
+  random.on('flip', function (eventObject) {
+    log('flip', eventObject);
   });
-  var eventView = function (event) {
-    var playerId = event.id;
+  var eventView = function (eventObject) {
+    var playerId = eventObject.id;
     var description = '';
-    if (event.name === 'lifePointsChange') {
-      var lifePoints = event.old + event.amount;
-      description = event.old + (lifePoints > event.old ? ' + ' : ' - ') +
-        Math.abs(event.amount) + ' = ' + lifePoints;
-    } else if (event.name === 'lifePointsChangeRevert') {
-      description = 'Life points reverted to ' + event.lifePoints;
-    } else if (event.name === 'lifePointsReset') {
+    if (eventObject.name === 'lifePointsChange') {
+      var lifePoints = eventObject.old + eventObject.amount;
+      description = eventObject.old + (lifePoints > eventObject.old ? ' + ' : ' - ') +
+        Math.abs(eventObject.amount) + ' = ' + lifePoints;
+    } else if (eventObject.name === 'lifePointsChangeRevert') {
+      description = 'Life points reverted to ' + eventObject.lifePoints;
+    } else if (eventObject.name === 'lifePointsReset') {
       description = 'Life points reset';
-    } else if (event.name === 'lifePointsResetRevert') {
+    } else if (eventObject.name === 'lifePointsResetRevert') {
       description = 'Life points reset reverted';
-    } else if (event.name === 'timerReset') {
+    } else if (eventObject.name === 'timerReset') {
       description = 'Timer reset';
-    } else if (event.name === 'timerResetRevert') {
+    } else if (eventObject.name === 'timerResetRevert') {
       description = 'Timer reset reverted';
-    } else if (event.name === 'roll') {
-      description = 'Rolled ' + event.value;
-    } else if (event.name === 'flip') {
-      description = 'Flipped ' + event.value;
+    } else if (eventObject.name === 'roll') {
+      description = 'Rolled ' + eventObject.value;
+    } else if (eventObject.name === 'flip') {
+      description = 'Flipped ' + eventObject.value;
     }
-    var name =
+    var playerName =
         playerId !== undefined ? 'P' + (playerId + 1) :
         m.trust('&nbsp;&nbsp;');
     return [
-      m('.yc-history-name-col', name),
+      m('.yc-history-name-col', playerName),
       m('.yc-history-desc-col', description),
-      m('.yc-history-time-col', Time.getTimestamp(event.time))
+      m('.yc-history-time-col', Time.getTimestamp(eventObject.time))
     ];
   };
-  history.view = function () {
+  historyComponent.view = function () {
     return [
       m('.yc-history', [
-        events.reduceRight(function (previous, event, index) {
+        events.reduceRight(function (previous, eventObject, index) {
           var previousEvent = events[index + 1];
-          if (previousEvent && Time.startOfDay(previousEvent.time) > Time.startOfDay(event.time)) {
+          if (previousEvent && Time.startOfDay(previousEvent.time) > Time.startOfDay(eventObject.time)) {
             // Separate days.
             previous = previous.concat(
               m('.yc-history-break', [
-                m('span.yc-history-break-text', Time.getDaystamp(event.time))
+                m('span.yc-history-break-text', Time.getDaystamp(eventObject.time))
               ])
             );
           }
-          return previous.concat(m('.yc-history-row', eventView(event)));
+          return previous.concat(m('.yc-history-row', eventView(eventObject)));
         }, [])
       ])
     ];
   };
-  return history;
+  return historyComponent;
 };
 
 var PersistedHistory = function (spec) {
   spec = spec === undefined ? {} : spec;
   var persistedSpec = Persistence.unpersist('yc-history');
-  return new History(Utils.assign(persistedSpec || {}, spec));
+  return new HistoryComponent(Utils.assign(persistedSpec || {}, spec));
 };
 
-History.PersistedHistory = PersistedHistory;
+HistoryComponent.PersistedHistory = PersistedHistory;
 
-module.exports = History;
+module.exports = HistoryComponent;
