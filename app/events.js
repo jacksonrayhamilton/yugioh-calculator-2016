@@ -5,7 +5,7 @@ var Utils = require('./utils');
 /**
  * Makes an object that can emit named events to listeners.
  */
-var Events = function () {
+function Events () {
   var events = {};
   var map = {};
   events.on = function (eventName, handler) {
@@ -35,6 +35,6 @@ var Events = function () {
     }
   };
   return events;
-};
+}
 
 module.exports = Events;

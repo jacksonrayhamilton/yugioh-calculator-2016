@@ -6,7 +6,7 @@ var Persistence = require('./persistence');
 var Time = require('./time');
 var Utils = require('./utils');
 
-var HistoryComponent = function (spec) {
+function HistoryComponent (spec) {
   var maxEvents = 150;
   spec = spec === undefined ? {} : spec;
   var historyComponent = {};
@@ -16,12 +16,12 @@ var HistoryComponent = function (spec) {
   var timer = spec.timer;
   var undos = spec.undos;
   var random = spec.random;
-  var persist = function () {
+  function persist () {
     Persistence.queuePersist('yc-history', {
       events: events
     });
-  };
-  var log = function (eventName, eventObject) {
+  }
+  function log (eventName, eventObject) {
     eventObject = eventObject || {};
     eventObject.name = eventName;
     eventObject.time = Date.now();
@@ -30,7 +30,7 @@ var HistoryComponent = function (spec) {
       events = events.slice(-1 * maxEvents);
     }
     persist();
-  };
+  }
   app.on('lifePointsReset', function () {
     log('lifePointsReset');
   });
@@ -57,7 +57,7 @@ var HistoryComponent = function (spec) {
   random.on('flip', function (eventObject) {
     log('flip', eventObject);
   });
-  var eventView = function (eventObject) {
+  function eventView (eventObject) {
     var playerId = eventObject.id;
     var description = '';
     if (eventObject.name === 'lifePointsChange') {
@@ -87,7 +87,7 @@ var HistoryComponent = function (spec) {
       m('.yc-history-desc-col', description),
       m('.yc-history-time-col', Time.getTimestamp(eventObject.time))
     ];
-  };
+  }
   historyComponent.view = function () {
     return [
       m('.yc-history', [
@@ -107,13 +107,13 @@ var HistoryComponent = function (spec) {
     ];
   };
   return historyComponent;
-};
+}
 
-var PersistedHistory = function (spec) {
+function PersistedHistory (spec) {
   spec = spec === undefined ? {} : spec;
   var persistedSpec = Persistence.unpersist('yc-history');
   return new HistoryComponent(Utils.assign(persistedSpec || {}, spec));
-};
+}
 
 HistoryComponent.PersistedHistory = PersistedHistory;
 

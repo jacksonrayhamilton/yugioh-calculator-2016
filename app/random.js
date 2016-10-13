@@ -12,16 +12,16 @@ var coinTailsSvg = require('./icons/coin-tails.svg');
 
 var Events = require('./events');
 
-var getRandomInt = function (min, max) {
+function getRandomInt (min, max) {
   return Math.floor(Math.random() * (max - min + 1)) + min;
-};
+}
 
-var Random = function (spec) {
+function Random (spec) {
   spec = spec === undefined ? {} : spec;
   var random = new Events(spec);
   var dieResult;
   var coinResult;
-  var handleAnimation = function (clickEvent, callback) {
+  function handleAnimation (clickEvent, callback) {
     var target = clickEvent.currentTarget;
     var ended = false;
     var onAnimationEnd = function () {
@@ -36,9 +36,9 @@ var Random = function (spec) {
     };
     target.addEventListener('webkitAnimationEnd', onAnimationEnd);
     target.addEventListener('animationend', onAnimationEnd);
-  };
+  }
   var rolling = false;
-  var roll = function (clickEvent) {
+  function roll (clickEvent) {
     dieResult = getRandomInt(0, 5);
     random.emit('roll', {
       value: dieResult + 1
@@ -47,9 +47,9 @@ var Random = function (spec) {
     handleAnimation(clickEvent, function () {
       rolling = false;
     });
-  };
+  }
   var flipping = false;
-  var flip = function (clickEvent) {
+  function flip (clickEvent) {
     coinResult = getRandomInt(0, 1);
     random.emit('flip', {
       value: coinResult === 0 ? 'heads' : 'tails'
@@ -58,7 +58,7 @@ var Random = function (spec) {
     handleAnimation(clickEvent, function () {
       flipping = false;
     });
-  };
+  }
   random.view = function () {
     return [
       m('.yc-random', [
@@ -84,6 +84,6 @@ var Random = function (spec) {
     ];
   };
   return random;
-};
+}
 
 module.exports = Random;

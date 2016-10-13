@@ -9,7 +9,7 @@ var undoSvg = require('./icons/undo.svg');
 
 var Utils = require('./utils');
 
-var Calc = function (spec) {
+function Calc (spec) {
   spec = spec === undefined ? {} : spec;
   var calc = {};
   var lps = spec.lps;
@@ -51,6 +51,6 @@ var Calc = function (spec) {
     ];
   };
   return calc;
-};
+}
 
 module.exports = Calc;

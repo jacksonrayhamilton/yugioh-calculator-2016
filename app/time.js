@@ -5,9 +5,9 @@ var Time = {};
 /**
  * Pads a 2-digit number with a leading zero, if needed.
  */
-var pad = function (number) {
+function pad (number) {
   return number < 10 ? '0' + number : String(number);
-};
+}
 
 /**
  * Gets a timestamp.

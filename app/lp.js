@@ -6,22 +6,22 @@ var minusSvg = require('./icons/minus.svg');
 
 var Analytics = require('./analytics');
 
-var Lp = function (spec) {
+function Lp (spec) {
   spec = spec === undefined ? {} : spec;
   var lp = {};
   var player = spec.player;
   var operand = spec.operand;
   lp.type = 'lp';
-  var gain = function () {
+  function gain () {
     Analytics.event('Action', 'Add');
     player.gain(operand.getNumericValue());
     operand.reset();
-  };
-  var lose = function () {
+  }
+  function lose () {
     Analytics.event('Action', 'Subtract');
     player.lose(operand.getNumericValue());
     operand.reset();
-  };
+  }
   lp.view = function () {
     return m('.yc-lp', [
       m('.yc-lp-val', player.getLifePoints()),
@@ -30,6 +30,6 @@ var Lp = function (spec) {
     ]);
   };
   return lp;
-};
+}
 
 module.exports = Lp;

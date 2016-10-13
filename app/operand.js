@@ -3,19 +3,18 @@
 var m = require('mithril');
 var Utils = require('./utils');
 
-var getZeros = (function () {
-  var getZero = function () {
-    return '0';
-  };
-  return function (n) {
-    return Utils.times(n, getZero);
-  };
-}());
+function getZero () {
+  return '0';
+}
+
+function getZeros (n) {
+  return Utils.times(n, getZero);
+}
 
 /**
  * Abstract representation of an operand (a number) in an expression.
  */
-var Operand = function () {
+function Operand () {
   var operand = {};
   var values = [];
   operand.type = 'operand';
@@ -55,30 +54,30 @@ var Operand = function () {
     var selected = value.charAt(index);
 
     // Split up so we can test positions more easily.
-    var digitsToElements = function (digits, selectors) {
+    function digitsToElements (digits, selectors) {
       selectors = selectors === undefined ? function () {
         return '';
       } : selectors;
       return digits.split('').map(function (digit, digitIndex, digitStrings) {
         return m('span.yc-operand-digit' + selectors(digitIndex, digitStrings), digit);
       });
-    };
+    }
 
-    var splitDigits = function (digits) {
+    function splitDigits (digits) {
       return digitsToElements(digits);
-    };
+    }
 
-    var splitLeadingDigits = function (digits) {
+    function splitLeadingDigits (digits) {
       return digitsToElements(digits, function (digitIndex, digitStrings) {
         return digitStrings.slice(0, digitIndex + 1).every(function (digit) {
           return digit === '0';
         }) ? '.yc-operand-extra-digit' : '';
       });
-    };
+    }
 
-    var selectDigit = function (digit) {
+    function selectDigit (digit) {
       return m('.yc-operand-selected.yc-operand-digit', digit);
-    };
+    }
 
     var vals = values.length;
 
@@ -93,6 +92,6 @@ var Operand = function () {
     ));
   };
   return operand;
-};
+}
 
 module.exports = Operand;

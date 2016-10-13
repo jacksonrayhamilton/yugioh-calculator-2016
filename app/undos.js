@@ -4,7 +4,7 @@ var Events = require('./events');
 var Persistence = require('./persistence');
 var Utils = require('./utils');
 
-var Undos = function (spec) {
+function Undos (spec) {
   var maxItems = 150;
   spec = spec === undefined ? {} : spec;
   var undos = new Events();
@@ -13,14 +13,12 @@ var Undos = function (spec) {
   var players = spec.players;
   var timer = spec.timer;
   app.on('lifePointsReset', function (eventObject) {
-    // eslint-disable-next-line no-use-before-define
     push({
       type: 'lifePointsReset',
       players: eventObject.previous
     });
   });
   timer.on('timerReset', function (eventObject) {
-    // eslint-disable-next-line no-use-before-define
     push({
       type: 'timerReset',
       timer: eventObject.previous
@@ -28,36 +26,35 @@ var Undos = function (spec) {
   });
   players.forEach(function (player) {
     player.on('lifePointsChange', function (eventObject) {
-      // eslint-disable-next-line no-use-before-define
       push({
         type: 'lifePointsChange',
         change: eventObject
       });
     });
   });
-  var clean = function () {
+  function clean () {
     if (items.length > maxItems) {
       items = items.slice(-1 * maxItems);
     }
-  };
-  var persist = function () {
+  }
+  function persist () {
     Persistence.queuePersist('yc-undos', {
       items: items
     });
-  };
-  var onChangeItems = function () {
+  }
+  function onChangeItems () {
     clean();
     persist();
-  };
-  var push = function (item) {
+  }
+  function push (item) {
     items.push(item);
     onChangeItems();
-  };
-  var pop = function () {
+  }
+  function pop () {
     var item = items.pop();
     onChangeItems();
     return item;
-  };
+  }
   undos.undo = function () {
     var last = pop();
     if (last === undefined) {
@@ -90,13 +87,13 @@ var Undos = function (spec) {
     }
   };
   return undos;
-};
+}
 
-var PersistedUndos = function (spec) {
+function PersistedUndos (spec) {
   spec = spec === undefined ? {} : spec;
   var persistedSpec = Persistence.unpersist('yc-undos');
   return new Undos(Utils.assign(persistedSpec || {}, spec));
-};
+}
 
 Undos.PersistedUndos = PersistedUndos;
 

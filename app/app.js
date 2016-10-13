@@ -16,7 +16,7 @@ var PersistedUndos = require('./undos').PersistedUndos;
 var Random = require('./random');
 var Utils = require('./utils');
 
-var App = function (spec) {
+function App (spec) {
   spec = spec === undefined ? {} : spec;
   var app = new Events();
   var element = spec.element;
@@ -31,7 +31,7 @@ var App = function (spec) {
   var undos;
   var mode;
   var modes;
-  var initNth = function () {
+  function initNth () {
     operand = new Operand();
     lps = players.map(function (player) {
       return new Lp({
@@ -47,22 +47,22 @@ var App = function (spec) {
     });
     calc = new Calc({
       lps: lps,
-      reset: reset, // eslint-disable-line no-use-before-define
-      back: back, // eslint-disable-line no-use-before-define
+      reset: reset,
+      back: back,
       operand: operand,
       digits: digits,
       timer: timer,
-      randomMode: randomMode, // eslint-disable-line no-use-before-define
-      historyMode: historyMode, // eslint-disable-line no-use-before-define
-      undo: undo // eslint-disable-line no-use-before-define
+      randomMode: randomMode,
+      historyMode: historyMode,
+      undo: undo
     });
     modes = {
       calc: calc,
       random: random,
       history: historyComponent
     };
-  };
-  var init = function () {
+  }
+  function init () {
     players = Utils.times(2, function (n) {
       return new PersistedPlayer({
         id: n
@@ -93,8 +93,8 @@ var App = function (spec) {
     });
     mode = 'calc';
     initNth();
-  };
-  var reset = function () {
+  }
+  function reset () {
     Analytics.event('Action', 'Reset Life Points');
     var areAllPlayersDefault = players.every(function (player) {
       return player.areLifePointsDefault();
@@ -116,8 +116,8 @@ var App = function (spec) {
       previous: previous
     });
     initNth();
-  };
-  var onKeydown = function (keydownEvent) {
+  }
+  function onKeydown (keydownEvent) {
     var keyCode = keydownEvent.keyCode;
     if (keyCode === 8) { // backspace
       keydownEvent.preventDefault(); // Don't navigate back one page.
@@ -130,25 +130,25 @@ var App = function (spec) {
       operand.insertDigit(digit);
       m.endComputation();
     }
-  };
-  var back = function () {
+  }
+  function back () {
     operand.deleteLastDigit();
-  };
-  var revertMode = function () {
+  }
+  function revertMode () {
     mode = 'calc';
-  };
-  var randomMode = function () {
+  }
+  function randomMode () {
     Analytics.event('Random', 'Show Random');
     mode = 'random';
-  };
-  var historyMode = function () {
+  }
+  function historyMode () {
     Analytics.event('History', 'Show History');
     mode = 'history';
-  };
-  var undo = function () {
+  }
+  function undo () {
     Analytics.event('Action', 'Undo');
     undos.undo();
-  };
+  }
   app.view = function () {
     return m('.yc-layout', [
       mode !== 'calc' ? [
@@ -168,6 +168,6 @@ var App = function (spec) {
     m.mount(element, null);
   };
   return app;
-};
+}
 
 module.exports = App;

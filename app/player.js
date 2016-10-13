@@ -13,7 +13,7 @@ var minLifePoints = -9999;
 /**
  * Abstract representation of a Yugioh player.
  */
-var Player = function (spec) {
+function Player (spec) {
   spec = spec === undefined ? {} : spec;
   var player = new Events(spec);
   var id = spec.id;
@@ -29,20 +29,20 @@ var Player = function (spec) {
   };
   player.setLifePoints = function (_lifePoints) {
     if (lifePoints !== _lifePoints) {
-      persist(); // eslint-disable-line no-use-before-define
+      persist();
     }
     lifePoints = _lifePoints;
   };
   player.areLifePointsDefault = function () {
     return lifePoints === defaultLifePoints;
   };
-  var persist = function () {
+  function persist () {
     Persistence.queuePersist('yc-player-' + id, {
       id: id,
       lifePoints: lifePoints
     });
-  };
-  var gain = function (amount) {
+  }
+  function gain (amount) {
     var oldLifePoints = lifePoints;
     lifePoints += amount;
     lifePoints = Math.min(lifePoints, maxLifePoints);
@@ -55,7 +55,7 @@ var Player = function (spec) {
       });
       persist();
     }
-  };
+  }
   player.lose = function (amount) {
     gain(-1 * amount);
   };
@@ -68,12 +68,12 @@ var Player = function (spec) {
   };
   persist();
   return player;
-};
+}
 
 /**
  * Reanimate a persisted player object.
  */
-var PersistedPlayer = function (spec) {
+function PersistedPlayer (spec) {
   spec = spec === undefined ? {} : spec;
   var persistedSpec = Persistence.unpersist('yc-player-' + spec.id);
   if (persistedSpec) {
@@ -81,7 +81,7 @@ var PersistedPlayer = function (spec) {
   } else {
     return new Player(spec);
   }
-};
+}
 
 Player.PersistedPlayer = PersistedPlayer;
 

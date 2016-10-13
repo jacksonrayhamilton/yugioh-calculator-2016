@@ -9,41 +9,41 @@ var Time = require('./time');
 /**
  * Abstract representation of a Yugioh match timer.
  */
-var Timer = function (spec) {
+function Timer (spec) {
   var timerUpdateFrequency = 1000; // 1 second
   var matchTime = 40 * 60 * 1000;  // 40 minutes
   spec = spec === undefined ? {} : spec;
   var timer = new Events(spec);
   var startTime = spec.startTime;
   var timeout;
-  var getTimePassed = function () {
+  function getTimePassed () {
     return Date.now() - startTime;
-  };
+  }
   timer.getTimeLeft = function () {
     return matchTime - getTimePassed();
   };
   timer.isInOvertime = function () {
     return getTimePassed() > matchTime;
   };
-  var tick = function () {
+  function tick () {
     if (!timer.isInOvertime()) {
       timeout = setTimeout(function () {
         m.redraw();
         tick();
       }, timerUpdateFrequency);
     }
-  };
-  var persist = function () {
+  }
+  function persist () {
     Persistence.queuePersist('yc-timer', {
       startTime: startTime
     });
-  };
-  var restore = function (time) {
+  }
+  function restore (time) {
     clearTimeout(timeout);
     startTime = time;
     persist();
     tick();
-  };
+  }
   timer.restore = function (time) {
     restore(time);
     timer.emit('timerRestore');
@@ -70,12 +70,12 @@ var Timer = function (spec) {
     tick();
   }
   return timer;
-};
+}
 
 /**
  * Reanimate a persisted timer object.
  */
-var PersistedTimer = function (spec) {
+function PersistedTimer (spec) {
   spec = spec === undefined ? {} : spec;
   var persistedSpec = Persistence.unpersist('yc-timer');
   if (persistedSpec) {
@@ -83,7 +83,7 @@ var PersistedTimer = function (spec) {
   } else {
     return new Timer(spec);
   }
-};
+}
 
 Timer.PersistedTimer = PersistedTimer;
 
