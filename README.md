@@ -1,5 +1,11 @@
 # Yugioh Calculator 2016
 
+<img alt="Screenshot of Yugioh Calculator's equation builder and coin flipper / die roller"
+     src="screenshot.png"
+     align="right"/>
+
+Check out the app at [www.yugiohcalculator.com](https://www.yugiohcalculator.com/)!
+
 Welcome to the source code for the 2016 edition of Yugioh Calculator, a web app
 for tracking life points in a game of Yu-Gi-Oh!
 
