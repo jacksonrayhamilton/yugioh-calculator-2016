@@ -1,43 +1,45 @@
 'use strict';
 
-define([
-  './yc',
-  './utils'
-], function (YC) {
+var Utils = require('./utils');
 
-  /**
-   * Makes an object that can emit named events to listeners.
-   */
-  YC.Events = function () {
-    var events = {};
-    var map = {};
-    events.on = function (event, handler) {
-      if (!YC.hasOwn(map, event)) {
-        map[event] = [];
-      }
-      map[event].push(handler);
-    };
-    events.off = function (event, handler) {
-      if (handler === undefined) {
-        map[event] = [];
-      } else {
-        for (;;) {
-          var index = map[event].indexOf(handler);
-          if (index === -1) {
-            break;
-          }
-          map[event].splice(index, 1);
-        }
-      }
-    };
-    events.emit = function (event, data) {
-      if (YC.hasOwn(map, event)) {
-        map[event].forEach(function (handler) {
-          handler(data);
-        });
-      }
-    };
-    return events;
+// An object that can emit named events to listeners.
+function Events () {
+  var events = {};
+  var map = {};
+
+  // Register a handler for an event.
+  events.on = function (eventName, handler) {
+    if (!Utils.hasOwn(map, eventName)) {
+      map[eventName] = [];
+    }
+    map[eventName].push(handler);
   };
 
-});
+  // Remove a handler for an event.
+  events.off = function (eventName, handler) {
+    if (handler === undefined) {
+      map[eventName] = [];
+    } else {
+      for (;;) {
+        var index = map[eventName].indexOf(handler);
+        if (index === -1) {
+          break;
+        }
+        map[eventName].splice(index, 1);
+      }
+    }
+  };
+
+  // Trigger an event, passing data along.
+  events.emit = function (eventName, data) {
+    if (Utils.hasOwn(map, eventName)) {
+      map[eventName].forEach(function (handler) {
+        handler(data);
+      });
+    }
+  };
+
+  return events;
+}
+
+module.exports = Events;

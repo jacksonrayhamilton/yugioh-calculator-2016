@@ -1,6 +1,6 @@
 *.log
-.tmp/
-build/
-certs/
-config/static.json
 node_modules/
+public/
+
+# Private deployment credentials; see scripts/deploy.sh.
+.env

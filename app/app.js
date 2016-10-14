@@ -1,175 +1,202 @@
 'use strict';
 
-define([
-  'm',
-  './yc',
-  'text!./icons/close.svg',
-  './analytics',
-  './events',
-  './operand',
-  './lp',
-  './digit',
-  './calc',
-  './player',
-  './timer',
-  './undos',
-  './random',
-  './history',
-  './utils'
-], function (m, YC, closeSvg) {
+var m = require('mithril');
+var closeSvg = require('./icons/close.svg');
 
-  YC.App = function (spec) {
-    spec = spec === undefined ? {} : spec;
-    var app = new YC.Events();
-    var element = spec.element;
-    var players;
-    var operand;
-    var lps;
-    var digits;
-    var timer;
-    var calc;
-    var random;
-    var history;
-    var undos;
-    var mode;
-    var modes;
-    var initNth = function () {
-      operand = new YC.Operand();
-      lps = players.map(function (player) {
-        return new YC.Lp({
-          player: player,
-          operand: operand
-        });
+var Analytics = require('./analytics');
+var Calc = require('./calc');
+var Digit = require('./digit');
+var Events = require('./events');
+var Lp = require('./lp');
+var Operand = require('./operand');
+var PersistedHistory = require('./history').PersistedHistory;
+var PersistedPlayer = require('./player').PersistedPlayer;
+var PersistedTimer = require('./timer').PersistedTimer;
+var PersistedUndos = require('./undos').PersistedUndos;
+var Random = require('./random');
+var Utils = require('./utils');
+
+// Application UI and state container.
+function App (spec) {
+  spec = spec === undefined ? {} : spec;
+
+  var app = new Events();
+  var element = spec.element;
+
+  // State variables.
+  var players;
+  var operand;
+  var lps;
+  var digits;
+  var timer;
+  var calc;
+  var random;
+  var historyComponent;
+  var undos;
+  var mode;
+  var modes;
+
+  // Set the application to its initial state for the Nth time (for the first
+  // time, and when the user resets the application state).
+  function initNth () {
+    operand = new Operand();
+    lps = players.map(function (player) {
+      return new Lp({
+        player: player,
+        operand: operand
       });
-      digits = YC.times(10, function (n) {
-        return new YC.Digit({
-          value: n,
-          operand: operand
-        });
+    });
+    digits = Utils.times(10, function (n) {
+      return new Digit({
+        value: n,
+        operand: operand
       });
-      calc = new YC.Calc({
-        lps: lps,
-        reset: reset, // eslint-disable-line no-use-before-define
-        back: back, // eslint-disable-line no-use-before-define
-        operand: operand,
-        digits: digits,
-        timer: timer,
-        randomMode: randomMode, // eslint-disable-line no-use-before-define
-        historyMode: historyMode, // eslint-disable-line no-use-before-define
-        undo: undo // eslint-disable-line no-use-before-define
+    });
+    calc = new Calc({
+      lps: lps,
+      reset: reset,
+      back: back,
+      operand: operand,
+      digits: digits,
+      timer: timer,
+      randomMode: randomMode,
+      historyMode: historyMode,
+      undo: undo
+    });
+    modes = {
+      calc: calc,
+      random: random,
+      history: historyComponent
+    };
+  }
+
+  // Initialize the application for the first time, restoring relevant previous
+  // state from disk.
+  function init () {
+    players = Utils.times(2, function (n) {
+      return new PersistedPlayer({
+        id: n
       });
-      modes = {
-        calc: calc,
-        random: random,
-        history: history
+    });
+    timer = new PersistedTimer();
+    timer.on('timerReset', function () {
+      Analytics.event('Action', 'Restart Timer');
+    });
+    undos = new PersistedUndos({
+      app: app,
+      players: players,
+      timer: timer
+    });
+    random = new Random();
+    random.on('roll', function () {
+      Analytics.event('Random', 'Roll Die');
+    });
+    random.on('flip', function () {
+      Analytics.event('Random', 'Flip Coin');
+    });
+    historyComponent = new PersistedHistory({
+      app: app,
+      players: players,
+      timer: timer,
+      undos: undos,
+      random: random
+    });
+    mode = 'calc';
+    initNth();
+  }
+
+  // Reset each player's life points, and reset the application state.
+  function reset () {
+    Analytics.event('Action', 'Reset Life Points');
+    var areAllPlayersDefault = players.every(function (player) {
+      return player.areLifePointsDefault();
+    });
+    if (areAllPlayersDefault) {
+      // Don't uselessly reset (it clutters the history).
+      return;
+    }
+    var previous = players.map(function (player) {
+      return {
+        id: player.getId(),
+        lifePoints: player.getLifePoints()
       };
-    };
-    var init = function () {
-      players = YC.times(2, function (n) {
-        return new YC.PersistedPlayer({
-          id: n
-        });
-      });
-      timer = new YC.PersistedTimer();
-      timer.on('timerReset', function () {
-        YC.Analytics.event('Action', 'Restart Timer');
-      });
-      undos = new YC.PersistedUndos({
-        app: app,
-        players: players,
-        timer: timer
-      });
-      random = new YC.Random();
-      random.on('roll', function () {
-        YC.Analytics.event('Random', 'Roll Die');
-      });
-      random.on('flip', function () {
-        YC.Analytics.event('Random', 'Flip Coin');
-      });
-      history = new YC.PersistedHistory({
-        app: app,
-        players: players,
-        timer: timer,
-        undos: undos,
-        random: random
-      });
-      mode = 'calc';
-      initNth();
-    };
-    var reset = function () {
-      YC.Analytics.event('Action', 'Reset Life Points');
-      var areAllPlayersDefault = players.every(function (player) {
-        return player.areLifePointsDefault();
-      });
-      if (areAllPlayersDefault) {
-        // Don't uselessly reset (it clutters the history).
-        return;
-      }
-      var previous = players.map(function (player) {
-        return {
-          id: player.getId(),
-          lifePoints: player.getLifePoints()
-        };
-      });
-      players.forEach(function (player) {
-        player.reset();
-      });
-      app.emit('lifePointsReset', {
-        previous: previous
-      });
-      initNth();
-    };
-    var onKeydown = function (event) {
-      var keyCode = event.keyCode;
-      if (keyCode === 8) { // backspace
-        event.preventDefault(); // Don't navigate back one page.
-        m.startComputation();
-        operand.deleteLastDigit();
-        m.endComputation();
-      } else if (keyCode >= 48 && keyCode <= 57) {
-        var digit = keyCode - 48;
-        m.startComputation();
-        operand.insertDigit(digit);
-        m.endComputation();
-      }
-    };
-    var back = function () {
+    });
+    players.forEach(function (player) {
+      player.reset();
+    });
+    app.emit('lifePointsReset', {
+      previous: previous
+    });
+    initNth();
+  }
+
+  // Add keyboard support for desktop users.
+  function onKeydown (keydownEvent) {
+    var keyCode = keydownEvent.keyCode;
+    if (keyCode === 8) { // backspace
+      keydownEvent.preventDefault(); // Don't navigate back one page.
+      m.startComputation();
       operand.deleteLastDigit();
-    };
-    var revertMode = function () {
-      mode = 'calc';
-    };
-    var randomMode = function () {
-      YC.Analytics.event('Random', 'Show Random');
-      mode = 'random';
-    };
-    var historyMode = function () {
-      YC.Analytics.event('History', 'Show History');
-      mode = 'history';
-    };
-    var undo = function () {
-      YC.Analytics.event('Action', 'Undo');
-      undos.undo();
-    };
-    app.view = function () {
-      return m('.yc-layout', [
-        mode !== 'calc' ? [
-          m('.yc-layout-row.yc-layout-status', [
-            timer.view(),
-            m('.yc-close.yc-icon-container', {onclick: revertMode}, m.trust(closeSvg))
-          ]),
-        ] : [],
-        modes[mode].view()
-      ]);
-    };
-    init();
-    document.addEventListener('keydown', onKeydown);
-    m.mount(element, app);
-    app.destroy = function () {
-      document.removeEventListener('keydown', onKeydown);
-      m.mount(element, null);
-    };
-    return app;
+      m.endComputation();
+    } else if (keyCode >= 48 && keyCode <= 57) {
+      var digit = keyCode - 48;
+      m.startComputation();
+      operand.insertDigit(digit);
+      m.endComputation();
+    }
+  }
+
+  // Handler for the "Back" button.
+  function back () {
+    operand.deleteLastDigit();
+  }
+
+  // Go back to the default "mode" (which is for entering numbers).
+  function revertMode () {
+    mode = 'calc';
+  }
+
+  // Go to the "random" mode, where coins can be flipped and dice can be rolled.
+  function randomMode () {
+    Analytics.event('Random', 'Show Random');
+    mode = 'random';
+  }
+
+  // Go to the "history" mode, where all actions taken with the calculator are
+  // recorded and displayed by time and day.
+  function historyMode () {
+    Analytics.event('History', 'Show History');
+    mode = 'history';
+  }
+
+  // Undo the previous action.
+  function undo () {
+    Analytics.event('Action', 'Undo');
+    undos.undo();
+  }
+
+  app.view = function () {
+    return m('.yc-layout', [
+      mode !== 'calc' ? [
+        m('.yc-layout-row.yc-layout-status', [
+          timer.view(),
+          m('.yc-close.yc-icon-container', {onclick: revertMode}, m.trust(closeSvg))
+        ]),
+      ] : [],
+      modes[mode].view()
+    ]);
   };
 
-});
+  init();
+  document.addEventListener('keydown', onKeydown);
+
+  m.mount(element, app);
+  app.destroy = function () {
+    document.removeEventListener('keydown', onKeydown);
+    m.mount(element, null);
+  };
+
+  return app;
+}
+
+module.exports = App;

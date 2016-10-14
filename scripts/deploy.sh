@@ -1,24 +1,27 @@
 #!/usr/bin/env bash
 
-ssh_login=ubuntu@ec2-54-67-17-42.us-west-1.compute.amazonaws.com
+# Deploy the website via SSH.
 
-source ~/.nvm/nvm.sh
+# Normalize execution location.
+FILE_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+cd "$FILE_DIR/../"
 
-# Build and copy client files.
-nvm exec grunt build
+# Set SSH environment variables; should export the following:
+# - SSH_USER
+# - SSH_HOSTNAME
+# - REMOTE_PROD_DEST_DIR
+source .env
 
-# Package the application and extract it on the server.
-tar --verbose --create --gzip \
-    build/ config/ scripts/start.sh server.js .nvmrc package.json \
-    | ssh ${ssh_login} \
-          'mkdir -p ~/yc/ && tar --verbose --extract --gzip -C ~/yc/'
+# LOCAL_BUILD_DIR must end with a "/".
+LOCAL_BUILD_DIR=public/
 
-# Install and start the application.  Assume the keys are already available in
-# `~/yc/certs/`.  Yuck, using `sudo` because letsencrypt will probably lock down
-# the SSL keys.
-ssh ${ssh_login} <<EOF
-source ~/.nvm/nvm.sh
-cd ~/yc/
-nvm exec npm install --production
-sudo \$(which node) \$(which forever) start server.js
-EOF
+# Build production site to build directory.
+npm run build
+
+# Copy local production build directory to remote.  Consider removing
+# `--rsync-path 'sudo rsync'` if the directory doesn't require `sudo` and your
+# user isn't a sudoer.
+rsync --verbose --archive --update --delete \
+      --rsync-path 'sudo rsync' \
+      "$LOCAL_BUILD_DIR" \
+      "$SSH_USER"@"$SSH_HOSTNAME":"$REMOTE_PROD_DEST_DIR"

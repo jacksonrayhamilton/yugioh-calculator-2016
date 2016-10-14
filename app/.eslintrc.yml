@@ -1,7 +1,0 @@
-env:
-  amd: true
-  browser: true
-
-globals:
-  Assertion: false
-  expect: false

@@ -1,105 +1,119 @@
 'use strict';
 
-define([
-  './yc',
-  './events',
-  './persistence',
-  './time',
-  './utils'
-], function (YC) {
+var Events = require('./events');
+var Persistence = require('./persistence');
+var Utils = require('./utils');
 
-  YC.Undos = function (spec) {
-    var maxItems = 150;
-    spec = spec === undefined ? {} : spec;
-    var undos = new YC.Events();
-    var items = spec.items === undefined ? [] : spec.items;
-    var app = spec.app;
-    var players = spec.players;
-    var timer = spec.timer;
-    app.on('lifePointsReset', function (event) {
-      // eslint-disable-next-line no-use-before-define
+var maxItems = 150;
+
+// Stack of actions that have been taken, which can be undone.
+function Undos (spec) {
+  spec = spec === undefined ? {} : spec;
+  var items = spec.items === undefined ? [] : spec.items;
+  var app = spec.app;
+  var players = spec.players;
+  var timer = spec.timer;
+
+  var undos = new Events();
+
+  // The following listeners detect when events happen, and record them for
+  // later undoing.
+
+  app.on('lifePointsReset', function (eventObject) {
+    push({
+      type: 'lifePointsReset',
+      players: eventObject.previous
+    });
+  });
+  timer.on('timerReset', function (eventObject) {
+    push({
+      type: 'timerReset',
+      timer: eventObject.previous
+    });
+  });
+  players.forEach(function (player) {
+    player.on('lifePointsChange', function (eventObject) {
       push({
-        type: 'lifePointsReset',
-        players: event.previous
+        type: 'lifePointsChange',
+        change: eventObject
       });
     });
-    timer.on('timerReset', function (event) {
-      // eslint-disable-next-line no-use-before-define
-      push({
-        type: 'timerReset',
-        timer: event.previous
-      });
+  });
+
+  // Remove old events to avoid a memory leak.
+  function clean () {
+    if (items.length > maxItems) {
+      items = items.slice(-1 * maxItems);
+    }
+  }
+
+  // Store the current state of these undos.
+  function persist () {
+    Persistence.queuePersist('yc-undos', {
+      items: items
     });
-    players.forEach(function (player) {
-      player.on('lifePointsChange', function (event) {
-        // eslint-disable-next-line no-use-before-define
-        push({
-          type: 'lifePointsChange',
-          change: event
-        });
-      });
-    });
-    var clean = function () {
-      if (items.length > maxItems) {
-        items = items.slice(-1 * maxItems);
-      }
-    };
-    var persist = function () {
-      YC.queuePersist('yc-undos', {
-        items: items
-      });
-    };
-    var onChangeItems = function () {
-      clean();
-      persist();
-    };
-    var push = function (item) {
-      items.push(item);
-      onChangeItems();
-    };
-    var pop = function () {
-      var item = items.pop();
-      onChangeItems();
-      return item;
-    };
-    undos.undo = function () {
-      var last = pop();
-      if (last === undefined) {
-        return;
-      }
-      if (last.type === 'lifePointsReset') {
-        players.forEach(function (player) {
-          var lifePoints = YC.find(last.players, function (lastPlayer) {
-            return lastPlayer.id === player.getId();
-          }).lifePoints;
-          player.setLifePoints(lifePoints);
-        });
-        undos.emit('lifePointsResetRevert');
-      } else if (last.type === 'timerReset') {
-        var startTime = last.timer.startTime;
-        timer.restore(startTime);
-        undos.emit('timerResetRevert', {
-          startTime: startTime
-        });
-      } else if (last.type === 'lifePointsChange') {
-        var player = YC.find(players, function (currentPlayer) {
-          return last.change.id === currentPlayer.getId();
-        });
-        var lifePoints = last.change.old;
+  }
+
+  function onChangeItems () {
+    clean();
+    persist();
+  }
+
+  // Add another item to undo.
+  function push (item) {
+    items.push(item);
+    onChangeItems();
+  }
+
+  // Undo an action and remove it from the stack.
+  function pop () {
+    var item = items.pop();
+    onChangeItems();
+    return item;
+  }
+
+  undos.undo = function () {
+    var last = pop();
+    if (last === undefined) {
+      return;
+    }
+    if (last.type === 'lifePointsReset') {
+      players.forEach(function (player) {
+        var lifePoints = Utils.find(last.players, function (lastPlayer) {
+          return lastPlayer.id === player.getId();
+        }).lifePoints;
         player.setLifePoints(lifePoints);
-        undos.emit('lifePointsChangeRevert', {
-          id: player.getId(),
-          lifePoints: lifePoints
-        });
-      }
-    };
-    return undos;
+      });
+      undos.emit('lifePointsResetRevert');
+    } else if (last.type === 'timerReset') {
+      var startTime = last.timer.startTime;
+      timer.restore(startTime);
+      undos.emit('timerResetRevert', {
+        startTime: startTime
+      });
+    } else if (last.type === 'lifePointsChange') {
+      var player = Utils.find(players, function (currentPlayer) {
+        return last.change.id === currentPlayer.getId();
+      });
+      var lifePoints = last.change.old;
+      player.setLifePoints(lifePoints);
+      undos.emit('lifePointsChangeRevert', {
+        id: player.getId(),
+        lifePoints: lifePoints
+      });
+    }
   };
 
-  YC.PersistedUndos = function (spec) {
-    spec = spec === undefined ? {} : spec;
-    var persistedSpec = YC.unpersist('yc-undos');
-    return new YC.Undos(YC.assign(persistedSpec || {}, spec));
-  };
+  return undos;
+}
 
-});
+// Reanimate a persisted undos object.
+function PersistedUndos (spec) {
+  spec = spec === undefined ? {} : spec;
+  var persistedSpec = Persistence.unpersist('yc-undos');
+  return new Undos(Utils.assign(persistedSpec || {}, spec));
+}
+
+Undos.PersistedUndos = PersistedUndos;
+
+module.exports = Undos;
