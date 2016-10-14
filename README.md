@@ -50,6 +50,7 @@ Create a ".env" file at the project root with contents similar to the following
 export SSH_USER=user
 export SSH_HOSTNAME=example.com
 export REMOTE_PROD_DEST_DIR=/var/www/example.com/html/
+export SERVER_RELOAD_COMMAND='sudo service nginx reload'
 ```
 
 Run `scripts/deploy.sh` to synchronize the built app with your web server.

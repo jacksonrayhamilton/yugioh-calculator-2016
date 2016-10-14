@@ -30,6 +30,7 @@ module.exports = {
     }
   },
   plugins: {
+    digest: {manifest: 'manifest.json', referenceFiles: /\.(html|css)$/},
     postcss: {processors: [autoprefixer]},
     text: {pattern: /^app\/icons\//}
   },
