@@ -10,38 +10,44 @@ var defaultLifePoints = 8000;
 var maxLifePoints = 99999;
 var minLifePoints = -9999;
 
-/**
- * Abstract representation of a Yugioh player.
- */
+// Abstract representation of a Yugioh player.
 function Player (spec) {
   spec = spec === undefined ? {} : spec;
-  var player = new Events(spec);
   var id = spec.id;
   var lifePoints = spec.lifePoints === undefined ?
       defaultLifePoints :
       spec.lifePoints;
-  player.type = 'player';
+
+  var player = new Events(spec);
+
   player.getId = function () {
     return id;
   };
+
   player.getLifePoints = function () {
     return lifePoints;
   };
+
   player.setLifePoints = function (_lifePoints) {
     if (lifePoints !== _lifePoints) {
       persist();
     }
     lifePoints = _lifePoints;
   };
+
   player.areLifePointsDefault = function () {
     return lifePoints === defaultLifePoints;
   };
+
+  // Store the current state for this player.
   function persist () {
     Persistence.queuePersist('yc-player-' + id, {
       id: id,
       lifePoints: lifePoints
     });
   }
+
+  // Change life points (add or substract).
   function gain (amount) {
     var oldLifePoints = lifePoints;
     lifePoints += amount;
@@ -56,23 +62,30 @@ function Player (spec) {
       persist();
     }
   }
+
+  // Lose life points.
   player.lose = function (amount) {
     gain(-1 * amount);
   };
+
+  // Gain life points.
   player.gain = function (amount) {
     gain(amount);
   };
+
+  // Reset a player's life points.
   player.reset = function () {
     lifePoints = defaultLifePoints;
     persist();
   };
+
+  // Record the initial state.
   persist();
+
   return player;
 }
 
-/**
- * Reanimate a persisted player object.
- */
+// Reanimate a persisted player object.
 function PersistedPlayer (spec) {
   spec = spec === undefined ? {} : spec;
   var persistedSpec = Persistence.unpersist('yc-player-' + spec.id);

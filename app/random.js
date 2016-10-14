@@ -16,11 +16,16 @@ function getRandomInt (min, max) {
   return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
+// Roll dice and flip coins.
 function Random (spec) {
   spec = spec === undefined ? {} : spec;
+
   var random = new Events(spec);
+
   var dieResult;
   var coinResult;
+
+  // Determine when an animation ends (so it can be stopped).
   function handleAnimation (clickEvent, callback) {
     var target = clickEvent.currentTarget;
     var ended = false;
@@ -37,6 +42,7 @@ function Random (spec) {
     target.addEventListener('webkitAnimationEnd', onAnimationEnd);
     target.addEventListener('animationend', onAnimationEnd);
   }
+
   var rolling = false;
   function roll (clickEvent) {
     dieResult = getRandomInt(0, 5);
@@ -48,6 +54,7 @@ function Random (spec) {
       rolling = false;
     });
   }
+
   var flipping = false;
   function flip (clickEvent) {
     coinResult = getRandomInt(0, 1);
@@ -59,6 +66,7 @@ function Random (spec) {
       flipping = false;
     });
   }
+
   random.view = function () {
     return [
       m('.yc-random', [
@@ -83,6 +91,7 @@ function Random (spec) {
       ])
     ];
   };
+
   return random;
 }
 

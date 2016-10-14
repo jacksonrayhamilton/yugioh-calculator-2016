@@ -9,9 +9,9 @@ var undoSvg = require('./icons/undo.svg');
 
 var Utils = require('./utils');
 
+// Manipulate player life points.
 function Calc (spec) {
   spec = spec === undefined ? {} : spec;
-  var calc = {};
   var lps = spec.lps;
   var timer = spec.timer;
   var reset = spec.reset;
@@ -21,6 +21,9 @@ function Calc (spec) {
   var undo = spec.undo;
   var operand = spec.operand;
   var digits = spec.digits;
+
+  var calc = {};
+
   calc.view = function () {
     return [
       lps.map(function (lp) {
@@ -50,6 +53,7 @@ function Calc (spec) {
       })
     ];
   };
+
   return calc;
 }
 

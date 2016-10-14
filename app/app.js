@@ -16,10 +16,14 @@ var PersistedUndos = require('./undos').PersistedUndos;
 var Random = require('./random');
 var Utils = require('./utils');
 
+// Application UI and state container.
 function App (spec) {
   spec = spec === undefined ? {} : spec;
+
   var app = new Events();
   var element = spec.element;
+
+  // State variables.
   var players;
   var operand;
   var lps;
@@ -31,6 +35,9 @@ function App (spec) {
   var undos;
   var mode;
   var modes;
+
+  // Set the application to its initial state for the Nth time (for the first
+  // time, and when the user resets the application state).
   function initNth () {
     operand = new Operand();
     lps = players.map(function (player) {
@@ -62,6 +69,9 @@ function App (spec) {
       history: historyComponent
     };
   }
+
+  // Initialize the application for the first time, restoring relevant previous
+  // state from disk.
   function init () {
     players = Utils.times(2, function (n) {
       return new PersistedPlayer({
@@ -94,6 +104,8 @@ function App (spec) {
     mode = 'calc';
     initNth();
   }
+
+  // Reset each player's life points, and reset the application state.
   function reset () {
     Analytics.event('Action', 'Reset Life Points');
     var areAllPlayersDefault = players.every(function (player) {
@@ -117,6 +129,8 @@ function App (spec) {
     });
     initNth();
   }
+
+  // Add keyboard support for desktop users.
   function onKeydown (keydownEvent) {
     var keyCode = keydownEvent.keyCode;
     if (keyCode === 8) { // backspace
@@ -131,24 +145,36 @@ function App (spec) {
       m.endComputation();
     }
   }
+
+  // Handler for the "Back" button.
   function back () {
     operand.deleteLastDigit();
   }
+
+  // Go back to the default "mode" (which is for entering numbers).
   function revertMode () {
     mode = 'calc';
   }
+
+  // Go to the "random" mode, where coins can be flipped and dice can be rolled.
   function randomMode () {
     Analytics.event('Random', 'Show Random');
     mode = 'random';
   }
+
+  // Go to the "history" mode, where all actions taken with the calculator are
+  // recorded and displayed by time and day.
   function historyMode () {
     Analytics.event('History', 'Show History');
     mode = 'history';
   }
+
+  // Undo the previous action.
   function undo () {
     Analytics.event('Action', 'Undo');
     undos.undo();
   }
+
   app.view = function () {
     return m('.yc-layout', [
       mode !== 'calc' ? [
@@ -160,13 +186,16 @@ function App (spec) {
       modes[mode].view()
     ]);
   };
+
   init();
   document.addEventListener('keydown', onKeydown);
+
   m.mount(element, app);
   app.destroy = function () {
     document.removeEventListener('keydown', onKeydown);
     m.mount(element, null);
   };
+
   return app;
 }
 

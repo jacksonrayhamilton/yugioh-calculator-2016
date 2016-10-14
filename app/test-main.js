@@ -7,6 +7,7 @@ var chai = require('chai');
 window.Assertion = chai.Assertion;
 window.expect = chai.expect;
 
+// Run all test files that the application knows about.
 window.require.list().filter(function (moduleName) {
   return (/-test\.js$/).test(moduleName);
 }).forEach(require);

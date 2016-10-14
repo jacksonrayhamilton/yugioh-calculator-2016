@@ -6,21 +6,28 @@ var Persistence = require('./persistence');
 var Time = require('./time');
 var Utils = require('./utils');
 
+var maxEvents = 150;
+
+// View all the actions that been executed on each player's life points.
 function HistoryComponent (spec) {
-  var maxEvents = 150;
   spec = spec === undefined ? {} : spec;
-  var historyComponent = {};
   var events = spec.events || [];
   var app = spec.app;
   var players = spec.players;
   var timer = spec.timer;
   var undos = spec.undos;
   var random = spec.random;
+
+  var historyComponent = {};
+
+  // Store the current history state.
   function persist () {
     Persistence.queuePersist('yc-history', {
       events: events
     });
   }
+
+  // Record an event, removing old ones if there are too many.
   function log (eventName, eventObject) {
     eventObject = eventObject || {};
     eventObject.name = eventName;
@@ -31,6 +38,10 @@ function HistoryComponent (spec) {
     }
     persist();
   }
+
+  // The following listeners detect when events occur throughout the
+  // application, and record them.
+
   app.on('lifePointsReset', function () {
     log('lifePointsReset');
   });
@@ -57,6 +68,7 @@ function HistoryComponent (spec) {
   random.on('flip', function (eventObject) {
     log('flip', eventObject);
   });
+
   function eventView (eventObject) {
     var playerId = eventObject.id;
     var description = '';
@@ -88,6 +100,7 @@ function HistoryComponent (spec) {
       m('.yc-history-time-col', Time.getTimestamp(eventObject.time))
     ];
   }
+
   historyComponent.view = function () {
     return [
       m('.yc-history', [
@@ -106,9 +119,11 @@ function HistoryComponent (spec) {
       ])
     ];
   };
+
   return historyComponent;
 }
 
+// Reanimate a persisted history object.
 function PersistedHistory (spec) {
   spec = spec === undefined ? {} : spec;
   var persistedSpec = Persistence.unpersist('yc-history');

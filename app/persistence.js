@@ -4,9 +4,7 @@ var Utils = require('./utils');
 
 var Persistence = {};
 
-/**
- * Writes an object to localStorage after a delay.
- */
+// Writes an object to localStorage after a delay.
 Persistence.queuePersist = (function () {
   var delay = 300;
   var queue = {};
@@ -22,9 +20,7 @@ Persistence.queuePersist = (function () {
   };
 }());
 
-/**
- * Reads an object from localStorage synchronously.
- */
+// Reads an object from localStorage synchronously.
 Persistence.unpersist = function (key) {
   return JSON.parse(localStorage.getItem(key));
 };

@@ -6,22 +6,28 @@ var minusSvg = require('./icons/minus.svg');
 
 var Analytics = require('./analytics');
 
+// Representation of a player's life points.
 function Lp (spec) {
   spec = spec === undefined ? {} : spec;
-  var lp = {};
   var player = spec.player;
   var operand = spec.operand;
-  lp.type = 'lp';
+
+  var lp = {};
+
+  // Add a quantity to a player's life points.
   function gain () {
     Analytics.event('Action', 'Add');
     player.gain(operand.getNumericValue());
     operand.reset();
   }
+
+  // Remove a quantity from a player's life points.
   function lose () {
     Analytics.event('Action', 'Subtract');
     player.lose(operand.getNumericValue());
     operand.reset();
   }
+
   lp.view = function () {
     return m('.yc-lp', [
       m('.yc-lp-val', player.getLifePoints()),
@@ -29,6 +35,7 @@ function Lp (spec) {
       m('.yc-lp-lose.yc-icon-container', {onclick: lose}, m.trust(minusSvg))
     ]);
   };
+
   return lp;
 }
 

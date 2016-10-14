@@ -2,6 +2,7 @@
 
 var m = require('mithril');
 
+// Button for inserting one number into an operand.
 function Digit (spec) {
   spec = spec === undefined ? {} : spec;
   var digit = {};

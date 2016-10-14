@@ -9,7 +9,7 @@ describe('Operand', function () {
   beforeEach(function () {
 
     Assertion.addMethod('operandThingAt', function (thing, expected) {
-      var method = this; // eslint-disable-line no-invalid-this
+      var method = this;
       var operand = method._obj;
       var view = operand.view();
       var actual = -1;
@@ -33,7 +33,7 @@ describe('Operand', function () {
     });
 
     Assertion.addMethod('operandDigits', function (expected) {
-      var method = this; // eslint-disable-line no-invalid-this
+      var method = this;
       var operand = method._obj;
       var view = operand.view();
       var actual = view.children.reduce(function (total, child) {

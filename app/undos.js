@@ -4,14 +4,21 @@ var Events = require('./events');
 var Persistence = require('./persistence');
 var Utils = require('./utils');
 
+var maxItems = 150;
+
+// Stack of actions that have been taken, which can be undone.
 function Undos (spec) {
-  var maxItems = 150;
   spec = spec === undefined ? {} : spec;
-  var undos = new Events();
   var items = spec.items === undefined ? [] : spec.items;
   var app = spec.app;
   var players = spec.players;
   var timer = spec.timer;
+
+  var undos = new Events();
+
+  // The following listeners detect when events happen, and record them for
+  // later undoing.
+
   app.on('lifePointsReset', function (eventObject) {
     push({
       type: 'lifePointsReset',
@@ -32,29 +39,39 @@ function Undos (spec) {
       });
     });
   });
+
+  // Remove old events to avoid a memory leak.
   function clean () {
     if (items.length > maxItems) {
       items = items.slice(-1 * maxItems);
     }
   }
+
+  // Store the current state of these undos.
   function persist () {
     Persistence.queuePersist('yc-undos', {
       items: items
     });
   }
+
   function onChangeItems () {
     clean();
     persist();
   }
+
+  // Add another item to undo.
   function push (item) {
     items.push(item);
     onChangeItems();
   }
+
+  // Undo an action and remove it from the stack.
   function pop () {
     var item = items.pop();
     onChangeItems();
     return item;
   }
+
   undos.undo = function () {
     var last = pop();
     if (last === undefined) {
@@ -86,9 +103,11 @@ function Undos (spec) {
       });
     }
   };
+
   return undos;
 }
 
+// Reanimate a persisted undos object.
 function PersistedUndos (spec) {
   spec = spec === undefined ? {} : spec;
   var persistedSpec = Persistence.unpersist('yc-undos');
