@@ -33,6 +33,20 @@ body {
 /* Material Design ("MD") colors from
    https://www.google.com/design/spec/style/color.html#color-color-palette */
 
+noscript {
+  justify-content: center;
+}
+
+noscript p {
+  max-width: 240px;
+  margin: 10px auto 10px auto;
+  padding: 20px;
+  border-radius: 3px;
+  background-color: #eeeeee;    /* MD Grey 200*/
+  font-size: 5vh;
+  text-align: center;
+}
+
 .yc-lp-val,
 .yc-layout-status > *,
 .yc-random-cell {
