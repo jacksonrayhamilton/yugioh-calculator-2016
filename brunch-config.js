@@ -9,8 +9,12 @@ module.exports = {
   files: {
     javascripts: {
       joinTo: {
-        'app.js': [/.*/, '!app/test-main.js'],
-        'test.js': ['app/test-main.js']
+        'app.js': ['node_modules/auto-reload-brunch/vendor/auto-reload.js'],
+        'test.js': ['app/*-test.js']
+      },
+      entryPoints: {
+        'app/main.js': 'app.js',
+        'app/test-main.js': 'test.js'
       }
     },
     stylesheets: {
@@ -38,14 +42,8 @@ module.exports = {
     production: {
       files: {
         javascripts: {
-          joinTo: {
-            'app.js': [
-              'app/*.js',
-              '!app/test-main.js',
-              '!app/*-test.js',
-              /^node_modules\/mithril\//,
-              /^node_modules\/fastclick\//
-            ]
+          entryPoints: {
+            'app/main.js': 'app.js'
           }
         }
       },
