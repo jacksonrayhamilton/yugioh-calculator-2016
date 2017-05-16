@@ -3,7 +3,7 @@
 node_modules/
 
 # Build artifacts.
-manifest.json
+/manifest.json
 manifest.conf
 public/
 
