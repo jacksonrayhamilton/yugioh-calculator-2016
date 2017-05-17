@@ -1,0 +1,23 @@
+.no-js-container {
+  justify-content: center;
+}
+
+.no-js-message,
+.no-js-reload-button {
+  max-width: 240px;
+  margin: 10px auto 10px auto;
+  border-radius: 3px;
+  padding: 20px;
+  background-color: #eeeeee;    /* MD Grey 200*/
+  font-size: 5vh;
+}
+
+.no-js-message {
+  text-align: center;
+}
+
+.no-js-reload-button {
+  background-color: #424242;    /* MD Grey 800 */
+  color: #fff;
+  text-decoration: none;
+}
