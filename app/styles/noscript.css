@@ -1,5 +1,6 @@
 .yc-no-js-container {
   justify-content: center;
+  text-align: center;
 }
 
 .yc-no-js-message,
@@ -9,11 +10,7 @@
   border-radius: 3px;
   padding: 20px;
   background-color: #eeeeee;    /* MD Grey 200*/
-  font-size: 5vh;
-}
-
-.yc-no-js-message {
-  text-align: center;
+  font-size: 28px;
 }
 
 .yc-no-js-reload-button {
