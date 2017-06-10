@@ -40,6 +40,34 @@ The app will be available at [localhost:3333](http://localhost:3333).
 
 Test that the code is still clean and working with `npm test`.
 
+### Testing HTTPS-only features
+
+Features like service workers only work with HTTPS.  If you don't want to go
+through the hassle of setting that up, you can test these features by uploading
+a built version of the app to GitHub Pages, which offers free HTTPS.
+
+Adjacent to wherever you cloned this directory, clone the repository again, but
+with a different name:
+
+```sh
+git clone --branch gh-pages --single-branch \
+  git@github.com:jacksonrayhamilton/yugioh-calculator-2016.git \
+  yugioh-calculator-2016-gh-pages
+```
+
+Afterwards, the directory structure of the place on your computer where you
+store your repositories should look like this:
+
+```
+yugioh-calculator-2016/
+yugioh-calculator-2016-gh-pages/
+```
+
+Then, within the `yugioh-calculator-2016/` directory, run `scripts/gh-pages.sh`
+to build and deploy the app to GitHub pages.  Visit the app at
+https://jacksonrayhamilton.github.io/yugioh-calculator-2016/ (but replace
+"jacksonrayhamilton" with the name of your GitHub account).
+
 ## Deployment
 
 Create a ".env" file at the project root with contents similar to the following
