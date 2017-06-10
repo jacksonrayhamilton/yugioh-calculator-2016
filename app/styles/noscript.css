@@ -1,9 +1,9 @@
-.no-js-container {
+.yc-no-js-container {
   justify-content: center;
 }
 
-.no-js-message,
-.no-js-reload-button {
+.yc-no-js-message,
+.yc-no-js-reload-button {
   width: 240px;
   margin: 10px auto 10px auto;
   border-radius: 3px;
@@ -12,11 +12,11 @@
   font-size: 5vh;
 }
 
-.no-js-message {
+.yc-no-js-message {
   text-align: center;
 }
 
-.no-js-reload-button {
+.yc-no-js-reload-button {
   background-color: #424242;    /* MD Grey 800 */
   color: #fff;
   text-decoration: none;
