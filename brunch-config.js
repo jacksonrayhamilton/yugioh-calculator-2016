@@ -45,7 +45,8 @@ module.exports = {
           'public/**/*.*',
           'public/**/!(*map*)'
         ],
-        stripPrefix: 'public'
+        stripPrefix: 'public',
+        replacePrefix: process.env.YC_ENV === 'gh-pages' ? '/yugioh-calculator-2016' : ''
       }
     }
   },
