@@ -21,7 +21,7 @@ module.exports = function (grunt) {
         options: {
           html: 'public/index.html'
         },
-        src: 'design/icon.png',
+        src: 'app/assets/web-app-icon.png',
         dest: 'public'
       }
     },

@@ -28,6 +28,7 @@
     "mithril": "^0.2.4",
     "mocha": "^3.4.1",
     "postcss-brunch": "^2.0.3",
+    "sw-precache-brunch": "^2.0.1",
     "text-brunch": "^1.0.0",
     "uglify-js-brunch": "^2.0.1"
   }

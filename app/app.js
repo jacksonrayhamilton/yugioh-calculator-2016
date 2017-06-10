@@ -195,6 +195,10 @@ function App (spec) {
     document.removeEventListener('keydown', onKeydown);
     m.mount(element, null);
   };
+  // Register service worker to enable offline access.
+  if (navigator.serviceWorker) {
+    navigator.serviceWorker.register('sw.js');
+  }
 
   return app;
 }

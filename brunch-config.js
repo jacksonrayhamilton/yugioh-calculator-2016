@@ -36,7 +36,19 @@ module.exports = {
   plugins: {
     digest: {manifest: 'manifest.json', referenceFiles: /\.(html|css)$/},
     postcss: {processors: [autoprefixer]},
-    text: {pattern: /^app\/icons\//}
+    text: {pattern: /^app\/icons\//},
+    swPrecache: {
+      swFileName: 'sw.js',
+      options: {
+        cacheId: 'yugioh-calculator',
+        staticFileGlobs: [
+          'public/**/*.*',
+          'public/**/!(*map*)'
+        ],
+        stripPrefix: 'public',
+        replacePrefix: process.env.YC_ENV === 'gh-pages' ? '/yugioh-calculator-2016' : ''
+      }
+    }
   },
   overrides: {
     production: {
