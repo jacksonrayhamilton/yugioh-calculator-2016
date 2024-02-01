@@ -7,7 +7,7 @@ var Persistence = require('./persistence');
 var Time = require('./time');
 
 var timerUpdateFrequency = 1000; // 1 second
-var matchTime = 40 * 60 * 1000;  // 40 minutes
+var matchTime = 45 * 60 * 1000;  // 45 minutes
 
 // Abstract representation of a Yugioh match timer.
 function Timer (spec) {
