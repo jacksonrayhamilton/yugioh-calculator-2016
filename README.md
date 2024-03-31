@@ -77,7 +77,7 @@ Create a ".env" file at the project root with contents similar to the following
 #!/usr/bin/env bash
 export SSH_USER=user
 export SSH_HOSTNAME=example.com
-export REMOTE_PROD_DEST_DIR=/var/www/example.com/html/
+export REMOTE_PROD_DEST_DIR=/var/www/example.com/
 export SERVER_RELOAD_COMMAND='sudo service nginx reload'
 ```
 
