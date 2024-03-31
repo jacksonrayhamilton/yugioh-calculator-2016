@@ -31,5 +31,10 @@
     "sw-precache-brunch": "^2.0.1",
     "text-brunch": "^1.0.0",
     "uglify-js-brunch": "^2.0.1"
+  },
+  "overrides": {
+    "grunt-favicons": {
+      "grunt": "$grunt"
+    }
   }
 }
