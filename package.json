@@ -1,6 +1,7 @@
 {
   "private": true,
   "scripts": {
+    "postinstall": "patch-package",
     "start": "rm -rf public && brunch watch --server",
     "build": "rm -rf public && brunch build --production && grunt && ./scripts/generate-manifest.js",
     "test": "npm run lint && npm run unit",
@@ -27,6 +28,7 @@
     "karma-mocha": "^1.2.0",
     "mithril": "^0.2.4",
     "mocha": "^3.4.1",
+    "patch-package": "^8.0.0",
     "postcss-brunch": "^2.0.3",
     "sw-precache-brunch": "^2.0.1",
     "text-brunch": "^1.0.0",
