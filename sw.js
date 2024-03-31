@@ -37,7 +37,7 @@
 /* eslint-disable indent, no-unused-vars, no-multiple-empty-lines, max-nested-callbacks, space-before-function-paren, quotes, comma-spacing */
 'use strict';
 
-var precacheConfig = [["/yugioh-calculator-2016/app-876efb7a.js","0106050aa875201d7211854a7dc1ea96"],["/yugioh-calculator-2016/app-da9c6e35.css","4faf30e5c07b385cb877ad7419ac05c7"],["/yugioh-calculator-2016/fonts/ubuntu-mono-4b8122e7.woff","90a3fd38639c25a1607d565bc72d7b52"],["/yugioh-calculator-2016/fonts/ubuntu-mono-ff9e23f8.woff2","98d7f2f48c7f453961a643df2a07dfef"],["/yugioh-calculator-2016/index.html","8258626d244e343189722fcbc6515b5e"],["/yugioh-calculator-2016/manifest-49269970.json","33e8dcf1f3a31c7f533b9750fe068d23"],["/yugioh-calculator-2016/web-app-icon.png","2816b4d7d78c85c434b6fb11146ad99d"]];
+var precacheConfig = [["/yugioh-calculator-2016/app-6f4bbcca.js","7b748944e189c669db7e7f8c561a57c5"],["/yugioh-calculator-2016/app-b2b3cfb9.css","4c53eed14d9aa7af02077d701bc1aeda"],["/yugioh-calculator-2016/fonts/ubuntu-mono-4b8122e7.woff","90a3fd38639c25a1607d565bc72d7b52"],["/yugioh-calculator-2016/fonts/ubuntu-mono-ff9e23f8.woff2","98d7f2f48c7f453961a643df2a07dfef"],["/yugioh-calculator-2016/index.html","118654851e85dad6136bb057df2f9194"],["/yugioh-calculator-2016/manifest-49269970.json","33e8dcf1f3a31c7f533b9750fe068d23"],["/yugioh-calculator-2016/web-app-icon.png","2816b4d7d78c85c434b6fb11146ad99d"]];
 var cacheName = 'sw-precache-v3-yugioh-calculator-' + (self.registration ? self.registration.scope : '');
 
 
@@ -45,7 +45,7 @@ var ignoreUrlParametersMatching = [/^utm_/];
 
 
 
-var addDirectoryIndex = function (originalUrl, index) {
+var addDirectoryIndex = function(originalUrl, index) {
     var url = new URL(originalUrl);
     if (url.pathname.slice(-1) === '/') {
       url.pathname += index;
@@ -53,7 +53,7 @@ var addDirectoryIndex = function (originalUrl, index) {
     return url.toString();
   };
 
-var cleanResponse = function (originalResponse) {
+var cleanResponse = function(originalResponse) {
     // If this is not a redirected response, then we don't have to do anything.
     if (!originalResponse.redirected) {
       return Promise.resolve(originalResponse);
@@ -75,7 +75,7 @@ var cleanResponse = function (originalResponse) {
     });
   };
 
-var createCacheKey = function (originalUrl, paramName, paramValue,
+var createCacheKey = function(originalUrl, paramName, paramValue,
                            dontCacheBustUrlsMatching) {
     // Create a new URL object to avoid modifying originalUrl.
     var url = new URL(originalUrl);
@@ -91,7 +91,7 @@ var createCacheKey = function (originalUrl, paramName, paramValue,
     return url.toString();
   };
 
-var isPathWhitelisted = function (whitelist, absoluteUrlString) {
+var isPathWhitelisted = function(whitelist, absoluteUrlString) {
     // If the whitelist is empty, then consider all URLs to be whitelisted.
     if (whitelist.length === 0) {
       return true;
@@ -104,7 +104,7 @@ var isPathWhitelisted = function (whitelist, absoluteUrlString) {
     });
   };
 
-var stripIgnoredUrlParameters = function (originalUrl,
+var stripIgnoredUrlParameters = function(originalUrl,
     ignoreUrlParametersMatching) {
     var url = new URL(originalUrl);
     // Remove the hash; see https://github.com/GoogleChrome/sw-precache/issues/290
