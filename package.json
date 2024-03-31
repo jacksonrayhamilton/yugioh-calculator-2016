@@ -33,6 +33,9 @@
     "uglify-js-brunch": "^2.0.1"
   },
   "overrides": {
+    "cheerio": {
+      "cheerio-select": "0.0.3"
+    },
     "grunt-favicons": {
       "grunt": "$grunt"
     }
