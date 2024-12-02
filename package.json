@@ -10,7 +10,6 @@
     "unit-auto": "vitest"
   },
   "devDependencies": {
-    "autoprefixer": "^6.3.6",
     "eslint": "^8.57.1",
     "fastclick": "^1.0.6",
     "mithril": "^0.2.4",
