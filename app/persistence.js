@@ -1,6 +1,4 @@
-'use strict';
-
-var Utils = require('./utils');
+import Utils from './utils';
 
 var Persistence = {};
 
@@ -25,4 +23,4 @@ Persistence.unpersist = function (key) {
   return JSON.parse(localStorage.getItem(key));
 };
 
-module.exports = Persistence;
+export default Persistence;

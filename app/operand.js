@@ -1,7 +1,5 @@
-'use strict';
-
-var m = require('mithril');
-var Utils = require('./utils');
+import m from 'mithril';
+import Utils from './utils';
 
 function getZero () {
   return '0';
@@ -120,4 +118,4 @@ function Operand () {
   return operand;
 }
 
-module.exports = Operand;
+export default Operand;

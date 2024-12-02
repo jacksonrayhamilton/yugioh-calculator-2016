@@ -1,13 +1,11 @@
-'use strict';
+import m from 'mithril';
+import resetSvg from './icons/reset.svg?raw';
+import backspaceSvg from './icons/backspace.svg?raw';
+import dieSvg from './icons/dice-5.svg?raw';
+import bookSvg from './icons/book.svg?raw';
+import undoSvg from './icons/undo.svg?raw';
 
-var m = require('mithril');
-var resetSvg = require('./icons/reset.svg');
-var backspaceSvg = require('./icons/backspace.svg');
-var dieSvg = require('./icons/dice-5.svg');
-var bookSvg = require('./icons/book.svg');
-var undoSvg = require('./icons/undo.svg');
-
-var Utils = require('./utils');
+import Utils from './utils';
 
 // Manipulate player life points.
 function Calc (spec) {
@@ -57,4 +55,4 @@ function Calc (spec) {
   return calc;
 }
 
-module.exports = Calc;
+export default Calc;

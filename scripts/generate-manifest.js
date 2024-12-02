@@ -10,9 +10,7 @@
 /* eslint-env node */
 /* eslint-disable no-console */
 
-'use strict';
-
-var fs = require('fs');
+import fs from 'fs';
 
 function isEmpty (collection) {
   return collection.length === 0;

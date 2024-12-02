@@ -1,7 +1,5 @@
 /* global ga */
 
-'use strict';
-
 // Record user behavior for application enchancement (using Google Analytics).
 var Analytics = {};
 
@@ -21,4 +19,4 @@ Analytics.event = function (eventCategory, eventAction) {
   });
 };
 
-module.exports = Analytics;
+export default Analytics;

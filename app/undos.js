@@ -1,8 +1,6 @@
-'use strict';
-
-var Events = require('./events');
-var Persistence = require('./persistence');
-var Utils = require('./utils');
+import Events from './events';
+import Persistence from './persistence';
+import Utils from './utils';
 
 var maxItems = 150;
 
@@ -108,12 +106,10 @@ function Undos (spec) {
 }
 
 // Reanimate a persisted undos object.
-function PersistedUndos (spec) {
+export function PersistedUndos (spec) {
   spec = spec === undefined ? {} : spec;
   var persistedSpec = Persistence.unpersist('yc-undos');
   return new Undos(Utils.assign(persistedSpec || {}, spec));
 }
 
-Undos.PersistedUndos = PersistedUndos;
-
-module.exports = Undos;
+export default Undos;

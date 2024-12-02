@@ -1,7 +1,5 @@
-'use strict';
-
-var Events = require('./events');
-var Persistence = require('./persistence');
+import Events from './events';
+import Persistence from './persistence';
 
 var defaultLifePoints = 8000;
 
@@ -86,7 +84,7 @@ function Player (spec) {
 }
 
 // Reanimate a persisted player object.
-function PersistedPlayer (spec) {
+export function PersistedPlayer (spec) {
   spec = spec === undefined ? {} : spec;
   var persistedSpec = Persistence.unpersist('yc-player-' + spec.id);
   if (persistedSpec) {
@@ -96,6 +94,4 @@ function PersistedPlayer (spec) {
   }
 }
 
-Player.PersistedPlayer = PersistedPlayer;
-
-module.exports = Player;
+export default Player;

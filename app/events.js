@@ -1,6 +1,4 @@
-'use strict';
-
-var Utils = require('./utils');
+import Utils from './utils';
 
 // An object that can emit named events to listeners.
 function Events () {
@@ -42,4 +40,4 @@ function Events () {
   return events;
 }
 
-module.exports = Events;
+export default Events;
