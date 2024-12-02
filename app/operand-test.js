@@ -1,8 +1,6 @@
 /* eslint-env mocha */
 
-'use strict';
-
-var Operand = require('./operand');
+import Operand from './operand';
 
 describe('Operand', function () {
 

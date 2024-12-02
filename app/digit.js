@@ -1,6 +1,4 @@
-'use strict';
-
-var m = require('mithril');
+import m from 'mithril';
 
 // Button for inserting one number into an operand.
 function Digit (spec) {
@@ -17,4 +15,4 @@ function Digit (spec) {
   return digit;
 }
 
-module.exports = Digit;
+export default Digit;

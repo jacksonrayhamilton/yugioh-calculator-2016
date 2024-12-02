@@ -5,15 +5,13 @@
     <title>Yugioh Calculator</title>
     <meta name="description" content="A free Yugioh calculator app for iPhone, iPod, iPad, and Android.">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
-    <meta name="apple-mobile-web-app-capable" content="yes"/>
+    <meta name="mobile-web-app-capable" content="yes"/>
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
     <meta name="apple-mobile-web-app-title" content="Yugioh Calc"/>
     <meta name="format-detection" content="telephone=no"/>
     <meta name="theme-color" content="#ffffff"/>
-    <!-- DIGEST() is for the digest-brunch plugin. -->
-    <link rel="preload" href="DIGEST(fonts/ubuntu-mono.woff2)" as="font" type="font/woff2" crossorigin=""/>
-    <link rel="stylesheet" href="DIGEST(app.css)"/>
-    <link rel="manifest" href="DIGEST(manifest.json)"/>
+    <link rel="preload" href="fonts/ubuntu-mono.woff2" as="font" type="font/woff2" crossorigin=""/>
+    <link rel="stylesheet" href="app/styles/main.css"/>
     <script>
       (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
       (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
@@ -30,8 +28,6 @@
         <a class="yc-no-js-reload-button yc-button" href="/">Reload</a>
       </noscript>
     </div>
-    <!-- DIGEST() is for the digest-brunch plugin. -->
-    <script src="DIGEST(app.js)"></script>
-    <script>require('app/main');</script>
+    <script type="module" src="app/main.js"></script>
   </body>
 </html>

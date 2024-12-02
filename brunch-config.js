@@ -1,11 +1,9 @@
 /* eslint-env node */
 
-'use strict';
-
 var autoprefixer = require('autoprefixer')({remove: false, browsers: ['> 0%']});
 var cssnano = require('cssnano')({safe: true});
 
-module.exports = {
+export default {
   files: {
     javascripts: {
       joinTo: {

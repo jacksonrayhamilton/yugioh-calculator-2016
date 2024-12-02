@@ -1,6 +1,4 @@
-'use strict';
-
-module.exports = {
+export default {
   env: {
     browser: true,
     commonjs: true

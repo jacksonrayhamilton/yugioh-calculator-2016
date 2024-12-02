@@ -1,8 +1,6 @@
 /* eslint-env node */
 
-'use strict';
-
-module.exports = function (grunt) {
+export default function (grunt) {
 
   grunt.loadNpmTasks('grunt-contrib-htmlmin');
   grunt.loadNpmTasks('grunt-favicons');

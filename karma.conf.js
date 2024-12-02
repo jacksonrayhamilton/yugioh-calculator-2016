@@ -1,8 +1,6 @@
 /* eslint-env node */
 
-'use strict';
-
-module.exports = function (config) {
+export default function (config) {
   config.set({
     basePath: 'public',
     browsers: ['Chrome'],

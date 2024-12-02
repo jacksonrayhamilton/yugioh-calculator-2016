@@ -1,6 +1,4 @@
-'use strict';
-
-var chai = require('chai');
+import chai from 'chai';
 
 // The following utilities are so ubiquitous that it is worth making them
 // globally available.

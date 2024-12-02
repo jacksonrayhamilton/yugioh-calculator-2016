@@ -2,8 +2,9 @@
   "private": true,
   "scripts": {
     "postinstall": "patch-package",
-    "start": "rm -rf public && brunch watch --server",
-    "build": "rm -rf public && brunch build --production && grunt && ./scripts/generate-manifest.js",
+    "start": "vite dev",
+    "dev": "vite dev",
+    "build": "vite build",
     "test": "npm run lint && npm run unit",
     "lint": "eslint '*.js' app",
     "unit": "karma start --single-run",
@@ -32,7 +33,9 @@
     "postcss-brunch": "^2.0.3",
     "sw-precache-brunch": "^2.0.1",
     "text-brunch": "^1.0.0",
-    "uglify-js-brunch": "^2.0.1"
+    "uglify-js-brunch": "^2.0.1",
+    "vite": "^6.0.1",
+    "vite-plugin-pwa": "^0.21.1"
   },
   "overrides": {
     "cheerio": {
