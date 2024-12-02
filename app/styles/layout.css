@@ -23,6 +23,14 @@
   font-size: 12vh;
 }
 
+/* Shrink the font size slightly when we detect a possible overflow (only
+applies when the value is 5 digits or more */
+@media (max-aspect-ratio: 60/100) {
+  .yc-layout .yc-lp-val.yc-lp-len-5 {
+    font-size: 10vh;
+  }
+}
+
 .yc-layout .yc-lp-gain,
 .yc-layout .yc-lp-lose {
   font-size: 13vh;
