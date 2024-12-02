@@ -10,6 +10,7 @@ export default defineConfig({
     assetsInlineLimit: 0
   },
   plugins: [
+    // eslint-disable-next-line new-cap
     VitePWA({
       filename: 'sw.js',
       workbox: {
