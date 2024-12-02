@@ -7,8 +7,8 @@
     "build": "vite build",
     "test": "npm run lint && npm run unit",
     "lint": "eslint '*.js' '*.mjs' app",
-    "unit": "karma start --single-run",
-    "unit-auto": "karma start"
+    "unit": "vitest run",
+    "unit-auto": "vitest"
   },
   "devDependencies": {
     "auto-reload-brunch": "^2.7.1",
@@ -35,7 +35,8 @@
     "text-brunch": "^1.0.0",
     "uglify-js-brunch": "^2.0.1",
     "vite": "^6.0.1",
-    "vite-plugin-pwa": "^0.21.1"
+    "vite-plugin-pwa": "^0.21.1",
+    "vitest": "^2.1.8"
   },
   "overrides": {
     "cheerio": {
