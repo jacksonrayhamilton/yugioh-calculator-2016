@@ -29,8 +29,9 @@ function Lp (spec) {
   }
 
   lp.view = function () {
+    var lifePoints = player.getLifePoints();
     return m('.yc-lp', [
-      m('.yc-lp-val', player.getLifePoints()),
+      m('.yc-lp-val.yc-lp-len-' + String(lifePoints).length, lifePoints),
       m('.yc-lp-gain.yc-icon-container', {onclick: gain}, m.trust(plusSvg)),
       m('.yc-lp-lose.yc-icon-container', {onclick: lose}, m.trust(minusSvg))
     ]);
