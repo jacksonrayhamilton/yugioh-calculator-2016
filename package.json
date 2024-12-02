@@ -44,5 +44,8 @@
     "grunt-favicons": {
       "grunt": "$grunt"
     }
+  },
+  "dependencies": {
+    "@fontsource/ubuntu-mono": "^5.1.0"
   }
 }
