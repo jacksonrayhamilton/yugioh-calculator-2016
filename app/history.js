@@ -114,7 +114,11 @@ function HistoryComponent (spec) {
               ])
             );
           }
-          return previous.concat(m('.yc-history-row', eventView(eventObject)));
+          var playerId = eventObject.id;
+          var playerIdSelector =
+              playerId !== undefined ? '.yc-history-row-p' + (playerId + 1) :
+              '';
+          return previous.concat(m('.yc-history-row' + playerIdSelector, eventView(eventObject)));
         }, [])
       ])
     ];

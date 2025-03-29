@@ -31,7 +31,7 @@ body {
 }
 
 /* Material Design ("MD") colors from
-   https://www.google.com/design/spec/style/color.html#color-color-palette */
+   https://materialui.co/colors */
 
 .yc-lp-val,
 .yc-layout-status > *,
@@ -131,4 +131,28 @@ body {
 .yc-layout > *:nth-child(5) > *:last-child,
 .yc-layout > *:nth-child(6) > *:last-child {
   margin: 0 5px 5px 5px;
+}
+
+.yc-history-row-p1 {
+  color: #880e4f;               /* MD Pink 900 */
+}
+
+.yc-history-row-p1:nth-child(odd) {
+  background-color: #f8bbd0;    /* MD Pink 100 */
+}
+
+.yc-history-row-p1:nth-child(even) {
+  background-color: #f48fb1;    /* MD Pink 200 */
+}
+
+.yc-history-row-p2 {
+  color: #01579b;               /* MD Light Blue 900 */
+}
+
+.yc-history-row-p2:nth-child(odd) {
+  background-color: #b3e5fc;    /* MD Light Blue 100 */
+}
+
+.yc-history-row-p2:nth-child(even) {
+  background-color: #81d4fa;    /* MD Light Blue 200 */
 }
