@@ -31,7 +31,7 @@ function Operand () {
     // numbers in that range.  Numbers >=1000 % 100 always take at least two
     // numbers to describe, except in the >= 1000 % 1000 case, but that's less
     // common than the "not % 1000" case, so it's usually more efficient to fill
-    // in 2 zeros for >=1000 too.  Afterwards, we can overwrite to accomodate
+    // in 2 zeros for >=1000 too.  Afterwards, we can overwrite to accommodate
     // any other quantity.
     var zeros = values.length < 2 ?
         getZeros(2) :
@@ -89,7 +89,7 @@ function Operand () {
     }
 
     // Display leading digits, because the only logical way to enter "rare"
-    // quanities like "150" is to pad until it's possible to overwrite digits.
+    // quantities like "150" is to pad until it's possible to overwrite digits.
     function splitLeadingDigits (digits) {
       return digitsToElements(digits, function (digitIndex, digitStrings) {
         return digitStrings.slice(0, digitIndex + 1).every(function (digit) {
