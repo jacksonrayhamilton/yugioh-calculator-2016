@@ -48,7 +48,7 @@ function Operand () {
 
   // Get the current operand value as a number.
   operand.getNumericValue = function () {
-    return parseFloat(operand.getValue());
+    return Number(operand.getValue());
   };
 
   // Get the point where the next digit will be entered.
