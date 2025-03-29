@@ -17,10 +17,12 @@ function Operand () {
 
   // Numbers that will be joined to form a value to use as an operand.
   var values = [];
+  var zerosDeleted = 0;
 
   // Remove all currently-entered numbers.
   operand.reset = function () {
     values = [];
+    zerosDeleted = 0;
   };
 
   // Get the current operand value as a string.
@@ -33,9 +35,14 @@ function Operand () {
     // common than the "not % 1000" case, so it's usually more efficient to fill
     // in 2 zeros for >=1000 too.  Afterwards, we can overwrite to accommodate
     // any other quantity.
+    //
+    // Users can also delete the automatically supplied zeros as one way to
+    // enter "rare" quantities.  Deleting the first zero makes it easier to get
+    // quantities like "50", "150" and "125", and deleting both of the zeros
+    // makes it straightforward to enter "25".
     var zeros = values.length < 2 ?
-        getZeros(2) :
-        getZeros(4 - values.length);
+        getZeros(2 - zerosDeleted) :
+        getZeros(4 - zerosDeleted - values.length);
     return values.concat(zeros).join('');
   };
 
@@ -51,6 +58,11 @@ function Operand () {
 
   // Insert another digit, if possible.
   operand.insertDigit = function (digit) {
+    if (values.length === 0 && digit === 0 && zerosDeleted > 0) {
+      // Restore deleted zeros.
+      zerosDeleted -= 1;
+      return;
+    }
     if (values.length >= 5) {
       // Values over 5 digits are practically non-existent, and are more likely
       // to break the layout due to misuse.
@@ -60,7 +72,11 @@ function Operand () {
   };
 
   operand.deleteLastDigit = function () {
-    values.pop();
+    if (values.length) {
+      values.pop();
+    } else if (zerosDeleted < 2) {
+      zerosDeleted += 1;
+    }
   };
 
   operand.view = function () {
@@ -88,8 +104,8 @@ function Operand () {
       return digitsToElements(digits);
     }
 
-    // Display leading digits, because the only logical way to enter "rare"
-    // quantities like "150" is to pad until it's possible to overwrite digits.
+    // Display leading digits.  One way to enter "rare" quantities like "150" is
+    // to pad until it's possible to overwrite digits.
     function splitLeadingDigits (digits) {
       return digitsToElements(digits, function (digitIndex, digitStrings) {
         return digitStrings.slice(0, digitIndex + 1).every(function (digit) {
@@ -109,10 +125,10 @@ function Operand () {
     return m('.yc-operand', [].concat(
       splitLeadingDigits(leading),
       index < 2 && vals < 2 ? m('.yc-operand-blinker') : [],
-      (index >= 2 || vals >= 2) && index < 4 ?
+      (index >= 2 || vals >= 2) && index < (4 - zerosDeleted) ?
         selectDigit(selected) :
         splitDigits(selected),
-      index === 4 ? m('.yc-operand-blinker') : [],
+      (index >= (4 - zerosDeleted) && index <= 4) ? m('.yc-operand-blinker') : [],
       splitDigits(trailing)
     ));
   };
