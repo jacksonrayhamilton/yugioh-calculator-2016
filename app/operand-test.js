@@ -61,6 +61,12 @@ describe('Operand', function () {
     expect(operand.getValue()).to.equal('1200');
     operand.insertDigit(3);
     expect(operand.getValue()).to.equal('1230');
+    operand.insertDigit(4);
+    expect(operand.getValue()).to.equal('1234');
+    operand.insertDigit(5);
+    expect(operand.getValue()).to.equal('12345');
+    operand.insertDigit(6);
+    expect(operand.getValue()).to.equal('12345');
   });
 
   it('should transition from blinker, to selected, to blinker, to none', function () {
