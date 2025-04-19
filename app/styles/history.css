@@ -13,6 +13,11 @@
   padding: 5px;
 }
 
+.yc-history-name-col,
+.yc-history-time-col {
+  flex-shrink: 0;
+}
+
 .yc-history-desc-col {
   flex: 1;
   text-align: center;
