@@ -26,12 +26,24 @@ function Lp (spec) {
     operand.reset();
   }
 
+  // Halve a player's life points.  Note that,
+  //
+  //   "If halving your Life Points results in a fraction, your Life Points
+  //    are rounded up."
+  //
+  // From: https://yugipedia.com/wiki/Card_Rulings:Solemn_Judgment
+  function halve () {
+    Analytics.event('Action', 'Halve');
+    player.lose(Math.floor(player.getLifePoints() / 2));
+  }
+
   lp.view = function () {
     var lifePoints = player.getLifePoints();
     return m('.yc-lp', [
       m('.yc-lp-val.yc-lp-len-' + String(lifePoints).length, lifePoints),
       m('.yc-lp-gain.yc-icon-container', {onclick: gain}, m.trust(plusSvg)),
-      m('.yc-lp-lose.yc-icon-container', {onclick: lose}, m.trust(minusSvg))
+      m('.yc-lp-lose.yc-icon-container', {onclick: lose}, m.trust(minusSvg)),
+      m('.yc-lp-halve', {onclick: halve}, '½')
     ]);
   };
 

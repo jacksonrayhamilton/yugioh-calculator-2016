@@ -25,15 +25,26 @@
 
 /* Shrink the font size slightly when we detect a possible overflow (only
 applies when the value is 5 digits or more */
-@media (max-aspect-ratio: 60/100) {
+@media (max-aspect-ratio: 3/5) {
   .yc-layout .yc-lp-val.yc-lp-len-5 {
     font-size: 10vh;
   }
 }
 
 .yc-layout .yc-lp-gain,
-.yc-layout .yc-lp-lose {
+.yc-layout .yc-lp-lose,
+.yc-layout .yc-lp-halve {
   font-size: 13vh;
+}
+
+.yc-layout .yc-lp-halve {
+  display: none;
+}
+
+@media (min-aspect-ratio: 5/4) {
+  .yc-layout .yc-lp-halve {
+    display: flex;
+  }
 }
 
 .yc-layout-status {
