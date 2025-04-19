@@ -100,6 +100,13 @@ applies when the value is 5 digits or more */
   font-size: 2.5vh;
 }
 
+@media (min-aspect-ratio: 5/4) {
+  .yc-layout .yc-history-row,
+  .yc-layout .yc-history-break {
+    font-size: 5vh;
+  }
+}
+
 .yc-close {
   display: flex;
   justify-content: center;
