@@ -5,6 +5,7 @@ body {
 .yc-lp-val,
 .yc-lp-gain,
 .yc-lp-lose,
+.yc-lp-halve,
 .yc-timer,
 .yc-layout-operand-table,
 .yc-random-cell,
@@ -50,7 +51,8 @@ body {
 }
 
 .yc-lp-gain,
-.yc-lp-lose {
+.yc-lp-lose,
+.yc-lp-halve {
   color: #fff;
   margin: 5px 5px 0 0;
 }
@@ -63,11 +65,13 @@ body {
   background-color: #66bb6a;    /* MD Green 400 */
 }
 
-.yc-lp-lose {
+.yc-lp-lose,
+.yc-lp-halve {
   background-color: #673ab7;    /* MD Deep Purple 500 */
 }
 
-.yc-lp-lose:active {
+.yc-lp-lose:active,
+.yc-lp-halve:active {
   background-color: #7e57c2;    /* MD Deep Purple 400 */
 }
 
@@ -81,6 +85,7 @@ body {
 
 .yc-lp-gain,
 .yc-lp-lose,
+.yc-lp-halve,
 .yc-reset-button,
 .yc-back-button,
 .yc-random-button,

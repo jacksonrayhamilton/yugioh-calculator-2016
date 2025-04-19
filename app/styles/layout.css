@@ -32,8 +32,19 @@ applies when the value is 5 digits or more */
 }
 
 .yc-layout .yc-lp-gain,
-.yc-layout .yc-lp-lose {
+.yc-layout .yc-lp-lose,
+.yc-layout .yc-lp-halve {
   font-size: 13vh;
+}
+
+.yc-layout .yc-lp-halve {
+  display: none;
+}
+
+@media (min-aspect-ratio: 5/4) {
+  .yc-layout .yc-lp-halve {
+    display: flex;
+  }
 }
 
 .yc-layout-status {

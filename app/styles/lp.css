@@ -4,7 +4,8 @@
 
 .yc-lp-val,
 .yc-lp-gain,
-.yc-lp-lose {
+.yc-lp-lose,
+.yc-lp-halve {
   display: flex;
   justify-content: center;
   align-items: center;
@@ -15,7 +16,16 @@
 }
 
 .yc-lp-gain,
+.yc-lp-lose,
+.yc-lp-halve {
+  cursor: pointer;
+}
+
+.yc-lp-gain,
 .yc-lp-lose {
   width: 20%;
-  cursor: pointer;
+}
+
+.yc-lp-halve {
+  width: 10%;
 }
