@@ -1,8 +1,13 @@
 // Configured for ESLint 3.7.1
 
-'use strict';
-
 module.exports = {
+  env: {
+    node: true
+  },
+  parserOptions: {
+    ecmaVersion: 6,
+    sourceType: 'module',
+  },
   rules: {
     /*
      * Possible Errors

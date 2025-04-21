@@ -1,20 +1,18 @@
-'use strict';
+import m from 'mithril';
+import closeSvg from './icons/close.svg?raw';
 
-var m = require('mithril');
-var closeSvg = require('./icons/close.svg');
-
-var Analytics = require('./analytics');
-var Calc = require('./calc');
-var Digit = require('./digit');
-var Events = require('./events');
-var Lp = require('./lp');
-var Operand = require('./operand');
-var PersistedHistory = require('./history').PersistedHistory;
-var PersistedPlayer = require('./player').PersistedPlayer;
-var PersistedTimer = require('./timer').PersistedTimer;
-var PersistedUndos = require('./undos').PersistedUndos;
-var Random = require('./random');
-var Utils = require('./utils');
+import Analytics from './analytics';
+import Calc from './calc';
+import Digit from './digit';
+import Events from './events';
+import Lp from './lp';
+import Operand from './operand';
+import { PersistedHistory } from './history';
+import { PersistedPlayer } from './player';
+import { PersistedTimer } from './timer';
+import { PersistedUndos } from './undos';
+import Random from './random';
+import Utils from './utils';
 
 // Application UI and state container.
 function App (spec) {
@@ -195,12 +193,8 @@ function App (spec) {
     document.removeEventListener('keydown', onKeydown);
     m.mount(element, null);
   };
-  // Register service worker to enable offline access.
-  if (navigator.serviceWorker) {
-    navigator.serviceWorker.register('sw.js');
-  }
 
   return app;
 }
 
-module.exports = App;
+export default App;

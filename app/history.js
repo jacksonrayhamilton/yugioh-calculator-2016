@@ -1,10 +1,8 @@
-'use strict';
+import m from 'mithril';
 
-var m = require('mithril');
-
-var Persistence = require('./persistence');
-var Time = require('./time');
-var Utils = require('./utils');
+import Persistence from './persistence';
+import Time from './time';
+import Utils from './utils';
 
 var maxEvents = 150;
 
@@ -128,12 +126,10 @@ function HistoryComponent (spec) {
 }
 
 // Reanimate a persisted history object.
-function PersistedHistory (spec) {
+export function PersistedHistory (spec) {
   spec = spec === undefined ? {} : spec;
   var persistedSpec = Persistence.unpersist('yc-history');
   return new HistoryComponent(Utils.assign(persistedSpec || {}, spec));
 }
 
-HistoryComponent.PersistedHistory = PersistedHistory;
-
-module.exports = HistoryComponent;
+export default HistoryComponent;

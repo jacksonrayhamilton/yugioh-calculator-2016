@@ -1,5 +1,3 @@
-'use strict';
-
 var Utils = {};
 
 // Determine if an object has an own property.  (Shortcut for
@@ -40,4 +38,4 @@ Utils.assign = function (dest, source) {
   return dest;
 };
 
-module.exports = Utils;
+export default Utils;

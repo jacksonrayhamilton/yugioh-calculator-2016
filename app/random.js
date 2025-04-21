@@ -1,16 +1,14 @@
-'use strict';
+import m from 'mithril';
+import dice1Svg from './icons/dice-1.svg?raw';
+import dice2Svg from './icons/dice-2.svg?raw';
+import dice3Svg from './icons/dice-3.svg?raw';
+import dice4Svg from './icons/dice-4.svg?raw';
+import dice5Svg from './icons/dice-5.svg?raw';
+import dice6Svg from './icons/dice-6.svg?raw';
+import coinHeadsSvg from './icons/coin-heads.svg?raw';
+import coinTailsSvg from './icons/coin-tails.svg?raw';
 
-var m = require('mithril');
-var dice1Svg = require('./icons/dice-1.svg');
-var dice2Svg = require('./icons/dice-2.svg');
-var dice3Svg = require('./icons/dice-3.svg');
-var dice4Svg = require('./icons/dice-4.svg');
-var dice5Svg = require('./icons/dice-5.svg');
-var dice6Svg = require('./icons/dice-6.svg');
-var coinHeadsSvg = require('./icons/coin-heads.svg');
-var coinTailsSvg = require('./icons/coin-tails.svg');
-
-var Events = require('./events');
+import Events from './events';
 
 function getRandomInt (min, max) {
   return Math.floor(Math.random() * (max - min + 1)) + min;
@@ -95,4 +93,4 @@ function Random (spec) {
   return random;
 }
 
-module.exports = Random;
+export default Random;

@@ -1,7 +1,5 @@
-'use strict';
-
-var App = require('./app');
-var attachFastClick = require('fastclick');
+import App from './app';
+import attachFastClick from 'fastclick';
 
 // Initialize the application.
 

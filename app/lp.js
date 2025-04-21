@@ -1,10 +1,8 @@
-'use strict';
+import m from 'mithril';
+import plusSvg from './icons/plus.svg?raw';
+import minusSvg from './icons/minus.svg?raw';
 
-var m = require('mithril');
-var plusSvg = require('./icons/plus.svg');
-var minusSvg = require('./icons/minus.svg');
-
-var Analytics = require('./analytics');
+import Analytics from './analytics';
 
 // Representation of a player's life points.
 function Lp (spec) {
@@ -52,4 +50,4 @@ function Lp (spec) {
   return lp;
 }
 
-module.exports = Lp;
+export default Lp;
