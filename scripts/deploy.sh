@@ -1,38 +1,36 @@
 #!/usr/bin/env bash
 
-# Deploy the website via SSH.
+# Deploy the website via Vercel.
+# Usage: ./deploy.sh [preview|prod]
+# Default is preview if no argument is provided.
 
 # Normalize execution location.
 FILE_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 cd "$FILE_DIR/../"
 
-# Set SSH environment variables; should export the following:
-# - SSH_USER
-# - SSH_HOSTNAME
-# - REMOTE_PROD_DEST_DIR
-# - SERVER_RELOAD_COMMAND
-source .env
-
-# Generated cache manifest configuration.
-MANIFEST_CONF=manifest.conf
-
 # LOCAL_BUILD_DIR must end with a "/".
 LOCAL_BUILD_DIR=public/
+
+# Get deployment environment from first argument
+DEPLOY_ENV="${1:-preview}"
+
+# Validate deployment environment
+if [ "$DEPLOY_ENV" != "prod" -a "$DEPLOY_ENV" != "preview" ]
+then
+  echo "Error: Invalid deployment environment '$DEPLOY_ENV'"
+  echo "Usage: ./deploy.sh [preview|prod]"
+  exit 1
+fi
 
 # Build production site to build directory.
 npm run build
 
-# Copy local production build files to remote.  Consider removing `--rsync-path
-# 'sudo rsync'` if the directory doesn't require `sudo` and your user isn't a
-# sudoer.
-rsync --verbose --archive --update --delete \
-      --rsync-path 'sudo rsync' \
-      "$LOCAL_BUILD_DIR" \
-      "$SSH_USER"@"$SSH_HOSTNAME":"$REMOTE_PROD_DEST_DIR/html/"
-rsync --verbose --archive --update --delete \
-      --rsync-path 'sudo rsync' \
-      "$MANIFEST_CONF" \
-      "$SSH_USER"@"$SSH_HOSTNAME":"$REMOTE_PROD_DEST_DIR/$MANIFEST_CONF"
-
-# Reload the server in case dynamically-generated configuration changed.
-ssh "$SSH_USER"@"$SSH_HOSTNAME" "$SERVER_RELOAD_COMMAND"
+# Upload to Vercel.
+if [ "$DEPLOY_ENV" = "prod" ]
+then
+  echo "Deploying to production environment..."
+  vercel --prod
+else
+  echo "Deploying to preview environment..."
+  vercel
+fi

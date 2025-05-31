@@ -1,10 +1,8 @@
-'use strict';
+import m from 'mithril';
 
-var m = require('mithril');
-
-var Events = require('./events');
-var Persistence = require('./persistence');
-var Time = require('./time');
+import Events from './events';
+import Persistence from './persistence';
+import Time from './time';
 
 var timerUpdateFrequency = 1000; // 1 second
 var matchTime = 45 * 60 * 1000;  // 45 minutes
@@ -90,7 +88,7 @@ function Timer (spec) {
 }
 
 // Reanimate a persisted timer object.
-function PersistedTimer (spec) {
+export function PersistedTimer (spec) {
   spec = spec === undefined ? {} : spec;
   var persistedSpec = Persistence.unpersist('yc-timer');
   if (persistedSpec) {
@@ -100,6 +98,4 @@ function PersistedTimer (spec) {
   }
 }
 
-Timer.PersistedTimer = PersistedTimer;
-
-module.exports = Timer;
+export default Timer;

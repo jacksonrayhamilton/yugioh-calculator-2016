@@ -7,5 +7,5 @@ node_modules/
 manifest.conf
 public/
 
-# Private deployment credentials; see scripts/deploy.sh.
-.env
+# For deployments.
+.vercel

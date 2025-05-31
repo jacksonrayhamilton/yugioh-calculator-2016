@@ -1,8 +1,6 @@
 /* eslint-env mocha */
 
-'use strict';
-
-var Player = require('./player');
+import Player from './player';
 
 describe('Player', function () {
 

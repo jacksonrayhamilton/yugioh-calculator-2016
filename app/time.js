@@ -1,5 +1,3 @@
-'use strict';
-
 var Time = {};
 
 // Pad a 2-digit number with a leading zero, if needed.
@@ -32,4 +30,4 @@ Time.getDaystamp = function (ms) {
   return new Date(ms).toLocaleDateString();
 };
 
-module.exports = Time;
+export default Time;

@@ -1,0 +1,5 @@
+[tools]
+node = "22.16.0"
+
+[env]
+# You can add environment variables here if needed

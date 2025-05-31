@@ -1,45 +1,21 @@
 {
   "private": true,
   "scripts": {
-    "postinstall": "patch-package",
-    "start": "rm -rf public && brunch watch --server",
-    "build": "rm -rf public && brunch build --production && grunt && ./scripts/generate-manifest.js",
+    "start": "vite dev",
+    "dev": "vite dev",
+    "build": "vite build",
     "test": "npm run lint && npm run unit",
-    "lint": "eslint '*.js' app",
-    "unit": "karma start --single-run",
-    "unit-auto": "karma start"
+    "lint": "eslint '*.js' '*.mjs' app",
+    "unit": "vitest run",
+    "unit-auto": "vitest"
   },
   "devDependencies": {
-    "auto-reload-brunch": "^2.7.1",
-    "autoprefixer": "^6.3.6",
-    "brunch": "^2.8.2",
-    "chai": "^3.5.0",
-    "css-brunch": "^2.6.1",
-    "cssnano": "^3.7.7",
-    "digest-brunch": "^1.6.0",
-    "eslint": "^3.7.1",
+    "@fontsource/ubuntu-mono": "^5.1.0",
+    "eslint": "^8.57.1",
     "fastclick": "^1.0.6",
-    "grunt": "^1.0.1",
-    "grunt-cli": "^1.2.0",
-    "grunt-contrib-htmlmin": "^2.0.0",
-    "grunt-favicons": "^0.8.0",
-    "karma": "^1.3.0",
-    "karma-chrome-launcher": "^2.0.0",
-    "karma-mocha": "^1.2.0",
     "mithril": "^0.2.4",
-    "mocha": "^3.4.1",
-    "patch-package": "^8.0.0",
-    "postcss-brunch": "^2.0.3",
-    "sw-precache-brunch": "^2.0.1",
-    "text-brunch": "^1.0.0",
-    "uglify-js-brunch": "^2.0.1"
-  },
-  "overrides": {
-    "cheerio": {
-      "cheerio-select": "0.0.3"
-    },
-    "grunt-favicons": {
-      "grunt": "$grunt"
-    }
+    "vite": "^6.3.2",
+    "vite-plugin-pwa": "^0.21.1",
+    "vitest": "^3.1.2"
   }
 }
