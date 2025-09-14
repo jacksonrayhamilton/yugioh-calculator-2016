@@ -23,6 +23,7 @@ Yugioh Calculator 2016 boasts the following features:
 - Undo
 - History of life point modifications
 - Match timer, 1-click to reset
+- Warnings when match time is nearing end
 
 The design has also been revamped to distribute space more economically, and to
 be "flatter," and the colors are bolder.
