@@ -5,7 +5,7 @@ import Persistence from './persistence';
 import Time from './time';
 
 var timerUpdateFrequency = 1000; // 1 second
-var matchTime = 45 * 60 * 1000;  // 45 minutes
+var matchTime = 50 * 60 * 1000;  // 50 minutes
 
 // Abstract representation of a Yugioh match timer.
 function Timer (spec) {
