@@ -1,0 +1,25 @@
+.yc-transient-timer {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+}
+
+.yc-transient-timer-icon {
+  margin-bottom: 20px;
+}
+
+.yc-transient-timer-time {
+  font-weight: bold;
+  margin-bottom: 40px;
+}
+
+.yc-transient-timer-close {
+  cursor: pointer;
+  padding: 20px;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}

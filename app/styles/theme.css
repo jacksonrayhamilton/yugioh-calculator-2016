@@ -183,3 +183,24 @@ body {
 .yc-history-row-p2:nth-child(even) {
   background-color: #81d4fa;    /* MD Light Blue 200 */
 }
+
+.yc-transient-timer {
+  background-color: #ffc107;    /* MD Amber 500 */
+  color: #fff;
+}
+
+.yc-transient-timer-icon svg {
+  fill: #fff;
+}
+
+.yc-transient-timer-close {
+  background-color: rgba(255, 255, 255, 0.2);
+}
+
+.yc-transient-timer-close:active {
+  background-color: rgba(255, 255, 255, 0.3);
+}
+
+.yc-transient-timer-close svg {
+  fill: #fff;
+}

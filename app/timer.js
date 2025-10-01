@@ -16,6 +16,7 @@ function Timer (spec) {
 
   var timer = new Events(spec);
   var timeout;
+  var wasInWarning = false;
 
   function getTimePassed () {
     return Date.now() - startTime;
@@ -42,6 +43,13 @@ function Timer (spec) {
   // Update the timer display, then later, update it again.
   function tick () {
     if (!timer.isInOvertime()) {
+      // Check if we just entered warning state
+      var isInWarning = timer.isInWarning();
+      if (isInWarning && !wasInWarning) {
+        timer.emit('warningEntered');
+      }
+      wasInWarning = isInWarning;
+
       timeout = setTimeout(function () {
         m.redraw();
         tick();
