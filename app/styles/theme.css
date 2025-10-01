@@ -105,15 +105,13 @@ body {
   background-color: #ffca28;    /* MD Amber 400 */
 }
 
-.yc-timer-danger,
 .yc-timer-overtime {
-  background-color: #ff9800;    /* MD Orange 500 */
+  background-color: #ffc107;    /* MD Amber 500 */
   color: #fff;
 }
 
-.yc-timer-danger:active,
 .yc-timer-overtime:active {
-  background-color: #ffb74d;    /* MD Orange 400 */
+  background-color: #ffca28;    /* MD Amber 400 */
 }
 
 .yc-timer-warning-icon svg {
