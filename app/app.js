@@ -12,6 +12,7 @@ import { PersistedPlayer } from './player';
 import { PersistedTimer } from './timer';
 import { PersistedUndos } from './undos';
 import Random from './random';
+import TransientTimer from './transient-timer';
 import Utils from './utils';
 
 // Application UI and state container.
@@ -31,6 +32,8 @@ function App (spec) {
   var random;
   var historyComponent;
   var undos;
+  var transientTimer;
+  var transientTimerTimeout;
   var mode;
   var modes;
 
@@ -64,7 +67,8 @@ function App (spec) {
     modes = {
       calc: calc,
       random: random,
-      history: historyComponent
+      history: historyComponent,
+      transientTimer: transientTimer
     };
   }
 
@@ -79,6 +83,9 @@ function App (spec) {
     timer = new PersistedTimer();
     timer.on('timerReset', function () {
       Analytics.event('Action', 'Restart Timer');
+    });
+    timer.on('warningEntered', function () {
+      showTransientTimer();
     });
     undos = new PersistedUndos({
       app: app,
@@ -98,6 +105,10 @@ function App (spec) {
       timer: timer,
       undos: undos,
       random: random
+    });
+    transientTimer = new TransientTimer({
+      timer: timer,
+      onClose: hideTransientTimer
     });
     mode = 'calc';
     initNth();
@@ -173,9 +184,29 @@ function App (spec) {
     undos.undo();
   }
 
+  // Show the transient timer mode
+  function showTransientTimer () {
+    mode = 'transientTimer';
+    // Auto-hide after 10 seconds
+    transientTimerTimeout = setTimeout(function () {
+      hideTransientTimer();
+    }, 10000);
+    m.redraw();
+  }
+
+  // Hide the transient timer mode
+  function hideTransientTimer () {
+    if (transientTimerTimeout) {
+      clearTimeout(transientTimerTimeout);
+      transientTimerTimeout = null;
+    }
+    mode = 'calc';
+    m.redraw();
+  }
+
   app.view = function () {
     return m('.yc-layout', [
-      mode !== 'calc' ? [
+      !['calc', 'transientTimer'].includes(mode) ? [
         m('.yc-layout-row.yc-layout-status', [
           timer.view(),
           m('.yc-close.yc-icon-container', {onclick: revertMode}, m.trust(closeSvg))

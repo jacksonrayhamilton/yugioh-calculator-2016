@@ -116,3 +116,35 @@ applies when the value is 5 digits or more */
 
   cursor: pointer;
 }
+
+.yc-transient-timer {
+  height: 100%;
+}
+
+.yc-transient-timer-icon {
+  font-size: 15vh;
+}
+
+.yc-transient-timer-icon svg {
+  width: 15vh;
+  height: 15vh;
+}
+
+.yc-transient-timer-time {
+  font-size: 15vh;
+}
+
+@media (min-aspect-ratio: 5/4) {
+  .yc-transient-timer-time {
+    font-size: 20vh;
+  }
+}
+
+.yc-transient-timer-close {
+  font-size: 10vh;
+}
+
+.yc-transient-timer-close svg {
+  width: 8vh;
+  height: 8vh;
+}

@@ -8,7 +8,6 @@ import warningSvg from './icons/warning.svg?raw';
 var timerUpdateFrequency = 1000; // 1 second
 var matchTime = 50 * 60 * 1000;  // 50 minutes
 var warningTime = 10 * 60 * 1000; // 10 minutes
-var dangerTime = 5 * 60 * 1000;   // 5 minutes
 
 // Abstract representation of a Yugioh match timer.
 function Timer (spec) {
@@ -17,7 +16,7 @@ function Timer (spec) {
 
   var timer = new Events(spec);
   var timeout;
-  var flashVisible = true;
+  var wasInWarning = false;
 
   function getTimePassed () {
     return Date.now() - startTime;
@@ -33,12 +32,7 @@ function Timer (spec) {
 
   timer.isInWarning = function () {
     var timeLeft = timer.getTimeLeft();
-    return timeLeft <= warningTime && timeLeft > dangerTime;
-  };
-
-  timer.isInDanger = function () {
-    var timeLeft = timer.getTimeLeft();
-    return timeLeft <= dangerTime && !timer.isInOvertime();
+    return timeLeft <= warningTime && !timer.isInOvertime();
   };
 
   timer.shouldShowWarningIcon = function () {
@@ -46,17 +40,16 @@ function Timer (spec) {
     return timeLeft <= warningTime && !timer.isInOvertime();
   };
 
-  timer.shouldFlashWarningIcon = function () {
-    return timer.isInDanger() && flashVisible;
-  };
-
   // Update the timer display, then later, update it again.
   function tick () {
     if (!timer.isInOvertime()) {
-      // Toggle flash visibility for danger mode
-      if (timer.isInDanger()) {
-        flashVisible = !flashVisible;
+      // Check if we just entered warning state
+      var isInWarning = timer.isInWarning();
+      if (isInWarning && !wasInWarning) {
+        timer.emit('warningEntered');
       }
+      wasInWarning = isInWarning;
+
       timeout = setTimeout(function () {
         m.redraw();
         tick();
@@ -99,8 +92,6 @@ function Timer (spec) {
     var cssClass = '.yc-timer';
     if (timer.isInWarning()) {
       cssClass += '.yc-timer-warning';
-    } else if (timer.isInDanger()) {
-      cssClass += '.yc-timer-danger';
     } else if (timer.isInOvertime()) {
       cssClass += '.yc-timer-overtime';
     }
@@ -114,13 +105,7 @@ function Timer (spec) {
       var timeText = Time.formatMs(timer.getTimeLeft());
       // Left side: warning icon or spacer
       if (timer.shouldShowWarningIcon()) {
-        // Show icon continuously in warning mode, flash only in danger mode
-        var iconVisible = !timer.isInDanger() || timer.shouldFlashWarningIcon();
-        if (iconVisible) {
-          content.push(m('.yc-timer-warning-icon', m.trust(warningSvg)));
-        } else {
-          content.push(m('.yc-timer-spacer'));
-        }
+        content.push(m('.yc-timer-warning-icon', m.trust(warningSvg)));
       } else {
         content.push(m('.yc-timer-spacer'));
       }
