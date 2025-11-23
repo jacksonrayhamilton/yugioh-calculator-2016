@@ -1,5 +1,6 @@
 {
   "private": true,
+  "type": "module",
   "scripts": {
     "start": "vite dev",
     "dev": "vite dev",
@@ -11,8 +12,9 @@
   },
   "devDependencies": {
     "@fontsource/ubuntu-mono": "^5.1.0",
-    "eslint": "^8.57.1",
+    "eslint": "^9.39.1",
     "fastclick": "^1.0.6",
+    "globals": "^16.5.0",
     "mithril": "^0.2.4",
     "vite": "^6.3.2",
     "vite-plugin-pwa": "^0.21.1",

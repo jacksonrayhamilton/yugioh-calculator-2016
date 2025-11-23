@@ -1,5 +1,3 @@
-/* eslint-env mocha */
-
 import Player from './player';
 
 describe('Player', function () {

@@ -1,5 +1,3 @@
-/* eslint-env mocha */
-
 import Operand from './operand';
 
 describe('Operand', function () {
