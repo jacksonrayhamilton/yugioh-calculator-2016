@@ -3,7 +3,6 @@ import m from 'mithril';
 import Events from './events';
 import Persistence from './persistence';
 import Time from './time';
-import warningSvg from './icons/warning.svg?raw';
 import settingsSvg from './icons/settings.svg?raw';
 
 var timerUpdateFrequency = 1000; // 1 second
@@ -99,21 +98,10 @@ function Timer (spec) {
 
     var content = [];
     if (timer.isInOvertime()) {
-      content.push(m('.yc-timer-spacer'));
       content.push(m('.yc-timer-text', 'TIME'));
-      content.push(m('.yc-timer-spacer'));
     } else {
       var timeText = Time.formatMs(timer.getTimeLeft());
-      // Left side: warning icon or spacer
-      if (timer.shouldShowWarningIcon()) {
-        content.push(m('.yc-timer-warning-icon', m.trust(warningSvg)));
-      } else {
-        content.push(m('.yc-timer-spacer'));
-      }
-      // Center: countdown text
       content.push(m('.yc-timer-text', timeText));
-      // Right side: dummy spacer to balance layout
-      content.push(m('.yc-timer-spacer'));
     }
 
     // Always render the container with both timer display and settings button

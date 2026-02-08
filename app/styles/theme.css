@@ -121,7 +121,6 @@ body {
   background-color: #ffca28;    /* MD Amber 400 */
 }
 
-.yc-timer-warning-icon svg,
 .yc-timer-container.yc-timer-warning svg,
 .yc-timer-container.yc-timer-overtime svg {
   fill: #fff;
