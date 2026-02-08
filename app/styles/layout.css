@@ -19,6 +19,13 @@
   flex: 22.5;
 }
 
+@media (min-aspect-ratio: 5/4) {
+  /* Status row grows in landscape, so lp rows shrink to provide more room */
+  .yc-layout .yc-lp {
+    flex: 20;
+  }
+}
+
 .yc-layout .yc-lp-val {
   font-size: 12vh;
 }
@@ -50,6 +57,13 @@ applies when the value is 5 digits or more */
 .yc-layout-status {
   flex: 10;
   font-size: 7vh;
+}
+
+@media (min-aspect-ratio: 5/4) {
+  /* Status row grows in landscape to ensure it's interactive */
+  .yc-layout-status {
+    flex: 15;
+  }
 }
 
 .yc-layout-functions .yc-button {
