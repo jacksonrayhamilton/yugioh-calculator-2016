@@ -25,15 +25,15 @@
   display: none;
 }
 
-/* Landscape mode: split layout with 3:1 ratio and split corners */
+/* Landscape mode: split layout with 3:1 ratio and split corners (only in calc mode) */
 @media (min-aspect-ratio: 5/4) {
-  .yc-timer-display {
+  .yc-layout-status-calc .yc-timer-display {
     flex: 3;
     border-top-right-radius: 0;
     border-bottom-right-radius: 0;
   }
 
-  .yc-timer-settings {
+  .yc-layout-status-calc .yc-timer-settings {
     display: flex;
     flex: 1;
     justify-content: center;
