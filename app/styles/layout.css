@@ -105,7 +105,8 @@ applies when the value is 5 digits or more */
 }
 
 .yc-layout .yc-history,
-.yc-layout .yc-random {
+.yc-layout .yc-random,
+.yc-layout .yc-settings {
   flex: 90;
 }
 

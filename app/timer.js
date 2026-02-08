@@ -6,28 +6,38 @@ import Time from './time';
 import settingsSvg from './icons/settings.svg?raw';
 
 var timerUpdateFrequency = 1000; // 1 second
-var matchTime = 50 * 60 * 1000;  // 50 minutes
 var warningTime = 10 * 60 * 1000; // 10 minutes
+
+// Get the default match time in minutes from persistence
+function getDefaultMatchMinutes () {
+  var persisted = Persistence.unpersist('yc-default-match-minutes');
+  return persisted !== null ? persisted : 50;
+}
 
 // Abstract representation of a Yugioh match timer.
 function Timer (spec) {
   spec = spec === undefined ? {} : spec;
   var startTime = spec.startTime;
+  var defaultMinutes = spec.defaultMinutes !== undefined ? spec.defaultMinutes : getDefaultMatchMinutes();
 
   var timer = new Events(spec);
   var timeout;
   var wasInWarning = false;
+
+  function getMatchTime () {
+    return defaultMinutes * 60 * 1000;
+  }
 
   function getTimePassed () {
     return Date.now() - startTime;
   }
 
   timer.getTimeLeft = function () {
-    return matchTime - getTimePassed();
+    return getMatchTime() - getTimePassed();
   };
 
   timer.isInOvertime = function () {
-    return getTimePassed() > matchTime;
+    return getTimePassed() > getMatchTime();
   };
 
   timer.isInWarning = function () {
@@ -88,6 +98,18 @@ function Timer (spec) {
     timer.emit('timerReset', eventObject);
   };
 
+  // Get the default match time in minutes
+  timer.getDefaultMinutes = function () {
+    return defaultMinutes;
+  };
+
+  // Set the default match time in minutes and reset the timer
+  timer.setDefaultMinutes = function (minutes) {
+    defaultMinutes = minutes;
+    Persistence.queuePersist('yc-default-match-minutes', minutes);
+    timer.reset();
+  };
+
   timer.view = function () {
     var containerClass = '.yc-timer-container';
     if (timer.isInWarning()) {
@@ -111,8 +133,7 @@ function Timer (spec) {
       m('.yc-timer-settings.yc-icon-container', {
         onclick: function (e) {
           e.stopPropagation();
-          // TODO: Add settings handler
-          console.log('Settings clicked');
+          timer.emit('settingsRequested');
         }
       }, m.trust(settingsSvg))
     ]);

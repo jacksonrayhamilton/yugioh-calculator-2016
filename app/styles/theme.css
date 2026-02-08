@@ -10,6 +10,7 @@ body {
 .yc-timer-settings,
 .yc-layout-operand-table,
 .yc-random-cell,
+.yc-settings-button,
 .yc-button,
 .yc-digit,
 .yc-close {
@@ -94,6 +95,7 @@ body {
 .yc-random-button,
 .yc-history-button,
 .yc-undo-button,
+.yc-settings-button,
 .yc-digit {
   color: #fff;
   fill: #fff;
@@ -138,13 +140,15 @@ body {
 
 .yc-random-button,
 .yc-history-button,
-.yc-undo-button {
+.yc-undo-button,
+.yc-settings-button {
   background-color: #009688;    /* MD Teal 500 */
 }
 
 .yc-random-button:active,
 .yc-history-button:active,
-.yc-undo-button:active {
+.yc-undo-button:active,
+.yc-settings-button:active:not([disabled]) {
   background-color: #26a69a;    /* MD Teal 400 */
 }
 
