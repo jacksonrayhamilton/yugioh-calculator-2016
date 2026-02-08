@@ -4,6 +4,7 @@ import Events from './events';
 import Persistence from './persistence';
 import Time from './time';
 import warningSvg from './icons/warning.svg?raw';
+import settingsSvg from './icons/settings.svg?raw';
 
 var timerUpdateFrequency = 1000; // 1 second
 var matchTime = 50 * 60 * 1000;  // 50 minutes
@@ -89,11 +90,11 @@ function Timer (spec) {
   };
 
   timer.view = function () {
-    var cssClass = '.yc-timer';
+    var containerClass = '.yc-timer-container';
     if (timer.isInWarning()) {
-      cssClass += '.yc-timer-warning';
+      containerClass += '.yc-timer-warning';
     } else if (timer.isInOvertime()) {
-      cssClass += '.yc-timer-overtime';
+      containerClass += '.yc-timer-overtime';
     }
 
     var content = [];
@@ -115,7 +116,18 @@ function Timer (spec) {
       content.push(m('.yc-timer-spacer'));
     }
 
-    return m(cssClass, {onclick: timer.reset}, content);
+    // Always render the container with both timer display and settings button
+    // CSS controls visibility and layout based on orientation
+    return m(containerClass, [
+      m('.yc-timer.yc-timer-display', {onclick: timer.reset}, content),
+      m('.yc-timer-settings.yc-icon-container', {
+        onclick: function (e) {
+          e.stopPropagation();
+          // TODO: Add settings handler
+          console.log('Settings clicked');
+        }
+      }, m.trust(settingsSvg))
+    ]);
   };
 
   if (startTime === undefined) {

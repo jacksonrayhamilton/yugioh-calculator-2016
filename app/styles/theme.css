@@ -7,6 +7,7 @@ body {
 .yc-lp-lose,
 .yc-lp-halve,
 .yc-timer,
+.yc-timer-settings,
 .yc-layout-operand-table,
 .yc-random-cell,
 .yc-button,
@@ -36,11 +37,13 @@ body {
 
 .yc-lp-val,
 .yc-layout-status > *,
-.yc-random-cell {
+.yc-random-cell,
+.yc-timer-settings {
   background-color: #eeeeee;    /* MD Grey 200 */
 }
 
 .yc-timer:active,
+.yc-timer-settings:active,
 .yc-close:active,
 .yc-random-cell:active {
   background-color: #e0e0e0;    /* MD Grey 300 */
@@ -96,25 +99,31 @@ body {
   fill: #fff;
 }
 
-.yc-timer-warning {
+.yc-timer-container.yc-timer-warning > .yc-timer-display,
+.yc-timer-container.yc-timer-warning > .yc-timer-settings {
   background-color: #ffc107;    /* MD Amber 500 */
   color: #fff;
 }
 
-.yc-timer-warning:active {
+.yc-timer-container.yc-timer-warning > .yc-timer-display:active,
+.yc-timer-container.yc-timer-warning > .yc-timer-settings:active {
   background-color: #ffca28;    /* MD Amber 400 */
 }
 
-.yc-timer-overtime {
+.yc-timer-container.yc-timer-overtime > .yc-timer-display,
+.yc-timer-container.yc-timer-overtime > .yc-timer-settings {
   background-color: #ffc107;    /* MD Amber 500 */
   color: #fff;
 }
 
-.yc-timer-overtime:active {
+.yc-timer-container.yc-timer-overtime > .yc-timer-display:active,
+.yc-timer-container.yc-timer-overtime > .yc-timer-settings:active {
   background-color: #ffca28;    /* MD Amber 400 */
 }
 
-.yc-timer-warning-icon svg {
+.yc-timer-warning-icon svg,
+.yc-timer-container.yc-timer-warning svg,
+.yc-timer-container.yc-timer-overtime svg {
   fill: #fff;
 }
 
