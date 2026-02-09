@@ -7,8 +7,10 @@ body {
 .yc-lp-lose,
 .yc-lp-halve,
 .yc-timer,
+.yc-timer-settings,
 .yc-layout-operand-table,
 .yc-random-cell,
+.yc-settings-button,
 .yc-button,
 .yc-digit,
 .yc-close {
@@ -36,11 +38,13 @@ body {
 
 .yc-lp-val,
 .yc-layout-status > *,
-.yc-random-cell {
+.yc-random-cell,
+.yc-timer-settings {
   background-color: #eeeeee;    /* MD Grey 200 */
 }
 
 .yc-timer:active,
+.yc-timer-settings:active,
 .yc-close:active,
 .yc-random-cell:active {
   background-color: #e0e0e0;    /* MD Grey 300 */
@@ -91,30 +95,36 @@ body {
 .yc-random-button,
 .yc-history-button,
 .yc-undo-button,
+.yc-settings-button,
 .yc-digit {
   color: #fff;
   fill: #fff;
 }
 
-.yc-timer-warning {
+.yc-timer-container.yc-timer-warning > .yc-timer-display,
+.yc-timer-container.yc-timer-warning > .yc-timer-settings {
   background-color: #ffc107;    /* MD Amber 500 */
   color: #fff;
 }
 
-.yc-timer-warning:active {
+.yc-timer-container.yc-timer-warning > .yc-timer-display:active,
+.yc-timer-container.yc-timer-warning > .yc-timer-settings:active {
   background-color: #ffca28;    /* MD Amber 400 */
 }
 
-.yc-timer-overtime {
+.yc-timer-container.yc-timer-overtime > .yc-timer-display,
+.yc-timer-container.yc-timer-overtime > .yc-timer-settings {
   background-color: #ffc107;    /* MD Amber 500 */
   color: #fff;
 }
 
-.yc-timer-overtime:active {
+.yc-timer-container.yc-timer-overtime > .yc-timer-display:active,
+.yc-timer-container.yc-timer-overtime > .yc-timer-settings:active {
   background-color: #ffca28;    /* MD Amber 400 */
 }
 
-.yc-timer-warning-icon svg {
+.yc-timer-container.yc-timer-warning svg,
+.yc-timer-container.yc-timer-overtime svg {
   fill: #fff;
 }
 
@@ -130,13 +140,15 @@ body {
 
 .yc-random-button,
 .yc-history-button,
-.yc-undo-button {
+.yc-undo-button,
+.yc-settings-button {
   background-color: #009688;    /* MD Teal 500 */
 }
 
 .yc-random-button:active,
 .yc-history-button:active,
-.yc-undo-button:active {
+.yc-undo-button:active,
+.yc-settings-button:active:not([disabled]) {
   background-color: #26a69a;    /* MD Teal 400 */
 }
 

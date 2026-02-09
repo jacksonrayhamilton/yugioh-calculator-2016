@@ -27,7 +27,7 @@ function Calc (spec) {
       lps.map(function (lp) {
         return lp.view();
       }),
-      m('.yc-layout-row.yc-layout-status', [
+      m('.yc-layout-row.yc-layout-status.yc-layout-status-calc', [
         timer.view(),
         m('.yc-layout-operand-table', [
           m('.yc-layout-operand-cell', [

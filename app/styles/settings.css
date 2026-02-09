@@ -1,0 +1,55 @@
+.yc-settings {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  gap: 1vh;
+}
+
+.yc-settings-row {
+  display: flex;
+  align-items: center;
+  gap: 2vh;
+}
+
+.yc-settings-label {
+  font-size: 6vh;
+}
+
+.yc-settings-value {
+  font-size: 10vh;
+  min-width: 15vh;
+  text-align: center;
+}
+
+.yc-settings-controls {
+  display: flex;
+  flex-direction: column;
+  gap: 1vh;
+}
+
+.yc-settings-button {
+  width: 8vh;
+  height: 8vh;
+  cursor: pointer;
+}
+
+.yc-settings-button[disabled] {
+  pointer-events: none;
+}
+
+@media (min-aspect-ratio: 5/4) {
+  .yc-settings-label {
+    font-size: 8vh;
+  }
+
+  .yc-settings-value {
+    font-size: 14vh;
+  }
+
+  .yc-settings-button {
+    width: 12vh;
+    height: 12vh;
+  }
+}

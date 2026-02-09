@@ -12,6 +12,7 @@ import { PersistedPlayer } from './player';
 import { PersistedTimer } from './timer';
 import { PersistedUndos } from './undos';
 import Random from './random';
+import Settings from './settings';
 import TransientTimer from './transient-timer';
 import Utils from './utils';
 
@@ -30,6 +31,7 @@ function App (spec) {
   var timer;
   var calc;
   var random;
+  var settings;
   var historyComponent;
   var undos;
   var transientTimer;
@@ -67,6 +69,7 @@ function App (spec) {
     modes = {
       calc: calc,
       random: random,
+      settings: settings,
       history: historyComponent,
       transientTimer: transientTimer
     };
@@ -87,6 +90,9 @@ function App (spec) {
     timer.on('warningEntered', function () {
       showTransientTimer();
     });
+    timer.on('settingsRequested', function () {
+      settingsMode();
+    });
     undos = new PersistedUndos({
       app: app,
       players: players,
@@ -98,6 +104,9 @@ function App (spec) {
     });
     random.on('flip', function () {
       Analytics.event('Random', 'Flip Coin');
+    });
+    settings = new Settings({
+      timer: timer
     });
     historyComponent = new PersistedHistory({
       app: app,
@@ -176,6 +185,12 @@ function App (spec) {
   function historyMode () {
     Analytics.event('History', 'Show History');
     mode = 'history';
+  }
+
+  // Go to the "settings" mode, where application settings can be configured.
+  function settingsMode () {
+    Analytics.event('Settings', 'Show Settings');
+    mode = 'settings';
   }
 
   // Undo the previous action.

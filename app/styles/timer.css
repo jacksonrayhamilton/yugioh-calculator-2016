@@ -1,6 +1,6 @@
 .yc-timer {
   display: flex;
-  justify-content: space-evenly;
+  justify-content: center;
   align-items: center;
   cursor: pointer;
 }
@@ -9,15 +9,38 @@
   text-align: center;
 }
 
-.yc-timer-warning-icon,
-.yc-timer-spacer {
-  display: flex; /* Center icon */
-  width: 0.5em;
-  height: 0.5em;
-  flex-shrink: 0;
+/* Timer container (always used now) */
+.yc-timer-container {
+  display: flex;
+  flex: 3;
+  gap: 0;
 }
 
-.yc-timer-warning-icon svg {
-  width: 100%;
-  height: 100%;
+/* Portrait mode (default): timer display takes full width, settings hidden */
+.yc-timer-display {
+  flex: 1;
+}
+
+.yc-timer-settings {
+  display: none;
+}
+
+/* Landscape mode: split layout with 3:1 ratio and split corners (only in calc mode) */
+@media (min-aspect-ratio: 5/4) {
+  .yc-layout-status-calc .yc-timer-display {
+    flex: 3;
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+  }
+
+  .yc-layout-status-calc .yc-timer-settings {
+    display: flex;
+    flex: 1;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    border-radius: 3px;
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+  }
 }
