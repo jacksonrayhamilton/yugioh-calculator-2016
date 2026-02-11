@@ -37,9 +37,11 @@ body {
    https://materialui.co/colors */
 
 .yc-lp-val,
-.yc-layout-status > *,
-.yc-random-cell,
-.yc-timer-settings {
+.yc-timer,
+.yc-timer-settings,
+.yc-layout-operand-table,
+.yc-close,
+.yc-random-cell {
   background-color: #eeeeee;    /* MD Grey 200 */
 }
 
