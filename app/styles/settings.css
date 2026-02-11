@@ -41,15 +41,15 @@
 
 @media (min-aspect-ratio: 5/4) {
   .yc-settings-label {
-    font-size: 8vh;
+    font-size: 12vh;
   }
 
   .yc-settings-value {
-    font-size: 14vh;
+    font-size: 20vh;
   }
 
   .yc-settings-button {
-    width: 12vh;
-    height: 12vh;
+    width: 18vh;
+    height: 18vh;
   }
 }
